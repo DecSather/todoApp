@@ -65,6 +65,7 @@ fun SingleAccountScreen(
     accountType: String? = UserData.accounts.first().name
 ) {
     val account = remember(accountType) { UserData.getAccount(accountType) }
+    
     StatementBody(
         items = listOf(account),
         colors = { account.color },

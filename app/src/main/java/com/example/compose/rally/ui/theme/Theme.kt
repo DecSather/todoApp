@@ -1,9 +1,10 @@
 
 package com.example.compose.rally.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
@@ -16,8 +17,11 @@ import androidx.compose.ui.unit.sp
  */
 @Composable
 fun RallyTheme(content: @Composable () -> Unit) {
-    
-    MaterialTheme(colors = ColorPalette, typography = Typography, content = content)
+    if(isSystemInDarkTheme())
+    MaterialTheme(colors = DarkColorPalette, typography = Typography, content = content)
+    else
+        MaterialTheme(typography = Typography, content = content)
+        
 }
 
 /**
@@ -26,7 +30,13 @@ fun RallyTheme(content: @Composable () -> Unit) {
 @Composable
 fun RallyDialogThemeOverlay(content: @Composable () -> Unit) {
     // Rally is always dark themed.
-    val dialogColors = darkColors(
+    val darkDialogColors = darkColors(
+        primary = Color.White,
+        surface = Color.White.copy(alpha = 0.12f).compositeOver(Color.Black),
+        onSurface = Color.White
+    )
+    
+    val lightDialogColors = lightColors(
         primary = Color.White,
         surface = Color.White.copy(alpha = 0.12f).compositeOver(Color.Black),
         onSurface = Color.White
@@ -46,5 +56,8 @@ fun RallyDialogThemeOverlay(content: @Composable () -> Unit) {
             letterSpacing = 0.2.em
         )
     )
-    MaterialTheme(colors = dialogColors, typography = dialogTypography, content = content)
+    if(isSystemInDarkTheme())
+        MaterialTheme(colors = darkDialogColors, typography = dialogTypography, content = content)
+    else
+    MaterialTheme(colors = lightDialogColors, typography = dialogTypography, content = content)
 }

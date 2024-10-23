@@ -63,6 +63,7 @@ fun OverviewScreen(
     onClickSeeAllAccounts: () -> Unit = {},
     onClickSeeAllBills: () -> Unit = {},
     onAccountClick: (String) -> Unit = {},
+    onBillClick: (String) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -78,7 +79,8 @@ fun OverviewScreen(
         )
         Spacer(Modifier.height(RallyDefaultPadding))
         BillsCard(
-            onClickSeeAll = onClickSeeAllBills
+            onClickSeeAll = onClickSeeAllBills,
+            onBillClick = onBillClick
         )
     }
 }
@@ -249,7 +251,7 @@ private fun AccountsCard(onClickSeeAll: () -> Unit, onAccountClick: (String) -> 
  * The Bills card within the Rally Overview screen.
  */
 @Composable
-private fun BillsCard(onClickSeeAll: () -> Unit) {
+private fun BillsCard(onClickSeeAll: () -> Unit, onBillClick: (String) -> Unit) {
     val amount = UserData.bills.map { bill -> bill.amount }.sum()
     OverviewScreenCard(
         title = stringResource(R.string.bills),
@@ -260,6 +262,7 @@ private fun BillsCard(onClickSeeAll: () -> Unit) {
         values = { it.amount }
     ) { bill ->
         BillRow(
+            modifier = Modifier.clickable { onBillClick(bill.name) },
             name = bill.name,
             due = bill.due,
             amount = bill.amount,

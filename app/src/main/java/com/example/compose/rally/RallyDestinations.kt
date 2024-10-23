@@ -68,5 +68,20 @@ data object SingleAccount : RallyDestination {
     )
 }
 
+data object SingleBill : RallyDestination {
+    // Added for simplicity, this icon will not in fact be used, as SingleAccount isn't
+    // part of the RallyTabRow selection
+    override val icon = Icons.Filled.MoneyOff
+    override val route = "single_bill"
+    const val billTypeArg = "bill_type"
+    val routeWithArgs = "$route/{$billTypeArg}"
+    val arguments = listOf(
+        navArgument(billTypeArg) { type = NavType.StringType }
+    )
+    val deepLinks = listOf(
+        navDeepLink { uriPattern = "rally://$route/{$billTypeArg}" }
+    )
+}
+
 // Screens to be displayed in the top RallyTabRow
 val rallyTabRowScreens = listOf(Overview, Accounts, Bills)

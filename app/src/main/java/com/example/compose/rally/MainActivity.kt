@@ -16,6 +16,7 @@
 
 package com.example.compose.rally
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,11 +25,20 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.theme.RallyTheme
 
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+fun RallyPreview() {
+    RallyApp()
+}
 /**
  * This Activity recreates part of the Rally Material Study from
  * https://material.io/design/material-studies/rally.html
@@ -48,8 +58,12 @@ fun RallyApp() {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
-        val currentScreen =
-            rallyTabRowScreens.find { it.route == currentDestination?.route } ?: Overview
+        val rootDestination= rallyTabRowScreens.find { it.route == currentDestination?.route }
+        val currentScreen =rallyTabRowScreens.find {
+            it.route == currentDestination?.route
+                    || (it == Accounts && currentDestination?.route?.startsWith( SingleAccount.route ) == true)
+                    || (it == Bills && currentDestination?.route?.startsWith( SingleBill.route ) == true)
+        } ?: Overview
         
         Scaffold(
             topBar = {
