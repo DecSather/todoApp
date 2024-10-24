@@ -20,7 +20,7 @@ fun RallyTheme(content: @Composable () -> Unit) {
     if(isSystemInDarkTheme())
     MaterialTheme(colors = DarkColorPalette, typography = Typography, content = content)
     else
-        MaterialTheme(typography = Typography, content = content)
+        MaterialTheme(colors= LightColorPalette ,typography = Typography, content = content)
         
 }
 

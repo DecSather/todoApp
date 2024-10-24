@@ -44,46 +44,22 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.example.compose.rally.R
 import java.text.DecimalFormat
-
-/**
- * A row representing the basic information of an Account.
- */
 @Composable
-fun AccountRow(
+fun RoutineRow(
     modifier: Modifier = Modifier,
-    name: String,
-    number: Int,
-    amount: Float,
+    content: String,
+    subcontent:String,
+    credit: Float,
+    finished:Boolean,
     color: Color
 ) {
     BaseRow(
         modifier = modifier,
         color = color,
-        title = name,
-        subtitle = stringResource(R.string.account_redacted) + AccountDecimalFormat.format(number),
-        amount = amount,
-        negative = false
-    )
-}
-
-/**
- * A row representing the basic information of a Bill.
- */
-@Composable
-fun BillRow(
-    modifier: Modifier = Modifier,
-    name: String,
-    due: String,
-    amount: Float,
-    color: Color
-) {
-    BaseRow(
-        modifier =modifier,
-        color = color,
-        title = name,
-        subtitle = "Due $due",
-        amount = amount,
-        negative = true
+        title = content,
+        subtitle = subcontent,
+        amount = credit.toFloat(),
+        negative = finished
     )
 }
 
@@ -135,7 +111,7 @@ private fun BaseRow(
             )
         }
         Spacer(Modifier.width(16.dp))
-
+        
         CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
@@ -147,6 +123,48 @@ private fun BaseRow(
         }
     }
     RallyDivider()
+}
+
+/**
+ * A row representing the basic information of an Account.
+ */
+@Composable
+fun AccountRow(
+    modifier: Modifier = Modifier,
+    name: String,
+    number: Int,
+    amount: Float,
+    color: Color
+) {
+    BaseRow(
+        modifier = modifier,
+        color = color,
+        title = name,
+        subtitle = stringResource(R.string.account_redacted) + AccountDecimalFormat.format(number),
+        amount = amount,
+        negative = false
+    )
+}
+
+/**
+ * A row representing the basic information of a Bill.
+ */
+@Composable
+fun BillRow(
+    modifier: Modifier = Modifier,
+    name: String,
+    due: String,
+    amount: Float,
+    color: Color
+) {
+    BaseRow(
+        modifier =modifier,
+        color = color,
+        title = name,
+        subtitle = "Due $due",
+        amount = amount,
+        negative = true
+    )
 }
 
 /**

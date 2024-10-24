@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
+import com.example.compose.rally.ui.backlogs.BacklogScreen
 import com.example.compose.rally.ui.bills.BillsScreen
 import com.example.compose.rally.ui.bills.SingleBillScreen
 import com.example.compose.rally.ui.overview.OverviewScreen

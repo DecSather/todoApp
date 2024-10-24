@@ -47,6 +47,7 @@ android {
 }
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.8.6")
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("androidx.compose.material:material:1.7.4")
     implementation( "androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
@@ -66,6 +67,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:1.7.4")
     implementation("androidx.compose.material3:material3:1.3.0")
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0")
+    implementation("androidx.room:room-common:2.6.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")

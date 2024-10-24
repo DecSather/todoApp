@@ -1,6 +1,7 @@
 
 package com.example.compose.rally.ui.components
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import com.example.compose.rally.ui.theme.RallyDialogThemeOverlay
@@ -30,7 +32,7 @@ fun RallyAlertDialog(
                 Column {
                     Divider(
                         Modifier.padding(horizontal = 12.dp),
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f)
+                        color = if(isSystemInDarkTheme())MaterialTheme.colors.onSurface.copy(alpha = 0.2f)else Color(0xFF000F5E)
                     )
                     TextButton(
                         onClick = onDismiss,

@@ -1,4 +1,3 @@
-
 package com.example.compose.rally.ui.components
 
 import androidx.compose.animation.animateColorAsState

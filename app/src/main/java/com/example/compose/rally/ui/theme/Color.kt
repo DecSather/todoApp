@@ -2,11 +2,22 @@
 package com.example.compose.rally.ui.theme
 
 import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
 val Green500 = Color(0xFF1EB980)
 val DarkBlue900 = Color(0xFF26282F)
+val Blue500=Color(0xFF94A9B8)
+val Blue900=Color(0xFFAFD7EC)
 
+val LightColorPalette= lightColors(
+    
+    primary = Blue500,
+    surface = Blue900,
+    onSurface = Color.Black,
+    background = Blue900,
+    onBackground = Color.Black
+)
 val DarkColorPalette = darkColors(
     primary = Green500,
     surface = DarkBlue900,

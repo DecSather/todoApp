@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Rally</string>
-    
+<!--     Backlog -->
+    <string name="credit">Credit</string>
+<!--     Rally -->
     <string name="total">Total</string>
     <string name="bill_amount">Amount</string>
     <string name="due">Due</string>
