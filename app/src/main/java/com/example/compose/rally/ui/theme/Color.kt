@@ -7,15 +7,16 @@ import androidx.compose.ui.graphics.Color
 
 val Green500 = Color(0xFF1EB980)
 val DarkBlue900 = Color(0xFF26282F)
-val Blue500=Color(0xFF94A9B8)
+val Blue500=Color(0xFF317AA1)
 val Blue900=Color(0xFFAFD7EC)
+val Blue300=Color(0xFF3CA4E5)
 
 val LightColorPalette= lightColors(
     
     primary = Blue500,
     surface = Blue900,
     onSurface = Color.Black,
-    background = Blue900,
+    background = Blue300,
     onBackground = Color.Black
 )
 val DarkColorPalette = darkColors(

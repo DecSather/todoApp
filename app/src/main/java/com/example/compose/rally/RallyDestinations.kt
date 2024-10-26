@@ -17,10 +17,7 @@
 package com.example.compose.rally
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.MoneyOff
-import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -35,11 +32,30 @@ sealed interface RallyDestination {
     val route: String
 }
 
+//BacklogDestination
+data object Backlogs : RallyDestination{
+    override val icon =Icons.Filled.Timer
+    override val route ="backlogs"
+}
+
+data object SingleBacklog : RallyDestination {
+    override val icon = Icons.Filled.Timer
+    override val route = "single_backlog"
+    const val backlogTypeArg = "backlog_type"
+    val routeWithArgs = "$route/{$backlogTypeArg}"
+    val arguments = listOf(
+        navArgument(backlogTypeArg) { type = NavType.StringType }
+    )
+    val deepLinks = listOf(
+        navDeepLink { uriPattern = "rally://$route/{$backlogTypeArg}" }
+    )
+}
+
 /**
  * Rally app navigation destinations
  */
 data object Overview : RallyDestination {
-    override val icon = Icons.Filled.PieChart
+    override val icon = Icons.Filled.Timer
     override val route = "overview"
 }
 
@@ -54,8 +70,6 @@ data object Bills : RallyDestination {
 }
 
 data object SingleAccount : RallyDestination {
-    // Added for simplicity, this icon will not in fact be used, as SingleAccount isn't
-    // part of the RallyTabRow selection
     override val icon = Icons.Filled.Money
     override val route = "single_account"
     const val accountTypeArg = "account_type"
@@ -69,8 +83,6 @@ data object SingleAccount : RallyDestination {
 }
 
 data object SingleBill : RallyDestination {
-    // Added for simplicity, this icon will not in fact be used, as SingleAccount isn't
-    // part of the RallyTabRow selection
     override val icon = Icons.Filled.MoneyOff
     override val route = "single_bill"
     const val billTypeArg = "bill_type"
@@ -84,4 +96,4 @@ data object SingleBill : RallyDestination {
 }
 
 // Screens to be displayed in the top RallyTabRow
-val rallyTabRowScreens = listOf(Overview, Accounts, Bills)
+val rallyTabRowScreens = listOf(Backlogs,Overview, Accounts, Bills)

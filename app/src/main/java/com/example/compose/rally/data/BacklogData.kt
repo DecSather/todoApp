@@ -17,7 +17,11 @@ data class Backlog(
     val importCredit: Float =4f,
     val normalCredit: Float =0f,
     val faverCredit: Float =2f,
+    
 )
+fun BackloggetRoutines(backlog: Backlog): List<Routine> {
+    return BacklogData.routines.filter {it.id in fromJsonToList(backlog.routineListJson)}
+}
 //详情卡片
 @Immutable
 data class Routine(
@@ -36,10 +40,10 @@ fun fromJsonToList(json: String): List<Int> = Gson().fromJson(json, Array<Int>::
 object BacklogData {
     val backlogs: List<Backlog> = listOf(
         Backlog(
-            timeTitle = "2024/1/1",
+            timeTitle = "2024-1-1",
             routineListJson = fromListToJson(List<Int>(1,{0})),
         ),Backlog(
-            timeTitle = "2024/1/2",
+            timeTitle = "2024-1-2",
             routineListJson = fromListToJson(List<Int>(1,{1})),
         )
         
@@ -62,7 +66,12 @@ object BacklogData {
         return backlogs.first { it.id == backlogId }
     }
     
+    fun getBacklog(backlogStrinf: String?): Backlog {
+        return backlogs.first { it.timeTitle == backlogStrinf }
+    }
     fun getRoutine(routineId: Int?): Routine {
         return routines.first { it.id == routineId }
     }
+    
+    
 }

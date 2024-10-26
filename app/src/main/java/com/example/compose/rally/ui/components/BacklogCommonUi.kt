@@ -1,22 +1,8 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.example.compose.rally.ui.components
 
+import android.icu.text.ListFormatter.Width
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -29,53 +15,68 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
-import java.text.DecimalFormat
 
+private val RallyDefaultPadding = 12.dp
 
-/**
- * A row representing the basic information of an Account.
- */
+private const val SHOWN_ITEMS = 3
 @Composable
-fun AccountRow(
+fun <T> CommonCard(
+    modifier: Modifier=Modifier,
+    timeTitle: String,
+    creditTotal: Float,
+    values: (T) -> Float,
+    colors: (T) -> Color,
+    data: List<T>,
+    row: @Composable (T) -> Unit
+) {
+    Card {
+        Column {
+            Column(modifier
+                .fillMaxWidth()
+                .padding(RallyDefaultPadding)
+            ) {
+                Text(text = timeTitle, style = MaterialTheme.typography.h2)
+                val amountText = "$" + creditTotal
+                Text(text = amountText, style = MaterialTheme.typography.subtitle2)
+            }
+            BaseDivider(data, values, colors)
+            Column(Modifier
+                .padding(start = 16.dp, top = 4.dp, end = 8.dp)
+            ) {
+                data.take(SHOWN_ITEMS).forEach { row(it) }
+                SeeAllButton(
+                    modifier = modifier.clearAndSetSemantics {
+                        contentDescription = "All $timeTitle"
+                    }
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun RoutineRow(
     modifier: Modifier = Modifier,
-    name: String,
-    number: Int,
-    amount: Float,
+    content: String,
+    subcontent:String,
+    credit: Float,
+    finished:Boolean,
     color: Color
 ) {
     BaseRow(
         modifier = modifier,
         color = color,
-        title = name,
-        subtitle = stringResource(R.string.account_redacted) + AccountDecimalFormat.format(number),
-        amount = amount,
-        negative = false
+        title = content,
+        subtitle = subcontent,
+        amount = credit,
+        negative = finished
     )
 }
-
-/**
- * A row representing the basic information of a Bill.
- */
-@Composable
-fun BillRow(
-    modifier: Modifier = Modifier,
-    name: String,
-    due: String,
-    amount: Float,
-    color: Color
-) {
-    BaseRow(
-        modifier =modifier,
-        color = color,
-        title = name,
-        subtitle = "Due $due",
-        amount = amount,
-        negative = true
-    )
-}
-
 
 @Composable
 private fun BaseRow(
@@ -138,9 +139,7 @@ private fun BaseRow(
     }
     RallyDivider()
 }
-/**
- * A vertical colored line that is used in a [BaseRow] to differentiate accounts.
- */
+//列区分竖线
 @Composable
 private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
     Spacer(
@@ -149,23 +148,37 @@ private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
             .background(color = color)
     )
 }
+//列
+@Composable
+private fun <T> BaseDivider(
+    data: List<T>,
+    values: (T) -> Float,
+    colors: (T) -> Color
+) {
+    Row(Modifier.fillMaxWidth()) {
+        data.forEach { item: T ->
+            Spacer(
+                modifier = Modifier
+                    .weight(values(item))
+                    .height(1.dp)
+                    .background(colors(item))
+            )
+        }
+    }
+}
+
 
 @Composable
-fun RallyDivider(modifier: Modifier = Modifier) {
-    Divider(color = MaterialTheme.colors.background, thickness = 1.dp, modifier = modifier)
-}
-
-fun formatAmount(amount: Float): String {
-    return AmountDecimalFormat.format(amount)
-}
-
-private val AccountDecimalFormat = DecimalFormat("####")
-private val AmountDecimalFormat = DecimalFormat("#,###.##")
-
-/**
- * Used with accounts and bills to create the animated circle.
- */
-fun <E> List<E>.extractProportions(selector: (E) -> Float): List<Float> {
-    val total = this.sumOf { selector(it).toDouble() }
-    return this.map { (selector(it) / total).toFloat() }
+private fun SeeAllButton(modifier: Modifier = Modifier) {
+    Box(modifier=modifier
+        .padding(16.dp) // 设置内边距，和 TextButton 一致
+        .fillMaxWidth()
+        .wrapContentSize(Alignment.Center)
+    ){
+        Text(
+            fontSize = 16.sp,
+            text= stringResource(R.string.see_all),
+            color = MaterialTheme.colors.primary
+        )
+    }
 }

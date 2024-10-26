@@ -37,9 +37,9 @@ fun RallyDialogThemeOverlay(content: @Composable () -> Unit) {
     )
     
     val lightDialogColors = lightColors(
-        primary = Color.White,
-        surface = Color.White.copy(alpha = 0.12f).compositeOver(Color.Black),
-        onSurface = Color.White
+        primary = Color.Black,
+        surface = Color.Black.copy(alpha = 0.12f).compositeOver(Color.White),
+        onSurface = Color.Black
     )
     
     // Copy the current [Typography] and replace some text styles for this theme.

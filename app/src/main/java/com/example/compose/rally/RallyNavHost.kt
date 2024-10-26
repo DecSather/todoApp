@@ -1,4 +1,3 @@
-
 package com.example.compose.rally
 
 import androidx.compose.runtime.Composable
@@ -10,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.ui.backlogs.BacklogScreen
+import com.example.compose.rally.ui.backlogs.SingleBacklogScreen
 import com.example.compose.rally.ui.bills.BillsScreen
 import com.example.compose.rally.ui.bills.SingleBillScreen
 import com.example.compose.rally.ui.overview.OverviewScreen
@@ -21,9 +21,18 @@ fun RallyNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Overview.route,
+        startDestination = Backlogs.route,
         modifier = modifier
     ) {
+        composable(route = Backlogs.route) {
+            BacklogScreen(
+//                跳转单个日志
+                onBacklogClick = {backlogType ->
+                    navController.navigateToSingleBacklog(backlogType)
+                },
+//                跳转单个待办-待实现
+            )
+        }
         composable(route = Overview.route) {
             OverviewScreen(
                 onClickSeeAllAccounts = {
@@ -55,6 +64,19 @@ fun RallyNavHost(
                     navController.navigateToSingleBill(billType)
                 })
         }
+        
+        composable(
+            route = SingleBacklog.routeWithArgs,
+            arguments = SingleBacklog.arguments,
+            deepLinks = SingleBacklog.deepLinks
+        ) {
+            navBackStackEntry ->
+            val backlogType =
+                navBackStackEntry.arguments?.getString(SingleBacklog.backlogTypeArg)
+            println(backlogType)
+            
+            SingleBacklogScreen(backlogType)
+        }
         composable(
             route = SingleAccount.routeWithArgs,
             arguments = SingleAccount.arguments,
@@ -62,6 +84,7 @@ fun RallyNavHost(
         ) { navBackStackEntry ->
             val accountType =
                 navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+            println(accountType)
             SingleAccountScreen(accountType)
         }
         composable(
@@ -78,25 +101,22 @@ fun RallyNavHost(
 
 fun NavHostController.navigateSingleTopTo(route: String) =
     this.navigate(route) {
-        // Pop up to the start destination of the graph to
-        // avoid building up a large stack of destinations
-        // on the back stack as users select items
         popUpTo(
             this@navigateSingleTopTo.graph.findStartDestination().id
         ) {
             saveState = true
         }
-        // Avoid multiple copies of the same destination when
-        // reselecting the same item
         launchSingleTop = true
-        // Restore state when reselecting a previously selected item
         restoreState = true
     }
+
+private fun NavHostController.navigateToSingleBacklog(backlogType: String) {
+    this.navigateSingleTopTo("${SingleBacklog.route}/$backlogType")
+}
 
 private fun NavHostController.navigateToSingleAccount(accountType: String) {
     this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
 }
-
 private fun NavHostController.navigateToSingleBill(billType: String) {
     this.navigateSingleTopTo("${SingleBill.route}/$billType")
 }

@@ -2,6 +2,7 @@ package com.example.compose.rally.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,8 +19,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.compose.rally.ui.theme.Blue900
 import com.example.compose.rally.ui.theme.RallyTheme
 
 @Composable
@@ -34,12 +38,9 @@ fun <T> CommonBody(
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         Box(Modifier.padding(16.dp)) {
             ThreeColorCircle(
-               proportions =  creditRatios,
-                modifier = Modifier
-                    .height(300.dp)
-                    .align(Alignment.Center)
-                    .fillMaxWidth()
+               proportions =  creditRatios
             )
+            Spacer(Modifier.height(12.dp))
             Column(modifier = Modifier.align(Alignment.Center)) {
                 Text(
                     text = circleLabel,
@@ -59,6 +60,15 @@ fun <T> CommonBody(
                 items.forEach { item ->
                     rows(item)
                 }
+//                预加载空列
+                RoutineRow(
+                    modifier = Modifier.clickable { /*waiting for implement*/ },
+                    content="待办清单",
+                    subcontent="点击添加",
+                    credit=0f,
+                    finished=false,
+                    color = Blue900
+                )
             }
         }
     }
@@ -72,6 +82,8 @@ private const val DividerLengthInDegrees = 1.8f
 fun ThreeColorCircle(
     proportions:List<Float>,
     modifier: Modifier = Modifier
+        .height(300.dp)
+        .fillMaxWidth()
 ) {
     val currentState = remember {
         MutableTransitionState(ThreeCircleProgress.START)
