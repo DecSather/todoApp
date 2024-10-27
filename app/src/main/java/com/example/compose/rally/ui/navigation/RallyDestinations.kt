@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.compose.rally
+package com.example.compose.rally.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -33,7 +33,7 @@ sealed interface RallyDestination {
 }
 
 //BacklogDestination
-data object Backlogs : RallyDestination{
+data object Backlogs : RallyDestination {
     override val icon =Icons.Filled.Timer
     override val route ="backlogs"
 }
@@ -64,11 +64,6 @@ data object Accounts : RallyDestination {
     override val route = "accounts"
 }
 
-data object Bills : RallyDestination {
-    override val icon = Icons.Filled.MoneyOff
-    override val route = "bills"
-}
-
 data object SingleAccount : RallyDestination {
     override val icon = Icons.Filled.Money
     override val route = "single_account"
@@ -82,18 +77,6 @@ data object SingleAccount : RallyDestination {
     )
 }
 
-data object SingleBill : RallyDestination {
-    override val icon = Icons.Filled.MoneyOff
-    override val route = "single_bill"
-    const val billTypeArg = "bill_type"
-    val routeWithArgs = "$route/{$billTypeArg}"
-    val arguments = listOf(
-        navArgument(billTypeArg) { type = NavType.StringType }
-    )
-    val deepLinks = listOf(
-        navDeepLink { uriPattern = "rally://$route/{$billTypeArg}" }
-    )
-}
 
 // Screens to be displayed in the top RallyTabRow
-val rallyTabRowScreens = listOf(Backlogs,Overview, Accounts, Bills)
+val rallyTabRowScreens = listOf(Backlogs, Overview, Accounts)

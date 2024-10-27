@@ -1,4 +1,4 @@
-package com.example.compose.rally.ui.backlogs
+package com.example.compose.rally.ui.backlog
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -6,28 +6,32 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.rally.R
-import com.example.compose.rally.data.Backlog
-import com.example.compose.rally.data.BacklogData
-import com.example.compose.rally.data.BackloggetRoutines
+import com.example.compose.rally.data.*
+import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
-import com.example.compose.rally.ui.theme.RallyTheme
 
-//全部日志
+//日程-home页
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BacklogScreen(
-    onBacklogClick:(String )->Unit={}
-    
+fun BacklogHomeScreen(
+    onBacklogClick:(String )->Unit={},
+    viewModel:BacklogHomeViewModel  = viewModel(factory = AppViewModelProvider.Factory)
 ) {
+    val homeUiState by viewModel.homeUiState.collectAsState()
 //    积分属性
     val importTotal = remember { BacklogData.backlogs.map { backlog -> backlog.importCredit}.sum() }
     val normalTotal = remember { BacklogData.backlogs.map { backlog -> backlog.normalCredit}.sum() }
@@ -61,7 +65,7 @@ fun BacklogScreen(
             }
         }
 //        日志卡
-        BacklogData.backlogs.map { backlog ->
+        homeUiState.backlogList.map { backlog ->
             BacklogsCard(
                 backlog = backlog,
                 modifier=Modifier.clickable {
@@ -72,38 +76,6 @@ fun BacklogScreen(
         }
     }
 }
-@Composable
-fun SingleBacklogScreen(
-    backlogType: String? = BacklogData.backlogs.first().timeTitle
-) {
-    val backlog = remember(backlogType) { BacklogData.getBacklog(backlogType) }
-    val routines= BackloggetRoutines(backlog)
-    val amount=routines.map { routine ->routine.credit }.sum()
-    CommonBody(
-    items=routines,
-    creditRatios= listOf(backlog.importCredit/amount,backlog.normalCredit/amount,backlog.faverCredit/amount),
-    amountsTotal=amount,
-    circleLabel=backlog.timeTitle,
-    ){routine ->
-        RoutineRow(
-            modifier = Modifier.clickable { /*waiting for implement*/ },
-            content=routine.content,
-            subcontent=routine.subcontent,
-            credit=routine.credit,
-            finished=routine.finished,
-            color = routine.color
-        )
-    }
-}
-
-@Preview
-@Composable
-fun BacklogScreenPreview(){
-    RallyTheme {
-        SingleBacklogScreen()
-    }
-}
-
 @Composable
 private fun BacklogsCard(
     backlog: Backlog,
@@ -118,7 +90,7 @@ private fun BacklogsCard(
         data = routines,
         colors = { it.color },
         values = { it.credit }
-    ) { routine ->
+    ){ routine ->
         RoutineRow(
             modifier = Modifier.clickable { /*waitng for implement*/ },
             content = routine.content,

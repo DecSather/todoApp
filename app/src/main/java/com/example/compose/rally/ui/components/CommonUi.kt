@@ -55,28 +55,6 @@ fun AccountRow(
     )
 }
 
-/**
- * A row representing the basic information of a Bill.
- */
-@Composable
-fun BillRow(
-    modifier: Modifier = Modifier,
-    name: String,
-    due: String,
-    amount: Float,
-    color: Color
-) {
-    BaseRow(
-        modifier =modifier,
-        color = color,
-        title = name,
-        subtitle = "Due $due",
-        amount = amount,
-        negative = true
-    )
-}
-
-
 @Composable
 private fun BaseRow(
     modifier: Modifier = Modifier,
@@ -163,7 +141,7 @@ private val AccountDecimalFormat = DecimalFormat("####")
 private val AmountDecimalFormat = DecimalFormat("#,###.##")
 
 /**
- * Used with accounts and bills to create the animated circle.
+ * Used with accounts to create the animated circle.
  */
 fun <E> List<E>.extractProportions(selector: (E) -> Float): List<Float> {
     val total = this.sumOf { selector(it).toDouble() }

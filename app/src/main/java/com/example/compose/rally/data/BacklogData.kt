@@ -6,19 +6,7 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 
 //待办项-单天
-@Immutable
-data class Backlog(
-    val id: Int = 0,
-    val timeTitle: String,
-    val routineListJson: String,
-//    val importColor: Color =Color(0xFF005D57),
-//    val normalColor: Color =Color(0xFF039667),
-//    val faverColor: Color = Color(0xFF04B97F),
-    val importCredit: Float =4f,
-    val normalCredit: Float =0f,
-    val faverCredit: Float =2f,
-    
-)
+
 fun BackloggetRoutines(backlog: Backlog): List<Routine> {
     return BacklogData.routines.filter {it.id in fromJsonToList(backlog.routineListJson)}
 }

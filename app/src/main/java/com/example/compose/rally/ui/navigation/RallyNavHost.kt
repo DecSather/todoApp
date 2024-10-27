@@ -1,4 +1,4 @@
-package com.example.compose.rally
+package com.example.compose.rally.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -8,10 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
-import com.example.compose.rally.ui.backlogs.BacklogScreen
-import com.example.compose.rally.ui.backlogs.SingleBacklogScreen
-import com.example.compose.rally.ui.bills.BillsScreen
-import com.example.compose.rally.ui.bills.SingleBillScreen
+import com.example.compose.rally.ui.backlog.BacklogHomeScreen
+import com.example.compose.rally.ui.backlog.SingleBacklogScreen
 import com.example.compose.rally.ui.overview.OverviewScreen
 
 @Composable
@@ -25,7 +23,7 @@ fun RallyNavHost(
         modifier = modifier
     ) {
         composable(route = Backlogs.route) {
-            BacklogScreen(
+            BacklogHomeScreen(
 //                跳转单个日志
                 onBacklogClick = {backlogType ->
                     navController.navigateToSingleBacklog(backlogType)
@@ -38,15 +36,9 @@ fun RallyNavHost(
                 onClickSeeAllAccounts = {
                     navController.navigateSingleTopTo(Accounts.route)
                 },
-                onClickSeeAllBills = {
-                    navController.navigateSingleTopTo(Bills.route)
-                },
                 onAccountClick = { accountType ->
                     navController.navigateToSingleAccount(accountType)
                 },
-                onBillClick = { billType ->
-                    navController.navigateToSingleBill(billType)
-                }
             )
         }
         composable(route = Accounts.route) {
@@ -56,13 +48,6 @@ fun RallyNavHost(
                     navController.navigateToSingleAccount(accountType)
                 }
             )
-        }
-        composable(route = Bills.route) {
-            BillsScreen(
-//                跳转单个账单
-                onBillClick = { billType ->
-                    navController.navigateToSingleBill(billType)
-                })
         }
         
         composable(
@@ -75,7 +60,7 @@ fun RallyNavHost(
                 navBackStackEntry.arguments?.getString(SingleBacklog.backlogTypeArg)
             println(backlogType)
             
-            SingleBacklogScreen(backlogType)
+            SingleBacklogScreen(backlogType=backlogType)
         }
         composable(
             route = SingleAccount.routeWithArgs,
@@ -86,15 +71,6 @@ fun RallyNavHost(
                 navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
             println(accountType)
             SingleAccountScreen(accountType)
-        }
-        composable(
-            route = SingleBill.routeWithArgs,
-            arguments = SingleBill.arguments,
-            deepLinks = SingleBill.deepLinks
-        ) { navBackStackEntry ->
-            val billType =
-                navBackStackEntry.arguments?.getString(SingleBill.billTypeArg)
-            SingleBillScreen(billType)
         }
     }
 }
@@ -117,11 +93,6 @@ private fun NavHostController.navigateToSingleBacklog(backlogType: String) {
 private fun NavHostController.navigateToSingleAccount(accountType: String) {
     this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
 }
-private fun NavHostController.navigateToSingleBill(billType: String) {
-    this.navigateSingleTopTo("${SingleBill.route}/$billType")
-}
-
-
 
 
 

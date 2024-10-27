@@ -14,14 +14,6 @@ data class Account(
     val color: Color
 )
 
-@Immutable
-data class Bill(
-    val name: String,
-    val due: String,
-    val amount: Float,
-    val color: Color
-)
-
 /**
  * Pretend repository for user's data.
  */
@@ -52,44 +44,9 @@ object UserData {
             Color(0xFF37EFBA)
         )
     )
-    val bills: List<Bill> = listOf(
-        Bill(
-            "RedPay Credit",
-            "Jan 29",
-            45.36f,
-            Color(0xFFFFDC78)
-        ),
-        Bill(
-            "Rent",
-            "Feb 9",
-            1200f,
-            Color(0xFFFF6951)
-        ),
-        Bill(
-            "TabFine Credit",
-            "Feb 22",
-            87.33f,
-            Color(0xFFFFD7D0)
-        ),
-        Bill(
-            "ABC Loans",
-            "Feb 29",
-            400f,
-            Color(0xFFFFAC12)
-        ),
-        Bill(
-            "ABC Loans 2",
-            "Feb 29",
-            77.4f,
-            Color(0xFFFFAC12)
-        )
-    )
 
     fun getAccount(accountName: String?): Account {
         return accounts.first { it.name == accountName }
     }
     
-    fun getBill(billName: String?): Bill {
-        return bills.first { it.name == billName }
-    }
 }

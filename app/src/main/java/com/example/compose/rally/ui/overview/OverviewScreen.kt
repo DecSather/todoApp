@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import com.example.compose.rally.R
 import com.example.compose.rally.data.UserData
 import com.example.compose.rally.ui.components.AccountRow
-import com.example.compose.rally.ui.components.BillRow
 import com.example.compose.rally.ui.components.RallyAlertDialog
 import com.example.compose.rally.ui.components.RallyDivider
 import com.example.compose.rally.ui.components.formatAmount
@@ -63,9 +62,7 @@ import java.util.Locale
 @Composable
 fun OverviewScreen(
     onClickSeeAllAccounts: () -> Unit = {},
-    onClickSeeAllBills: () -> Unit = {},
     onAccountClick: (String) -> Unit = {},
-    onBillClick: (String) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -80,10 +77,7 @@ fun OverviewScreen(
             onAccountClick = onAccountClick
         )
         Spacer(Modifier.height(RallyDefaultPadding))
-        BillsCard(
-            onClickSeeAll = onClickSeeAllBills,
-            onBillClick = onBillClick
-        )
+        
     }
 }
 @Preview
@@ -251,30 +245,6 @@ private fun AccountsCard(onClickSeeAll: () -> Unit, onAccountClick: (String) -> 
             number = account.number,
             amount = account.balance,
             color = account.color
-        )
-    }
-}
-
-/**
- * The Bills card within the Rally Overview screen.
- */
-@Composable
-private fun BillsCard(onClickSeeAll: () -> Unit, onBillClick: (String) -> Unit) {
-    val amount = UserData.bills.map { bill -> bill.amount }.sum()
-    OverviewScreenCard(
-        title = stringResource(R.string.bills),
-        amount = amount,
-        onClickSeeAll = onClickSeeAll,
-        data = UserData.bills,
-        colors = { it.color },
-        values = { it.amount }
-    ) { bill ->
-        BillRow(
-            modifier = Modifier.clickable { onBillClick(bill.name) },
-            name = bill.name,
-            due = bill.due,
-            amount = bill.amount,
-            color = bill.color
         )
     }
 }
