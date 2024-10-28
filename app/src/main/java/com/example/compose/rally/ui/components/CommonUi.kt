@@ -49,7 +49,7 @@ fun AccountRow(
         modifier = modifier,
         color = color,
         title = name,
-        subtitle = stringResource(R.string.account_redacted) + AccountDecimalFormat.format(number),
+        subtitle = stringResource(R.string.account_redacted) + number,
         amount = amount,
         negative = false
     )
@@ -65,7 +65,7 @@ private fun BaseRow(
     negative: Boolean
 ) {
     val dollarSign = if (negative) "–$ " else "$ "
-    val formattedAmount = formatAmount(amount)
+    val formattedAmount = amount
     Row(
         modifier = modifier
             .height(68.dp)
@@ -97,7 +97,7 @@ private fun BaseRow(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
-                text = formattedAmount,
+                text = "noIdeaAboutThisText",
                 style = typography.h6,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -132,13 +132,6 @@ private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 fun RallyDivider(modifier: Modifier = Modifier) {
     Divider(color = MaterialTheme.colors.background, thickness = 1.dp, modifier = modifier)
 }
-
-fun formatAmount(amount: Float): String {
-    return AmountDecimalFormat.format(amount)
-}
-
-private val AccountDecimalFormat = DecimalFormat("####")
-private val AmountDecimalFormat = DecimalFormat("#,###.##")
 
 /**
  * Used with accounts to create the animated circle.

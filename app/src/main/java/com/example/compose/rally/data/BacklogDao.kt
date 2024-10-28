@@ -28,8 +28,8 @@ interface BacklogDao {
     @Update
     suspend fun update(item: Backlog)
     
-    @Delete
-    suspend fun delete(item: Backlog)
+    @Query("DELETE FROM backlogs WHERE id = :id")
+    suspend fun deleteBacklogById(id: Int)
     
     
 }

@@ -24,15 +24,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
 import com.example.compose.rally.ui.theme.Blue900
+import java.time.format.DateTimeFormatter
 
+val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 @Composable
-fun <T> CommonBody(
+fun  CommonBody(
     modifier: Modifier = Modifier,
-    items: List<T>,
+//    items: List<T>,
     creditRatios:List<Float>,
     amountsTotal: Float,
     circleLabel: String,
-    rows: @Composable (T) -> Unit
+//    rows: @Composable (T) -> Unit
 ) {
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         Box(Modifier.padding(16.dp)) {
@@ -47,7 +49,7 @@ fun <T> CommonBody(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
                 Text(
-                    text = formatAmount(amountsTotal),
+                    text = amountsTotal.toString(),
                     style = MaterialTheme.typography.h2,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
@@ -55,20 +57,20 @@ fun <T> CommonBody(
         }
         Spacer(Modifier.height(10.dp))
         Card {
-            Column(modifier = Modifier.padding(12.dp)) {
-                items.forEach { item ->
-                    rows(item)
-                }
+//            Column(modifier = Modifier.padding(12.dp)) {
+//                items.forEach { item ->
+//                    rows(item)
+//                }
+//            }
 //                预加载空列
-                RoutineRow(
-                    modifier = Modifier.clickable { /*waiting for implement*/ },
-                    content="待办清单",
-                    subcontent="点击添加",
-                    credit=0f,
-                    finished=false,
-                    color = Blue900
-                )
-            }
+            RoutineRow(
+                modifier = Modifier.clickable { /*waiting for implement*/ },
+                content="待办清单",
+                subcontent="点击添加",
+                credit=0f,
+                finished=false,
+                color = Blue900
+            )
         }
     }
 }
@@ -78,14 +80,14 @@ private val RallyDefaultPadding = 12.dp
 
 private const val SHOWN_ITEMS = 3
 @Composable
-fun <T> CommonCard(
+fun CommonCard(
     modifier: Modifier=Modifier,
     timeTitle: String,
-    creditTotal: Float,
-    values: (T) -> Float,
-    colors: (T) -> Color,
-    data: List<T>,
-    row: @Composable (T) -> Unit
+    creditTotal: Float =0f,
+//    values: (T) -> Float,
+//    colors: (T) -> Color,
+//    data: List<T>,
+//    row: @Composable (T) -> Unit
 ) {
     Card {
         Column {
@@ -97,14 +99,14 @@ fun <T> CommonCard(
                 val amountText = "$" + creditTotal
                 Text(text = amountText, style = MaterialTheme.typography.subtitle2)
             }
-            BaseDivider(data, values, colors)
+//            BaseDivider(data, values, colors)
             Column(Modifier
                 .padding(start = 16.dp, top = 4.dp, end = 8.dp)
             ) {
-                data.take(SHOWN_ITEMS).forEach { row(it) }
+//                data.take(SHOWN_ITEMS).forEach { row(it) }
                 SeeAllButton(
                     modifier = modifier.clearAndSetSemantics {
-                        contentDescription = "All $timeTitle"
+                        contentDescription = "All $timeTitle's Routines"
                     }
                 )
             }
@@ -142,13 +144,12 @@ private fun BaseRow(
     negative: Boolean
 ) {
     val dollarSign = if (negative) "–$ " else "$ "
-    val formattedAmount = formatAmount(amount)
     Row(
         modifier = modifier
             .height(68.dp)
             .clearAndSetSemantics {
                 contentDescription =
-                    "$title account ending in ${subtitle.takeLast(4)}, current balance $dollarSign$formattedAmount"
+                    "$title account ending in ${subtitle.takeLast(4)}, current balance $dollarSign$amount"
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -174,7 +175,7 @@ private fun BaseRow(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
-                text = formattedAmount,
+                text = amount.toString(),
                 style = typography.h6,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -312,7 +313,7 @@ fun ThreeColorCircle(
             drawArc(
                 color = Color(0xFF039667),
                 startAngle = startAngle + DividerLengthInDegrees / 2,
-                sweepAngle = sweep - DividerLengthInDegrees * 2,
+                sweepAngle = sweep - DividerLengthInDegrees,
                 topLeft = topLeft,
                 size = size,
                 useCenter = false,

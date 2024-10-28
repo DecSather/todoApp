@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.stateIn
 /**
  * ViewModel to retrieve all items in the Room database.
  */
-class BacklogHomeViewModel(backlogsRepository: BacklogsRepository) : ViewModel() {
+class BacklogHomeViewModel(private val backlogsRepository: BacklogsRepository) : ViewModel() {
 
     /**
      * Holds home ui state. The list of items are retrieved from [ItemsRepository] and mapped to
@@ -29,6 +29,22 @@ class BacklogHomeViewModel(backlogsRepository: BacklogsRepository) : ViewModel()
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+    }
+    
+    suspend fun newCurrentBacklog(timeTitle:String) {
+        backlogsRepository.insertBacklog(
+            Backlog(
+            timeTitle =timeTitle,
+                routineListJson = "{}"
+            )
+        )
+        
+        
+    }
+    
+    
+    suspend fun deleteBacklogById(id:Int) {
+        backlogsRepository.deleteBacklogById(id)
     }
 }
 

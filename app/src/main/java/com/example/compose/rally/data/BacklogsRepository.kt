@@ -16,27 +16,21 @@
 
 package com.example.compose.rally.data
 
-import com.example.compose.rally.data.Backlog
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Repository that provides insert, update, delete, and retrieve of [Backlog] from a given data source.
  */
-interface BacklogsRepository {
-    /**
-     * Retrieve all the backlogs from the the given data source.
-     */
-    fun getAllBacklogsStream(): Flow<List<Backlog>>
-
-    fun getBacklogStream(id: Int): Flow<Backlog?>
-    fun getBacklogStreamByString(timeTitle: String): Flow<Backlog?>
-
-    suspend fun insertBacklog(backlog: Backlog)
-
-    suspend fun deleteBacklog(backlog: Backlog)
-
-    /**
-     * Update backlog in the data source
-     */
-    suspend fun updateBacklog(backlog: Backlog)
+class BacklogsRepository(private val backlogDao: BacklogDao) {
+    
+     fun getAllBacklogsStream(): Flow<List<Backlog>> = backlogDao.getAllBacklogs()
+    
+     fun getBacklogStream(id: Int): Flow<Backlog?> = backlogDao.getBacklog(id)
+     fun getBacklogStreamByString(timeTitle: String): Flow<Backlog?>  = backlogDao.getBacklogByString(timeTitle)
+    
+     suspend fun insertBacklog(backlog: Backlog) = backlogDao.insert(backlog)
+    
+     suspend fun deleteBacklogById(id:Int) = backlogDao.deleteBacklogById(id)
+    
+     suspend fun updateBacklog(backlog: Backlog) = backlogDao.update(backlog)
 }

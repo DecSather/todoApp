@@ -6,7 +6,6 @@ interface AppContainer {
     val backlogsRepository: BacklogsRepository
 }
 
-class AppDataContainer(private val context: Context):
-        AppContainer{
-    override val backlogsRepository: BacklogsRepository by lazy { OfflineBacklogsRepository(BacklogDatabase.getDatabase(context).backlogDao()) }
+class AppDataContainer(private val context: Context):AppContainer{
+    override val backlogsRepository: BacklogsRepository by lazy { BacklogsRepository(BacklogDatabase.getDatabase(context).backlogDao()) }
 }

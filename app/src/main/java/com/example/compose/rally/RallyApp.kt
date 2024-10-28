@@ -15,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.rally.ui.AppViewModelProvider
+import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.navigation.*
 import com.example.compose.rally.ui.theme.RallyTheme
@@ -29,7 +30,7 @@ fun RallyApp() {
         val currentDestination = currentBackStack?.destination
         val currentScreen = rallyTabRowScreens.find {
             it.route == currentDestination?.route
-                    || (it == Backlogs && currentDestination?.route?.startsWith( SingleBacklog.route ) == true)
+                    || (it == Backlogs && currentDestination?.route?.startsWith( SingleBacklogDestination.route ) == true)
                     || (it == Accounts && currentDestination?.route?.startsWith( SingleAccount.route ) == true)
         } ?: Backlogs
         

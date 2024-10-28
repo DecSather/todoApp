@@ -55,7 +55,6 @@ import com.example.compose.rally.data.UserData
 import com.example.compose.rally.ui.components.AccountRow
 import com.example.compose.rally.ui.components.RallyAlertDialog
 import com.example.compose.rally.ui.components.RallyDivider
-import com.example.compose.rally.ui.components.formatAmount
 import com.example.compose.rally.ui.theme.RallyTheme
 import java.util.Locale
 
@@ -188,9 +187,8 @@ private fun <T> OverviewScreenCard(
         Column {
             Column(Modifier.padding(RallyDefaultPadding)) {
                 Text(text = title, style = MaterialTheme.typography.subtitle2)
-                val amountText = "$" + formatAmount(
-                    amount
-                )
+                val amountText = "$" + amount
+                
                 Text(text = amountText, style = MaterialTheme.typography.h2)
             }
             OverViewDivider(data, values, colors)

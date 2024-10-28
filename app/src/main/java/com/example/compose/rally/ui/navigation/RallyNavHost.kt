@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.ui.backlog.BacklogHomeScreen
+import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.backlog.SingleBacklogScreen
 import com.example.compose.rally.ui.overview.OverviewScreen
 
@@ -25,8 +26,8 @@ fun RallyNavHost(
         composable(route = Backlogs.route) {
             BacklogHomeScreen(
 //                跳转单个日志
-                onBacklogClick = {backlogType ->
-                    navController.navigateToSingleBacklog(backlogType)
+                onBacklogClick = {backlogId ->
+                    navController.navigateToSingleBacklog(backlogId)
                 },
 //                跳转单个待办-待实现
             )
@@ -51,16 +52,15 @@ fun RallyNavHost(
         }
         
         composable(
-            route = SingleBacklog.routeWithArgs,
-            arguments = SingleBacklog.arguments,
-            deepLinks = SingleBacklog.deepLinks
+            route = SingleBacklogDestination.routeWithArgs,
+            arguments = SingleBacklogDestination.arguments,
+            deepLinks = SingleBacklogDestination.deepLinks
         ) {
             navBackStackEntry ->
             val backlogType =
-                navBackStackEntry.arguments?.getString(SingleBacklog.backlogTypeArg)
-            println(backlogType)
+                navBackStackEntry.arguments?.getString(SingleBacklogDestination.backlogIdArg)
             
-            SingleBacklogScreen(backlogType=backlogType)
+            SingleBacklogScreen(backlogType =backlogType)
         }
         composable(
             route = SingleAccount.routeWithArgs,
@@ -69,7 +69,6 @@ fun RallyNavHost(
         ) { navBackStackEntry ->
             val accountType =
                 navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
-            println(accountType)
             SingleAccountScreen(accountType)
         }
     }
@@ -86,8 +85,8 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         restoreState = true
     }
 
-private fun NavHostController.navigateToSingleBacklog(backlogType: String) {
-    this.navigateSingleTopTo("${SingleBacklog.route}/$backlogType")
+private fun NavHostController.navigateToSingleBacklog(backlogType: Int) {
+    this.navigateSingleTopTo("${SingleBacklogDestination.route}/$backlogType")
 }
 
 private fun NavHostController.navigateToSingleAccount(accountType: String) {

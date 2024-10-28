@@ -65,7 +65,7 @@ fun <T> StatementBody(
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
                 Text(
-                    text = formatAmount(amountsTotal),
+                    text = amountsTotal.toString(),
                     style = MaterialTheme.typography.h2,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )

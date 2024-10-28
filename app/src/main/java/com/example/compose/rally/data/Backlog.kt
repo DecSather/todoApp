@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "backlogs")
 data class Backlog(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 1,
-    val timeTitle: String,
+    val id: Int=0,
+    val timeTitle: String ="yyyy-MM-dd",
     val routineListJson: String,
     val importCredit: Float =4f,
     val normalCredit: Float =0f,
