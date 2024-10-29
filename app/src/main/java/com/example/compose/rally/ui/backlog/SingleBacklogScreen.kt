@@ -3,22 +3,22 @@ package com.example.compose.rally.ui.backlog
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.example.compose.rally.data.BacklogData
-import com.example.compose.rally.data.BackloggetRoutines
 import com.example.compose.rally.ui.AppViewModelProvider
-import com.example.compose.rally.ui.components.CommonBody
+import com.example.compose.rally.ui.components.RoutineBody
 import com.example.compose.rally.ui.components.RoutineRow
 import com.example.compose.rally.ui.navigation.NavigationDestination
+import com.example.compose.rally.ui.routine.RoutineHomeViewModel
+import com.example.compose.rally.ui.theme.Blue900
+import com.example.compose.rally.ui.theme.faverColor
+import com.example.compose.rally.ui.theme.importColor
+import com.example.compose.rally.ui.theme.normalColor
+import kotlinx.coroutines.launch
 
 object SingleBacklogDestination : NavigationDestination {
     override val route = "single_backlog"
@@ -32,34 +32,47 @@ object SingleBacklogDestination : NavigationDestination {
         navDeepLink { uriPattern = "rally://$route/{$backlogIdArg}" }
     )
 }
+//记得添加删除键
 @Composable
 fun SingleBacklogScreen(
-    navigateToAddBacklog: () -> Unit={},
-    navigateToUpdateBacklog: (Int) -> Unit={},
-    backlogType: String? = BacklogData.backlogs.first().timeTitle,
-    viewModel: SingleBacklogViewModel= viewModel(factory = AppViewModelProvider.Factory)
+    navigateBack: () -> Unit,
+    navigateToUpdateRoutine: (Int) -> Unit={},
+    viewModel: SingleBacklogViewModel= viewModel(factory = AppViewModelProvider.Factory),
+    routineHomeViewModel: RoutineHomeViewModel= viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    val routineHomeUiState=routineHomeViewModel.homeUiState.collectAsState()
+    val backlog=uiState.value.backlog
+    val routines=routineHomeUiState.value.routineList
 //    旧属性
-    val backlog = uiState.value.backlog
-//    val routines= BackloggetRoutines(backlog)
-//    val amount=routines.map { routine ->routine.credit }.sum()
-    val amount=0f
-    CommonBody(
-//        items=routines,
+    
+    val amount=routines.map { routine ->routine.credit }.sum()
+    RoutineBody(
+        routineHomeViewModel=routineHomeViewModel,
+        onDelete ={
+            coroutineScope.launch {
+                viewModel.deleteBacklogById(backlog.id)
+                navigateBack()
+            }
+        },
+        items=routines,
         creditRatios= listOf(backlog.importCredit/amount,backlog.normalCredit/amount,backlog.faverCredit/amount),
         amountsTotal=amount,
         circleLabel=backlog.timeTitle,
     )
-//    { routine ->
-//        RoutineRow(
-//            modifier = Modifier.clickable { /*waitng for implement*/ },
-//            content = routine.content,
-//            subcontent = routine.subcontent,
-//            credit = routine.credit,
-//            finished = routine.finished,
-//            color = routine.color
-//        )
-//    }
+    { routine ->
+        RoutineRow(
+            modifier = Modifier.clickable {navigateToUpdateRoutine},
+            content = routine.content,
+            subcontent = routine.subcontent,
+            credit = routine.credit,
+            finished = routine.finished,
+            color = when(routine.rank){
+                0-> importColor
+                1-> faverColor
+                else -> normalColor
+            }
+        )
+    }
 }

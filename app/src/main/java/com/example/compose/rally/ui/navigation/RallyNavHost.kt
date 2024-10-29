@@ -60,7 +60,9 @@ fun RallyNavHost(
             val backlogType =
                 navBackStackEntry.arguments?.getString(SingleBacklogDestination.backlogIdArg)
             
-            SingleBacklogScreen(backlogType =backlogType)
+            SingleBacklogScreen(
+                navigateBack= { navController.popBackStack() }
+            )
         }
         composable(
             route = SingleAccount.routeWithArgs,

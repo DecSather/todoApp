@@ -3,13 +3,16 @@ package com.example.compose.rally.ui.components
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -23,58 +26,124 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
+import com.example.compose.rally.data.Routine
+import com.example.compose.rally.ui.routine.RoutineHomeViewModel
 import com.example.compose.rally.ui.theme.Blue900
+import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 @Composable
-fun  CommonBody(
+fun  RoutineBody(
     modifier: Modifier = Modifier,
-//    items: List<T>,
+    routineHomeViewModel: RoutineHomeViewModel,
+    onDelete: () -> Unit={},
+    items: List<Routine>,
     creditRatios:List<Float>,
     amountsTotal: Float,
     circleLabel: String,
-//    rows: @Composable (T) -> Unit
+    rows: @Composable (Routine) -> Unit,
 ) {
-    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        Box(Modifier.padding(16.dp)) {
-            ThreeColorCircle(
-                proportions =  creditRatios
-            )
-            Spacer(Modifier.height(12.dp))
-            Column(modifier = Modifier.align(Alignment.Center)) {
-                Text(
-                    text = circleLabel,
-                    style = MaterialTheme.typography.body1,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+    var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
+    
+    val coroutineScope = rememberCoroutineScope()
+    Box(modifier=Modifier.fillMaxSize())
+    {
+        Column() {
+            Box(Modifier.padding(16.dp)) {
+                ThreeColorCircle(
+                    proportions = creditRatios
                 )
-                Text(
-                    text = amountsTotal.toString(),
-                    style = MaterialTheme.typography.h2,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                Spacer(Modifier.height(12.dp))
+                Column(modifier = Modifier.align(Alignment.Center)) {
+                    Text(
+                        text = circleLabel,
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        text = amountsTotal.toString(),
+                        style = MaterialTheme.typography.h2,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
             }
-        }
-        Spacer(Modifier.height(10.dp))
-        Card {
-//            Column(modifier = Modifier.padding(12.dp)) {
-//                items.forEach { item ->
-//                    rows(item)
-//                }
-//            }
+            Spacer(Modifier.height(10.dp))
+            Card {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    LazyColumn {
+                        items(items = items) { item ->
+                            rows(item)
+                        }
+                    }
+
 //                预加载空列
-            RoutineRow(
-                modifier = Modifier.clickable { /*waiting for implement*/ },
-                content="待办清单",
-                subcontent="点击添加",
-                credit=0f,
-                finished=false,
-                color = Blue900
+                    RoutineRow(
+                        modifier = Modifier.clickable {
+                            coroutineScope.launch {
+                                routineHomeViewModel.insertRoutine(
+                                    content = "new routine test2"
+                                )
+                            }
+                        },
+                        content = "待办清单",
+                        subcontent = "点击添加",
+                        credit = 0f,
+                        finished = false,
+                        color = Blue900
+                    )
+                }
+            }
+            Spacer(Modifier.height(16.dp))
+            
+            
+        }
+        FloatingActionButton(
+            onClick = { deleteConfirmationRequired = true },
+            backgroundColor = MaterialTheme.colors.surface,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(16.dp),
+        ) {
+            androidx.compose.material3.Icon(
+                imageVector = Icons.Default.DeleteForever,
+                contentDescription = "Delete Backlog"
+            )
+    }
+        if (deleteConfirmationRequired) {
+            DeleteConfirmationDialog(
+                onDeleteConfirm = {
+                    deleteConfirmationRequired = false
+                    onDelete()
+                },
+                onDeleteCancel = { deleteConfirmationRequired = false },
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
+    
 }
 
+
+@Composable
+private fun DeleteConfirmationDialog(
+    onDeleteConfirm: () -> Unit, onDeleteCancel: () -> Unit, modifier: Modifier = Modifier
+) {
+    AlertDialog(onDismissRequest = { /* Do nothing */ },
+        title = { Text(stringResource(R.string.attention)) },
+        text = { Text(stringResource(R.string.delete_question)) },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = onDeleteCancel) {
+                Text(text = stringResource(R.string.no))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDeleteConfirm) {
+                Text(text = stringResource(R.string.yes))
+            }
+        })
+}
 
 private val RallyDefaultPadding = 12.dp
 
@@ -83,35 +152,9 @@ private const val SHOWN_ITEMS = 3
 fun CommonCard(
     modifier: Modifier=Modifier,
     timeTitle: String,
-    creditTotal: Float =0f,
-//    values: (T) -> Float,
-//    colors: (T) -> Color,
-//    data: List<T>,
-//    row: @Composable (T) -> Unit
+    data: List<Float>,
+    colors: List<Color>,
 ) {
-    Card {
-        Column {
-            Column(modifier
-                .fillMaxWidth()
-                .padding(RallyDefaultPadding)
-            ) {
-                Text(text = timeTitle, style = MaterialTheme.typography.h2)
-                val amountText = "$" + creditTotal
-                Text(text = amountText, style = MaterialTheme.typography.subtitle2)
-            }
-//            BaseDivider(data, values, colors)
-            Column(Modifier
-                .padding(start = 16.dp, top = 4.dp, end = 8.dp)
-            ) {
-//                data.take(SHOWN_ITEMS).forEach { row(it) }
-                SeeAllButton(
-                    modifier = modifier.clearAndSetSemantics {
-                        contentDescription = "All $timeTitle's Routines"
-                    }
-                )
-            }
-        }
-    }
 }
 
 
@@ -205,18 +248,33 @@ private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 }
 //列
 @Composable
-private fun <T> BaseDivider(
-    data: List<T>,
-    values: (T) -> Float,
-    colors: (T) -> Color
+fun BaseDivider(
+    total:Float,
+    data: List<Float>,
+    colors: List<Color>
 ) {
-    Row(Modifier.fillMaxWidth()) {
-        data.forEach { item: T ->
+    var index=0
+    if(total>0.0) {
+        Row(Modifier.fillMaxWidth()) {
+            data.forEach { item ->
+                if(item>0.0){
+                    Spacer(
+                        modifier = Modifier
+                            .weight(item/total)
+                            .height(1.dp)
+                            .background(colors.get(index++))
+                    )
+                    
+                }
+            }
+        }
+    }else{
+        Row(Modifier.fillMaxWidth()) {
             Spacer(
                 modifier = Modifier
-                    .weight(values(item))
+                    .weight(1f)
                     .height(1.dp)
-                    .background(colors(item))
+                    .background(MaterialTheme.colors.background)
             )
         }
     }
@@ -224,7 +282,7 @@ private fun <T> BaseDivider(
 
 
 @Composable
-private fun SeeAllButton(modifier: Modifier = Modifier) {
+fun SeeAllButton(modifier: Modifier = Modifier) {
     Box(modifier=modifier
         .padding(16.dp) // 设置内边距，和 TextButton 一致
         .fillMaxWidth()

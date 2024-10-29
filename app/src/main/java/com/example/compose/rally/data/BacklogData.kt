@@ -7,19 +7,6 @@ import com.google.gson.Gson
 
 //待办项-单天
 
-fun BackloggetRoutines(backlog: Backlog): List<Routine> {
-    return BacklogData.routines.filter {it.id in fromJsonToList(backlog.routineListJson)}
-}
-//详情卡片
-@Immutable
-data class Routine(
-    val id: Int = 0,
-    val finished: Boolean =false,
-    val content: String,
-    val subcontent:String,
-    val credit: Float =0f,
-    val color:Color,
-)
 @TypeConverter
 fun fromListToJson(list: List<Int>): String = Gson().toJson(list)
 @TypeConverter
@@ -37,28 +24,12 @@ object BacklogData {
         
     )
     
-    val routines: List<Routine> = listOf(
-        Routine(
-            content ="1-Routine Content",
-            subcontent ="1-Routine subContent",
-            credit = 4f,
-            color = Color(0xFF005D57),
-        ),Routine(
-            content ="2-Routine Content",
-            subcontent ="2-Routine subContent",
-            credit = 2f,
-            color = Color(0xFF04B97F),
-        ),
-    )
     fun getBacklog(backlogId: Int?): Backlog {
         return backlogs.first { it.id == backlogId }
     }
     
     fun getBacklog(backlogStrinf: String?): Backlog {
         return backlogs.first { it.timeTitle == backlogStrinf }
-    }
-    fun getRoutine(routineId: Int?): Routine {
-        return routines.first { it.id == routineId }
     }
     
     

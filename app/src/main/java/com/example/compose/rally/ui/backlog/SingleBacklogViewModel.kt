@@ -17,9 +17,7 @@ class SingleBacklogViewModel(
     savedStateHandle: SavedStateHandle,
     private val backlogsRepository: BacklogsRepository
 ) : ViewModel() {
-    
     private val backlogId: Int = checkNotNull(savedStateHandle[SingleBacklogDestination.backlogIdArg])
-    
     val uiState: StateFlow<BacklogDetailsUiState> =
         backlogsRepository.getBacklogStream(backlogId)
             .filterNotNull()
@@ -32,6 +30,9 @@ class SingleBacklogViewModel(
             )
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+    }
+    suspend fun deleteBacklogById(id:Int) {
+        backlogsRepository.deleteBacklogById(id)
     }
 }
 

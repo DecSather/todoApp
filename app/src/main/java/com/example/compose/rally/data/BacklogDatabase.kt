@@ -5,9 +5,10 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Backlog::class], version = 1, exportSchema = false)
+@Database(entities = [Backlog::class,Routine::class], version =1, exportSchema = false)
 abstract class BacklogDatabase : RoomDatabase()  {
     abstract fun backlogDao():BacklogDao
+    abstract fun routineDao():RoutineDao
     companion object {
         @Volatile
         private var Instance:BacklogDatabase?=null

@@ -6,18 +6,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -27,6 +29,10 @@ import com.example.compose.rally.R
 import com.example.compose.rally.data.*
 import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
+import com.example.compose.rally.ui.routine.RoutineHomeViewModel
+import com.example.compose.rally.ui.theme.faverColor
+import com.example.compose.rally.ui.theme.importColor
+import com.example.compose.rally.ui.theme.normalColor
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -97,12 +103,11 @@ fun BacklogHomeScreen(
                 onClick ={
                     coroutineScope.launch {
                         viewModel.newCurrentBacklog(timeTitle = formattedDate)
-                        
                     }
                 },
-                shape = MaterialTheme.shapes.medium,
+                backgroundColor = MaterialTheme.colors.surface,
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
+                    .align(Alignment.CenterEnd)
                     .padding(16.dp),
                 
                 ) {
@@ -120,25 +125,28 @@ private fun BacklogsCard(
     backlog: Backlog,
     modifier: Modifier =Modifier
 ) {
-//    val routines=BackloggetRoutines(backlog)
-//    val amount = routines.map { routine -> routine.credit }.sum()
-    CommonCard(
-        modifier=modifier,
-        timeTitle = backlog.timeTitle,
-//        creditTotal = amount,
-//        data = routines,
-//        colors = { it.color },
-//        values = { it.credit }
-    )
-//    {
-//        routine ->
-//        RoutineRow(
-//            modifier = Modifier.clickable { /*waitng for implement*/ },
-//            content = routine.content,
-//            subcontent = routine.subcontent,
-//            credit = routine.credit,
-//            finished = routine.finished,
-//            color = routine.color
-//        )
-//    }
+    val creditTotal:Float =backlog.importCredit+backlog.normalCredit+backlog.faverCredit
+    Card {
+        Column {
+            Column(modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+            ) {
+                Text(text = backlog.timeTitle, style = MaterialTheme.typography.h2)
+                val amountText = "$" + creditTotal
+                Text(text = amountText, style = MaterialTheme.typography.subtitle2)
+            }
+            BaseDivider(creditTotal, listOf(backlog.importCredit,backlog.normalCredit,backlog.faverCredit), listOf(
+                importColor, normalColor, faverColor))
+            Column(Modifier
+                .padding(start = 16.dp, top = 4.dp, end = 8.dp)
+            ) {
+                SeeAllButton(
+                    modifier = modifier.clearAndSetSemantics {
+                        contentDescription = "All ${backlog.timeTitle}'s Routines"
+                    }
+                )
+            }
+        }
+    }
 }

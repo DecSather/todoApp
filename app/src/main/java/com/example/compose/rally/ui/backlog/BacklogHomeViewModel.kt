@@ -38,11 +38,7 @@ class BacklogHomeViewModel(private val backlogsRepository: BacklogsRepository) :
                 routineListJson = "{}"
             )
         )
-        
-        
     }
-    
-    
     suspend fun deleteBacklogById(id:Int) {
         backlogsRepository.deleteBacklogById(id)
     }
