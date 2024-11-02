@@ -28,7 +28,6 @@ class BacklogHomeViewModel(private val backlogsRepository: BacklogsRepository) :
     }
     
     suspend fun newCurrentBacklog(timeTitle:String):Int{
-      
         return backlogsRepository.insertBacklog(
             Backlog(
                 timeTitle =timeTitle,

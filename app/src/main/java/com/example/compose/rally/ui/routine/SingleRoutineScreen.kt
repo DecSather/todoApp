@@ -64,10 +64,8 @@ fun SingleRoutineBody(
     modifier: Modifier = Modifier
 ) {
     
-    var contentText by remember { mutableStateOf("loading...") }
     var rankText by remember { mutableStateOf("-1") }
     var creditText by remember { mutableStateOf("0.0") }
-    var subcontText by remember { mutableStateOf("empty") }
     
     val enabled=true
     Column(
@@ -81,10 +79,9 @@ fun SingleRoutineBody(
         ) {
 //        content
             OutlinedTextField(
-                value = if(contentText.equals("loading..."))itemUiState.routine.content else contentText,
+                value = itemUiState.routine.content,
                 onValueChange = {
-                        newText ->
-                    contentText = newText
+                    onRoutineValueChange(itemUiState.routine.copy(content = it ))
                 },
                 label = { Text(stringResource(R.string.rontine_content_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -102,6 +99,9 @@ fun SingleRoutineBody(
                 onValueChange ={
                         newText ->
                     rankText = newText
+                    if(rankText.isNotEmpty())
+                        onRoutineValueChange(itemUiState.routine.copy(rank = rankText.toInt() ))
+                    else onRoutineValueChange(itemUiState.routine.copy(rank = -1))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text(stringResource(R.string.rontine_rank_req)) },
@@ -120,6 +120,9 @@ fun SingleRoutineBody(
                 onValueChange = {
                         newText ->
                     creditText = newText
+                    if(creditText.isNotEmpty())
+                        onRoutineValueChange(itemUiState.routine.copy(credit = creditText.toFloat()))
+                    else onRoutineValueChange(itemUiState.routine.copy(credit = 0f))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text(stringResource(R.string.rontine_credit_req)) },
@@ -135,10 +138,9 @@ fun SingleRoutineBody(
             )
 //        subcontent
             OutlinedTextField(
-                value = if(subcontText.equals("empty"))itemUiState.routine.subcontent else subcontText,
+                value = itemUiState.routine.subcontent,
                 onValueChange = {
-                        newText ->
-                    subcontText = newText
+                    onRoutineValueChange(itemUiState.routine.copy(subcontent = it ))
                 },
                 label = { Text(stringResource(R.string.rontine_subcontent_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -159,18 +161,6 @@ fun SingleRoutineBody(
         
         Button(
             onClick = {
-                if (!contentText.equals("loading...")) {
-                    onRoutineValueChange(itemUiState.routine.copy(content = contentText ))
-                }
-                if (!rankText.equals("-1")) {
-                    onRoutineValueChange(itemUiState.routine.copy(rank=rankText.toInt()))
-                }
-                if (!creditText.equals("0.0")) {
-                    onRoutineValueChange(itemUiState.routine.copy(credit = creditText.toFloat()))
-                }
-                if (!subcontText.equals("empty")) {
-                    onRoutineValueChange(itemUiState.routine.copy(subcontent = subcontText ))
-                }
                 onSaveClick()
                       },
             enabled = itemUiState.isEntryValid,

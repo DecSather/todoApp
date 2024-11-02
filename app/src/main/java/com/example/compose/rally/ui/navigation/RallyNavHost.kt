@@ -42,18 +42,15 @@ fun RallyNavHost(
 //        Single Backlog
         composable(
             route = SingleBacklogDestination.routeWithArgs,
-            arguments = listOf(navArgument(SingleBacklogDestination.backlogIdArg) {
-                type = NavType.IntType
-            })
+            arguments = SingleBacklogDestination.arguments
         ){
-                backStackEntry ->
-            val backlogId = backStackEntry.arguments?.getInt("backlogId") ?: 0
+            val baklogId=it.arguments?.getInt("backlogId")
             SingleBacklogScreen(
                 navigateBack= { navController.popBackStack() },
 //                跳转新增待办
-                navigateToNewRoutine = {navController.navigateToNewRoutine(backlogId)},
-                navigateToSingleRoutine ={routineId ->
-                    navController.navigateToSingleRoutine(routineId)}
+                navigateToNewRoutine = {navController.navigate("${RoutineEntryDestination.route}/${baklogId}")},
+//                跳转指定待办
+                navigateToSingleRoutine ={navController.navigate("${SingleRoutineDestination.route}/${it}")}
             )
         }
         composable(route = Overview.route) {
@@ -75,21 +72,22 @@ fun RallyNavHost(
             )
         }
 
-//            new Routine Entry
+//            Entry new Routine
         composable(
-            route = RoutineEntryDestination.route,
+            route = RoutineEntryDestination.routeWithArgs,
+            arguments = RoutineEntryDestination.arguments
         ) {
-                backStackEntry ->
-            val backlogId = backStackEntry.arguments?.getInt("backlogId") ?: 0
+            val backlogId=it.arguments?.getInt("backlogId")?:0
             RoutineEntryScreen(
                 backlogId =backlogId,
-                navigateBack= { navController.navigateUp() }
+                navigateBack= { navController.popBackStack() }
             )
             
         }
 //        Single Routine
         composable(
-            route = SingleRoutineDestination.route,
+            route = SingleRoutineDestination.routeWithArgs,
+            arguments = SingleRoutineDestination.arguments
         ) {
             SingleRoutineScreen(
                 navigateBack= { navController.popBackStack() },
@@ -115,16 +113,6 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         restoreState = true
     }
 
-private fun NavHostController.navigateToNewRoutine(backlogType: Int) {
-    this.navigateSingleTopTo("${RoutineEntryDestination.route}/$backlogType")
-}
-
-private fun NavHostController.navigateToSingleRoutine(routineType: Int) {
-    this.navigateSingleTopTo("${SingleRoutineDestination.route}/$routineType")
-}
-private fun NavHostController.navigateToSingleBacklog(backlogType: Int) {
-    this.navigateSingleTopTo("${SingleBacklogDestination.route}/$backlogType")
-}
 
 private fun NavHostController.navigateToSingleAccount(accountType: String) {
     this.navigateSingleTopTo("${SingleAccount.route}/$accountType")

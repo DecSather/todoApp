@@ -44,7 +44,6 @@ data object BacklogHome : RallyDestination {
     override val route ="backlogs"
 }
 @SuppressLint("CoroutineCreationDuringComposition")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BacklogHomeScreen(
     onBacklogClick:(Int)->Unit={},
@@ -103,7 +102,9 @@ fun BacklogHomeScreen(
         if(!homeUiState.backlogList.isEmpty() && !homeUiState.backlogList.first().timeTitle.equals(formattedDate)) {
             FloatingActionButton(
                 onClick ={
-                         /*添加即跳转-待实现*/
+                    coroutineScope.launch {
+                        onBacklogClick(viewModel.newCurrentBacklog(formattedDate))
+                    }
                 },
                 backgroundColor = MaterialTheme.colors.surface,
                 modifier = Modifier

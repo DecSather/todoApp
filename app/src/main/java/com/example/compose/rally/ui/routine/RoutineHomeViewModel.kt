@@ -24,6 +24,10 @@ class RoutineHomeViewModel(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
+    suspend fun deleteZeroRoutines(){
+        for(i in 452..471)
+        routinesRepository.deleteRoutineById(i)
+    }
     
 }
 

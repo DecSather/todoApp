@@ -22,11 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import com.example.compose.rally.R
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.AppViewModelProvider
-import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.navigation.NavigationDestination
 import kotlinx.coroutines.launch
 //new Routine Entry-预添加类设计，非数据
@@ -35,9 +33,9 @@ object RoutineEntryDestination : NavigationDestination {
     override val icon = Icons.Filled.Check
     const val backlogIdArg = "backlogId"
     val routeWithArgs = "${route}/{${backlogIdArg}}"
-    val arguments = listOf(
-        navArgument(backlogIdArg) { type = NavType.IntType }
-    )
+    val arguments = listOf(navArgument(backlogIdArg) {
+        type = NavType.IntType
+    })
 }
 
 @Composable
@@ -68,7 +66,6 @@ fun RoutineEntryBody(
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -166,6 +163,7 @@ fun RoutineEntryBody(
         }
         Button(
             onClick = {
+                println("cur routine: "+itemUiState.routine.backlogId)
                 onSaveClick()
             },
             enabled = itemUiState.isEntryValid,

@@ -1,6 +1,7 @@
 package com.example.compose.rally.ui.backlog
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.runtime.*
@@ -25,7 +26,9 @@ object SingleBacklogDestination : RallyDestination {
     override val icon = Icons.Filled.Timer
     const val backlogIdArg = "backlogId"
     val routeWithArgs = "$route/{$backlogIdArg}"
-    
+    val arguments = listOf(navArgument(backlogIdArg) {
+        type = NavType.IntType
+    })
 }
 //记得添加删除键
 @Composable
@@ -38,6 +41,7 @@ fun SingleBacklogScreen(
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    
     val routineHomeUiState=routineHomeViewModel.homeUiState.collectAsState()
     val backlog=uiState.value.backlog
     val routines=routineHomeUiState.value.routineList
@@ -71,5 +75,6 @@ fun SingleBacklogScreen(
                 else -> normalColor
             }
         )
+        
     }
 }

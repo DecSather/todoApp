@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.rally.ui.AppViewModelProvider
+import com.example.compose.rally.ui.backlog.BacklogHome
 import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.navigation.*
@@ -24,20 +25,22 @@ import com.example.compose.rally.ui.theme.RallyTheme
 fun InventoryApp() {
 }
 
+// Screens to be displayed in the top RallyTabRow
+val rallyTabRowScreens = listOf(BacklogHome, Overview, Accounts)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RallyApp(navController: NavHostController = rememberNavController()) {
     RallyNavHost(navController = navController)
     RallyTheme {
-//        val navController = rememberNavController()
-//        val currentBackStack by navController.currentBackStackEntryAsState()
-//        val currentDestination = currentBackStack?.destination
-//        val currentScreen = rallyTabRowScreens.find {
-//            it.route == currentDestination?.route
-//                    || (it == Overview && currentDestination?.route?.startsWith( Overview.route ) == true)
-//                    || (it == Accounts && currentDestination?.route?.startsWith( SingleAccount.route ) == true)
-//        } ?: Backlogs
-        
+//        判断当前页面展开标题
+        val navController = rememberNavController()
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        val currentDestination = currentBackStack?.destination
+        val currentScreen = rallyTabRowScreens.find {
+            it.route == currentDestination?.route
+                    ||it == SingleBacklogDestination
+                    || (it == Accounts && currentDestination?.route?.startsWith( SingleAccount.route ) == true)
+        } ?: BacklogHome
         Scaffold(
             containerColor = if(isSystemInDarkTheme()) Color(0xFF26282F) else Color(0xFFD4E5EF),
 //            导航栏样式
@@ -47,6 +50,7 @@ fun RallyApp(navController: NavHostController = rememberNavController()) {
                     onTabSelected = { newScreen ->
                         navController.navigateSingleTopTo(newScreen.route)
                     },
+                    currentScreen= currentScreen
                 )
             }
         ) { innerPadding ->
