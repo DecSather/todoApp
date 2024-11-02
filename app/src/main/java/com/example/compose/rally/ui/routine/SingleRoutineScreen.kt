@@ -36,9 +36,6 @@ object SingleRoutineDestination : NavigationDestination {
     val arguments = listOf(
         navArgument(routineIdArg) { type = NavType.IntType }
     )
-    val deepLinks = listOf(
-        navDeepLink { uriPattern = "rally://${route}/{${routineIdArg}}" }
-    )
 }
 //waiting implement: 色圈有问题，需要同步routine数据
 @Composable

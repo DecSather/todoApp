@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.example.compose.rally.ui.backlog.BacklogHome
 
 /**
  * Contract for information needed on every Rally navigation destination
@@ -33,10 +34,6 @@ interface RallyDestination {
 }
 
 //BacklogDestination
-data object Backlogs : RallyDestination {
-    override val icon =Icons.Filled.Timer
-    override val route ="backlogs"
-}
 /**
  * Rally app navigation destinations
  */
@@ -65,4 +62,4 @@ data object SingleAccount : RallyDestination {
 
 
 // Screens to be displayed in the top RallyTabRow
-val rallyTabRowScreens = listOf(Backlogs, Overview, Accounts)
+val rallyTabRowScreens = listOf(BacklogHome, Overview, Accounts)

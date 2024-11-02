@@ -18,20 +18,21 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-<!--             new Routine Entry -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="rally" android:host="routine_entry" />
-            </intent-filter>
-<!--             Single Backlog -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="rally" android:host="single_backlog" />
-            </intent-filter>
+<!-- &lt;!&ndash;             new Routine Entry &ndash;&gt; -->
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.VIEW" /> -->
+<!--                 <category android:name="android.intent.category.DEFAULT" /> -->
+<!--                 <category android:name="android.intent.category.BROWSABLE" /> -->
+<!--                 <data android:scheme="rally" android:host="routine_entry" /> -->
+<!--             </intent-filter> -->
+<!-- &lt;!&ndash;             Single Backlog &ndash;&gt; -->
+<!--             <intent-filter> -->
+<!--                 <action android:name="android.intent.action.VIEW" /> -->
+<!--                 <category android:name="android.intent.category.DEFAULT" /> -->
+<!--                 <category android:name="android.intent.category.BROWSABLE" /> -->
+<!--                 <data android:scheme="rally" android:host="single_backlog" /> -->
+<!--             </intent-filter> -->
+            
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />

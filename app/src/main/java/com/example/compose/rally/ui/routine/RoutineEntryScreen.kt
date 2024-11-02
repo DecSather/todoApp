@@ -38,9 +38,6 @@ object RoutineEntryDestination : NavigationDestination {
     val arguments = listOf(
         navArgument(backlogIdArg) { type = NavType.IntType }
     )
-    val deepLinks = listOf(
-        navDeepLink { uriPattern = "rally://${route}/{${backlogIdArg}}" }
-    )
 }
 
 @Composable

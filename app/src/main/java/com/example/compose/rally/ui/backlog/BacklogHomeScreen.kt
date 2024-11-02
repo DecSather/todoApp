@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +30,7 @@ import com.example.compose.rally.R
 import com.example.compose.rally.data.*
 import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
+import com.example.compose.rally.ui.navigation.RallyDestination
 import com.example.compose.rally.ui.routine.RoutineHomeViewModel
 import com.example.compose.rally.ui.theme.faverColor
 import com.example.compose.rally.ui.theme.importColor
@@ -37,7 +39,10 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 //日程-home页
-
+data object BacklogHome : RallyDestination {
+    override val icon =Icons.Filled.Timer
+    override val route ="backlogs"
+}
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,9 +91,7 @@ fun BacklogHomeScreen(
                     backlog ->
                 BacklogsCard(
                     backlog = backlog,
-                    modifier=Modifier.clickable {
-                        onBacklogClick(backlog.id)
-                    }
+                    onBacklogClick=onBacklogClick,
                 )
                 Spacer(Modifier.height(12.dp))
             }
@@ -100,9 +103,7 @@ fun BacklogHomeScreen(
         if(!homeUiState.backlogList.isEmpty() && !homeUiState.backlogList.first().timeTitle.equals(formattedDate)) {
             FloatingActionButton(
                 onClick ={
-                    coroutineScope.launch {
-                        onBacklogClick(viewModel.newCurrentBacklog(timeTitle = formattedDate))
-                    }
+                         /*添加即跳转-待实现*/
                 },
                 backgroundColor = MaterialTheme.colors.surface,
                 modifier = Modifier
@@ -122,7 +123,8 @@ fun BacklogHomeScreen(
 @Composable
 private fun BacklogsCard(
     backlog: Backlog,
-    modifier: Modifier =Modifier
+    modifier: Modifier =Modifier,
+    onBacklogClick: (Int) -> Unit,
 ) {
     val creditTotal:Float =backlog.importCredit+backlog.normalCredit+backlog.faverCredit
     Card {
@@ -130,6 +132,7 @@ private fun BacklogsCard(
             Column(modifier
                 .fillMaxWidth()
                 .padding(12.dp)
+                .clickable { onBacklogClick(backlog.id) }
             ) {
                 Text(text = backlog.timeTitle, style = MaterialTheme.typography.h2)
                 val amountText = "$" + creditTotal
@@ -143,7 +146,7 @@ private fun BacklogsCard(
                 SeeAllButton(
                     modifier = modifier.clearAndSetSemantics {
                         contentDescription = "All ${backlog.timeTitle}'s Routines"
-                    }
+                    }.clickable { onBacklogClick(backlog.id) }
                 )
             }
         }

@@ -25,12 +25,7 @@ object SingleBacklogDestination : RallyDestination {
     override val icon = Icons.Filled.Timer
     const val backlogIdArg = "backlogId"
     val routeWithArgs = "$route/{$backlogIdArg}"
-    val arguments = listOf(
-        navArgument(backlogIdArg) { type = NavType.IntType }
-    )
-    val deepLinks = listOf(
-        navDeepLink { uriPattern = "rally://$route/{$backlogIdArg}" }
-    )
+    
 }
 //记得添加删除键
 @Composable

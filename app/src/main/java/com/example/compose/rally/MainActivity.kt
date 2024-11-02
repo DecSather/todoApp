@@ -7,18 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 
-@Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
-)
-@Composable
-fun RallyPreview() {
-    RallyApp()
-}
-/**
- * This Activity recreates part of the Rally Material Study from
- * https://material.io/design/material-studies/rally.html
- */
+//主程序加载-设置页面
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -4,10 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
+import com.example.compose.rally.ui.backlog.BacklogHome
 import com.example.compose.rally.ui.backlog.BacklogHomeScreen
 import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.backlog.SingleBacklogScreen
@@ -24,24 +27,25 @@ fun RallyNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Backlogs.route,
+        startDestination = BacklogHome.route,
         modifier = modifier
     ) {
 //            Backlog Home
-        composable(route = Backlogs.route) {
+        composable(route = BacklogHome.route) {
             BacklogHomeScreen(
-                onBacklogClick = {backlogId ->
-                    navController.navigateToSingleBacklog(backlogId)
-                },
+                onBacklogClick = {
+                    navController.navigate("${SingleBacklogDestination.route}/${it}")
+                }
             )
         }
 
 //        Single Backlog
         composable(
             route = SingleBacklogDestination.routeWithArgs,
-            arguments = SingleBacklogDestination.arguments,
-            deepLinks = SingleBacklogDestination.deepLinks
-        ) {
+            arguments = listOf(navArgument(SingleBacklogDestination.backlogIdArg) {
+                type = NavType.IntType
+            })
+        ){
                 backStackEntry ->
             val backlogId = backStackEntry.arguments?.getInt("backlogId") ?: 0
             SingleBacklogScreen(
@@ -73,9 +77,7 @@ fun RallyNavHost(
 
 //            new Routine Entry
         composable(
-            route = RoutineEntryDestination.routeWithArgs,
-            arguments = RoutineEntryDestination.arguments,
-            deepLinks = RoutineEntryDestination.deepLinks
+            route = RoutineEntryDestination.route,
         ) {
                 backStackEntry ->
             val backlogId = backStackEntry.arguments?.getInt("backlogId") ?: 0
@@ -87,9 +89,7 @@ fun RallyNavHost(
         }
 //        Single Routine
         composable(
-            route = SingleRoutineDestination.routeWithArgs,
-            arguments = SingleRoutineDestination.arguments,
-            deepLinks = SingleRoutineDestination.deepLinks
+            route = SingleRoutineDestination.route,
         ) {
             SingleRoutineScreen(
                 navigateBack= { navController.popBackStack() },
