@@ -10,17 +10,17 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.compose.rally.ui.AppViewModelProvider
-import com.example.compose.rally.ui.components.RoutineBody
+import com.example.compose.rally.ui.components.BacklogBody
 import com.example.compose.rally.ui.components.RoutineRow
 import com.example.compose.rally.ui.navigation.NavigationDestination
+import com.example.compose.rally.ui.navigation.RallyDestination
 import com.example.compose.rally.ui.routine.RoutineHomeViewModel
-import com.example.compose.rally.ui.theme.Blue900
 import com.example.compose.rally.ui.theme.faverColor
 import com.example.compose.rally.ui.theme.importColor
 import com.example.compose.rally.ui.theme.normalColor
 import kotlinx.coroutines.launch
 
-object SingleBacklogDestination : NavigationDestination {
+object SingleBacklogDestination : RallyDestination {
     override val route = "single_backlog"
     override val icon = Icons.Filled.Timer
     const val backlogIdArg = "backlogId"
@@ -36,7 +36,8 @@ object SingleBacklogDestination : NavigationDestination {
 @Composable
 fun SingleBacklogScreen(
     navigateBack: () -> Unit,
-    navigateToUpdateRoutine: (Int) -> Unit={},
+    navigateToNewRoutine:(Int)->Unit,
+    navigateToSingleRoutine: (Int) -> Unit={},
     viewModel: SingleBacklogViewModel= viewModel(factory = AppViewModelProvider.Factory),
     routineHomeViewModel: RoutineHomeViewModel= viewModel(factory = AppViewModelProvider.Factory),
 ) {
@@ -48,8 +49,9 @@ fun SingleBacklogScreen(
 //    旧属性
     
     val amount=routines.map { routine ->routine.credit }.sum()
-    RoutineBody(
-        routineHomeViewModel=routineHomeViewModel,
+    BacklogBody(
+        backlogId = backlog.id,
+        newRoutineClick=navigateToNewRoutine,
         onDelete ={
             coroutineScope.launch {
                 viewModel.deleteBacklogById(backlog.id)
@@ -63,7 +65,7 @@ fun SingleBacklogScreen(
     )
     { routine ->
         RoutineRow(
-            modifier = Modifier.clickable {navigateToUpdateRoutine},
+            modifier = Modifier.clickable {navigateToSingleRoutine(routine.id)},
             content = routine.content,
             subcontent = routine.subcontent,
             credit = routine.credit,

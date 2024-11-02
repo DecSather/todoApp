@@ -28,14 +28,16 @@ fun RallyApp() {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
+        println("cur destination: "+currentDestination?.route)
         val currentScreen = rallyTabRowScreens.find {
             it.route == currentDestination?.route
-                    || (it == Backlogs && currentDestination?.route?.startsWith( SingleBacklogDestination.route ) == true)
+                    || (it == Overview && currentDestination?.route?.startsWith( Overview.route ) == true)
                     || (it == Accounts && currentDestination?.route?.startsWith( SingleAccount.route ) == true)
         } ?: Backlogs
         
         Scaffold(
             containerColor = if(isSystemInDarkTheme()) Color(0xFF26282F) else Color(0xFFD4E5EF),
+//            导航栏样式
             topBar = {
                 RallyTabRow(
                     allScreens = rallyTabRowScreens,

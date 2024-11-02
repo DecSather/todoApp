@@ -9,12 +9,26 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.compose.rally.RallyApplication
 import com.example.compose.rally.ui.backlog.BacklogHomeViewModel
 import com.example.compose.rally.ui.backlog.SingleBacklogViewModel
+import com.example.compose.rally.ui.routine.RoutineEntryViewModel
 import com.example.compose.rally.ui.routine.RoutineHomeViewModel
+import com.example.compose.rally.ui.routine.SingleRoutineViewModel
 
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
-        
+
+//            SingleRoutine
+        initializer {
+            SingleRoutineViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.routinesRepository
+            )
+        }
+
+//            RoutineEntry
+        initializer {
+            RoutineEntryViewModel(inventoryApplication().container.routinesRepository)
+        }
 //            RoutineHome
         initializer {
             RoutineHomeViewModel(

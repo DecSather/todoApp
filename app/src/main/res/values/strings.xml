@@ -9,6 +9,11 @@
     <string name="sort">Sort</string>
     <string name="see_all">SEE ALL</string>
     
+    <string name="rontine_content_req">Routine Content*</string>
+    <string name="rontine_rank_req">Rank*</string>
+    <string name="rontine_subcontent_req">Remark</string>
+    <string name="rontine_credit_req">Credit*</string>
+    
 <!--     inventory -->
     
     <string name="attention">Attention</string>

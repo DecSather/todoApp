@@ -18,6 +18,7 @@ class SingleBacklogViewModel(
     private val backlogsRepository: BacklogsRepository
 ) : ViewModel() {
     private val backlogId: Int = checkNotNull(savedStateHandle[SingleBacklogDestination.backlogIdArg])
+    
     val uiState: StateFlow<BacklogDetailsUiState> =
         backlogsRepository.getBacklogStream(backlogId)
             .filterNotNull()

@@ -27,7 +27,7 @@ import androidx.navigation.navDeepLink
  * Contract for information needed on every Rally navigation destination
  */
 
-sealed interface RallyDestination {
+interface RallyDestination {
     val icon: ImageVector
     val route: String
 }
@@ -37,20 +37,6 @@ data object Backlogs : RallyDestination {
     override val icon =Icons.Filled.Timer
     override val route ="backlogs"
 }
-
-//data object SingleBacklog : RallyDestination {
-//    override val icon = Icons.Filled.Timer
-//    override val route = "single_backlog"
-//    const val backlogTypeArg = "backlog_type"
-//    val routeWithArgs = "$route/{$backlogTypeArg}"
-//    val arguments = listOf(
-//        navArgument(backlogTypeArg) { type = NavType.StringType }
-//    )
-//    val deepLinks = listOf(
-//        navDeepLink { uriPattern = "rally://$route/{$backlogTypeArg}" }
-//    )
-//}
-
 /**
  * Rally app navigation destinations
  */

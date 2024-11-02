@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.runtime.*
@@ -27,16 +26,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
 import com.example.compose.rally.data.Routine
-import com.example.compose.rally.ui.routine.RoutineHomeViewModel
 import com.example.compose.rally.ui.theme.Blue900
-import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 @Composable
-fun  RoutineBody(
-    modifier: Modifier = Modifier,
-    routineHomeViewModel: RoutineHomeViewModel,
+fun  BacklogBody(
+    backlogId: Int,
+    newRoutineClick:(Int)->Unit,
     onDelete: () -> Unit={},
     items: List<Routine>,
     creditRatios:List<Float>,
@@ -79,13 +76,7 @@ fun  RoutineBody(
 
 //                预加载空列
                     RoutineRow(
-                        modifier = Modifier.clickable {
-                            coroutineScope.launch {
-                                routineHomeViewModel.insertRoutine(
-                                    content = "new routine test2"
-                                )
-                            }
-                        },
+                        modifier = Modifier.clickable{ newRoutineClick(backlogId)},
                         content = "待办清单",
                         subcontent = "点击添加",
                         credit = 0f,

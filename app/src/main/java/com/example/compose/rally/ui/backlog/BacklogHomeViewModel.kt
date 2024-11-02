@@ -11,14 +11,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 /**
- * ViewModel to retrieve all items in the Room database.
+ * BacklogHome
  */
 class BacklogHomeViewModel(private val backlogsRepository: BacklogsRepository) : ViewModel() {
 
-    /**
-     * Holds home ui state. The list of items are retrieved from [ItemsRepository] and mapped to
-     * [HomeUiState]
-     */
     val homeUiState: StateFlow<HomeUiState> =
         backlogsRepository.getAllBacklogsStream().map { HomeUiState(it) }
             .stateIn(
@@ -31,13 +27,14 @@ class BacklogHomeViewModel(private val backlogsRepository: BacklogsRepository) :
         private const val TIMEOUT_MILLIS = 5_000L
     }
     
-    suspend fun newCurrentBacklog(timeTitle:String) {
-        backlogsRepository.insertBacklog(
+    suspend fun newCurrentBacklog(timeTitle:String):Int{
+      
+        return backlogsRepository.insertBacklog(
             Backlog(
-            timeTitle =timeTitle,
+                timeTitle =timeTitle,
                 routineListJson = "{}"
             )
-        )
+        ).toInt()
     }
     suspend fun deleteBacklogById(id:Int) {
         backlogsRepository.deleteBacklogById(id)

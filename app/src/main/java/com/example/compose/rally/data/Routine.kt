@@ -16,7 +16,7 @@ data class Routine(
 //
     val finished: Boolean =false,
     val subcontent:String="",
-    val credit: Float =0f,
 //    0,1,2
     val rank:Int=1,
+    val credit: Float =0f,
 )

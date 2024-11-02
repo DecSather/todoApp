@@ -27,6 +27,7 @@ class BacklogsRepository(private val backlogDao: BacklogDao) {
     
      fun getBacklogStream(id: Int): Flow<Backlog?> = backlogDao.getBacklog(id)
      fun getBacklogStreamByString(timeTitle: String): Flow<Backlog?>  = backlogDao.getBacklogByString(timeTitle)
+     
     
      suspend fun insertBacklog(backlog: Backlog) = backlogDao.insert(backlog)
     

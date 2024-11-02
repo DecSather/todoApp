@@ -97,12 +97,11 @@ fun BacklogHomeScreen(
         //    每日新日程
         val currentDate = LocalDate.now()
         var formattedDate = currentDate.format(formatter)
-        
-        if(homeUiState.backlogList.isEmpty()||!homeUiState.backlogList.last().timeTitle.equals(formattedDate)) {
+        if(!homeUiState.backlogList.isEmpty() && !homeUiState.backlogList.first().timeTitle.equals(formattedDate)) {
             FloatingActionButton(
                 onClick ={
                     coroutineScope.launch {
-                        viewModel.newCurrentBacklog(timeTitle = formattedDate)
+                        onBacklogClick(viewModel.newCurrentBacklog(timeTitle = formattedDate))
                     }
                 },
                 backgroundColor = MaterialTheme.colors.surface,
