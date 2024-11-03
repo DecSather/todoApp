@@ -14,21 +14,19 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import com.example.compose.rally.R
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.AppViewModelProvider
-import com.example.compose.rally.ui.navigation.NavigationDestination
+import com.example.compose.rally.ui.navigation.RallyDestination
 import kotlinx.coroutines.launch
 //new Routine Entry-预添加类设计，非数据
-object SingleRoutineDestination : NavigationDestination {
+object SingleRoutineDestination : RallyDestination {
     override val route = "single_routine"
     override val icon = Icons.Filled.Check
     const val routineIdArg = "routineId"

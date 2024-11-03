@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
 import com.example.compose.rally.data.Routine
+import com.example.compose.rally.ui.theme.BackgroudBlue
 import com.example.compose.rally.ui.theme.Blue900
 import java.time.format.DateTimeFormatter
 
@@ -46,7 +47,7 @@ fun  BacklogBody(
     val coroutineScope = rememberCoroutineScope()
     Box(modifier=Modifier.fillMaxSize())
     {
-        Column() {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Box(Modifier.padding(16.dp)) {
                 ThreeColorCircle(
                     proportions = creditRatios
@@ -67,13 +68,11 @@ fun  BacklogBody(
             }
             Spacer(Modifier.height(10.dp))
             Card {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    LazyColumn {
-                        items(items = items) { item ->
-                            rows(item)
-                        }
+                Column(modifier = Modifier.padding(12.dp).weight(1f)){
+                    items.map {
+                        item ->
+                        rows(item)
                     }
-
 //                预加载空列
                     RoutineRow(
                         modifier = Modifier.clickable{ newRoutineClick(backlogId)},
@@ -84,11 +83,16 @@ fun  BacklogBody(
                         color = Blue900
                     )
                 }
+                Spacer(Modifier.height(16.dp))
             }
-            Spacer(Modifier.height(16.dp))
-            
-            
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(MaterialTheme.colors.background)
+            )
         }
+        
         FloatingActionButton(
             onClick = { deleteConfirmationRequired = true },
             backgroundColor = MaterialTheme.colors.surface,
@@ -265,7 +269,7 @@ fun BaseDivider(
                 modifier = Modifier
                     .weight(1f)
                     .height(1.dp)
-                    .background(MaterialTheme.colors.background)
+                    .background(BackgroudBlue)
             )
         }
     }

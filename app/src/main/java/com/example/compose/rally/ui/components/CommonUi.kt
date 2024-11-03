@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.example.compose.rally.R
+import com.example.compose.rally.ui.theme.BackgroudBlue
 import java.text.DecimalFormat
 
 
@@ -130,7 +131,7 @@ private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 
 @Composable
 fun RallyDivider(modifier: Modifier = Modifier) {
-    Divider(color = MaterialTheme.colors.background, thickness = 1.dp, modifier = modifier)
+    Divider(color = BackgroudBlue, thickness = 1.dp, modifier = modifier)
 }
 
 /**

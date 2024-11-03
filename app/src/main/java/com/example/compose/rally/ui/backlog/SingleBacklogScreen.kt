@@ -1,7 +1,6 @@
 package com.example.compose.rally.ui.backlog
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.runtime.*
@@ -9,11 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import androidx.navigation.navDeepLink
 import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.BacklogBody
 import com.example.compose.rally.ui.components.RoutineRow
-import com.example.compose.rally.ui.navigation.NavigationDestination
 import com.example.compose.rally.ui.navigation.RallyDestination
 import com.example.compose.rally.ui.routine.RoutineHomeViewModel
 import com.example.compose.rally.ui.theme.faverColor

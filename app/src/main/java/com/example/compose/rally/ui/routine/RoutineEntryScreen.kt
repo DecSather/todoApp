@@ -25,10 +25,10 @@ import androidx.navigation.navArgument
 import com.example.compose.rally.R
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.AppViewModelProvider
-import com.example.compose.rally.ui.navigation.NavigationDestination
+import com.example.compose.rally.ui.navigation.RallyDestination
 import kotlinx.coroutines.launch
 //new Routine Entry-预添加类设计，非数据
-object RoutineEntryDestination : NavigationDestination {
+object RoutineEntryDestination : RallyDestination {
     override val route = "routine_entry"
     override val icon = Icons.Filled.Check
     const val backlogIdArg = "backlogId"

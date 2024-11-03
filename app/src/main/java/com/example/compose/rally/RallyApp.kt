@@ -2,6 +2,7 @@ package com.example.compose.rally
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -20,6 +21,7 @@ import com.example.compose.rally.ui.backlog.BacklogHome
 import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.navigation.*
+import com.example.compose.rally.ui.theme.BackgroudBlue
 import com.example.compose.rally.ui.theme.RallyTheme
 @Composable
 fun InventoryApp() {
@@ -42,7 +44,7 @@ fun RallyApp(navController: NavHostController = rememberNavController()) {
                     || (it == Accounts && currentDestination?.route?.startsWith( SingleAccount.route ) == true)
         } ?: BacklogHome
         Scaffold(
-            containerColor = if(isSystemInDarkTheme()) Color(0xFF26282F) else Color(0xFFD4E5EF),
+            containerColor = if(isSystemInDarkTheme()) Color(0xFF26282F) else MaterialTheme.colors.background,
 //            导航栏样式
             topBar = {
                 RallyTabRow(
