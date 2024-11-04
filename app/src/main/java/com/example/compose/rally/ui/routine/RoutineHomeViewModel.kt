@@ -3,6 +3,7 @@ package com.example.compose.rally.ui.routine
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.compose.rally.data.BacklogsRepository
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.data.RoutinesRepository
 import com.example.compose.rally.ui.backlog.SingleBacklogDestination
@@ -23,10 +24,6 @@ class RoutineHomeViewModel(
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
-    }
-    suspend fun deleteZeroRoutines(){
-        for(i in 452..471)
-        routinesRepository.deleteRoutineById(i)
     }
     
 }

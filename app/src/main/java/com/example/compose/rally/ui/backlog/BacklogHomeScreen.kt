@@ -32,6 +32,7 @@ import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
 import com.example.compose.rally.ui.navigation.RallyDestination
 import com.example.compose.rally.ui.routine.RoutineHomeViewModel
+import com.example.compose.rally.ui.routine.formatedCredit
 import com.example.compose.rally.ui.theme.faverColor
 import com.example.compose.rally.ui.theme.importColor
 import com.example.compose.rally.ui.theme.normalColor
@@ -53,9 +54,9 @@ fun BacklogHomeScreen(
     val coroutineScope = rememberCoroutineScope()
 
 //    积分属性
-    val importTotal by rememberUpdatedState(homeUiState.backlogList.map { backlog -> backlog.importCredit.toDouble()}.sum())
-    val normalTotal by rememberUpdatedState(homeUiState.backlogList.map { backlog -> backlog.normalCredit.toDouble()}.sum() )
-    val faverTotal by rememberUpdatedState(homeUiState.backlogList.map { backlog -> backlog.faverCredit.toDouble()}.sum() )
+    val importTotal by rememberUpdatedState(homeUiState.backlogList.map { backlog -> backlog.importCredit}.sum())
+    val normalTotal by rememberUpdatedState(homeUiState.backlogList.map { backlog -> backlog.normalCredit}.sum() )
+    val faverTotal by rememberUpdatedState(homeUiState.backlogList.map { backlog -> backlog.faverCredit}.sum() )
     val creditsTotal =importTotal+normalTotal+faverTotal
     
 //    样式设计
@@ -69,7 +70,8 @@ fun BacklogHomeScreen(
 //        三色转圈
             Box(Modifier.padding(16.dp)) {
                 ThreeColorCircle(
-                    proportions =  listOf((importTotal/creditsTotal).toFloat(),(normalTotal/creditsTotal).toFloat(),(faverTotal/creditsTotal).toFloat())
+                    proportions =if(creditsTotal>0f)  listOf((importTotal/creditsTotal),(normalTotal/creditsTotal),(faverTotal/creditsTotal))
+                    else listOf(0f,0f,1f)
                 )
                 Spacer(Modifier.height(12.dp))
                 Column(modifier = Modifier.align(Alignment.Center)) {
@@ -79,7 +81,7 @@ fun BacklogHomeScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     Text(
-                        text = creditsTotal.toString(),
+                        text = formatedCredit( creditsTotal.toString()),
                         style = MaterialTheme.typography.h2,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
@@ -99,7 +101,7 @@ fun BacklogHomeScreen(
         //    每日新日程
         val currentDate = LocalDate.now()
         var formattedDate = currentDate.format(formatter)
-        if(!homeUiState.backlogList.isEmpty() && !homeUiState.backlogList.first().timeTitle.equals(formattedDate)) {
+        if(homeUiState.backlogList.isEmpty() || !homeUiState.backlogList.first().timeTitle.equals(formattedDate)) {
             FloatingActionButton(
                 onClick ={
                     coroutineScope.launch {

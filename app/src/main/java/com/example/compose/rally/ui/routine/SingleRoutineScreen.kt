@@ -21,8 +21,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.compose.rally.R
+import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.AppViewModelProvider
+import com.example.compose.rally.ui.backlog.BacklogUiState
 import com.example.compose.rally.ui.navigation.RallyDestination
 import kotlinx.coroutines.launch
 //new Routine Entry-预添加类设计，非数据
@@ -39,15 +41,28 @@ object SingleRoutineDestination : RallyDestination {
 @Composable
 fun SingleRoutineScreen(
     navigateBack: () -> Unit,
-    viewModel: SingleRoutineViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    routineViewModel: SingleRoutineViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val routineUiState = routineViewModel.routineUiState
+    val backlogUiState=routineViewModel.backlogUiState
     SingleRoutineBody(
-        itemUiState = viewModel.routineUiState,
-        onRoutineValueChange= viewModel::updateUiState,
-        onSaveClick = {
+        routineUiState = routineUiState,
+        onRoutineValueChange= routineViewModel::updateRoutineUiState,
+        onSaveClick = { oldCredit,newCredit ->
             coroutineScope.launch {
-                viewModel.updateRoutine()
+                if(!oldCredit.equals(newCredit)) {
+                    val oldcredit=oldCredit.toFloat()
+                    val newcredit=newCredit.toFloat()
+                    routineViewModel.updateBacklogUiState(
+                        when (routineUiState.routine.rank) {
+                            0 -> backlogUiState.backlog.copy(importCredit = backlogUiState.backlog.importCredit - oldcredit + newcredit)
+                            1 -> backlogUiState.backlog.copy(normalCredit = backlogUiState.backlog.normalCredit - oldcredit + newcredit)
+                            else -> backlogUiState.backlog.copy(faverCredit = backlogUiState.backlog.faverCredit - oldcredit + newcredit)
+                        }
+                    )
+                }
+                routineViewModel.updateRoutine()
                 navigateBack()
             }
         },
@@ -56,12 +71,11 @@ fun SingleRoutineScreen(
 
 @Composable
 fun SingleRoutineBody(
-    itemUiState: RoutineUiState,
+    routineUiState: RoutineUiState,
     onRoutineValueChange:(Routine) -> Unit,
-    onSaveClick: () -> Unit,
+    onSaveClick: (String,String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    
     var rankText by remember { mutableStateOf("-1") }
     var creditText by remember { mutableStateOf("0.0") }
     
@@ -77,9 +91,9 @@ fun SingleRoutineBody(
         ) {
 //        content
             OutlinedTextField(
-                value = itemUiState.routine.content,
+                value = routineUiState.routine.content,
                 onValueChange = {
-                    onRoutineValueChange(itemUiState.routine.copy(content = it ))
+                    onRoutineValueChange(routineUiState.routine.copy(content = it ))
                 },
                 label = { Text(stringResource(R.string.rontine_content_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -93,13 +107,10 @@ fun SingleRoutineBody(
             )
 //        rank
             OutlinedTextField(
-                value = if(rankText.equals("-1"))itemUiState.routine.rank.toString() else rankText,
+                value = if(rankText.equals("-1"))routineUiState.routine.rank.toString() else rankText,
                 onValueChange ={
                         newText ->
                     rankText = newText
-                    if(rankText.isNotEmpty())
-                        onRoutineValueChange(itemUiState.routine.copy(rank = rankText.toInt() ))
-                    else onRoutineValueChange(itemUiState.routine.copy(rank = -1))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text(stringResource(R.string.rontine_rank_req)) },
@@ -114,13 +125,10 @@ fun SingleRoutineBody(
             )
 //        credit
             OutlinedTextField(
-                value = if(creditText.equals("0.0"))itemUiState.routine.credit.toString() else creditText,
+                value = if(creditText.equals("0.0"))routineUiState.routine.credit.toString() else creditText,
                 onValueChange = {
                         newText ->
                     creditText = newText
-                    if(creditText.isNotEmpty())
-                        onRoutineValueChange(itemUiState.routine.copy(credit = creditText.toFloat()))
-                    else onRoutineValueChange(itemUiState.routine.copy(credit = 0f))
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text(stringResource(R.string.rontine_credit_req)) },
@@ -136,9 +144,9 @@ fun SingleRoutineBody(
             )
 //        subcontent
             OutlinedTextField(
-                value = itemUiState.routine.subcontent,
+                value = routineUiState.routine.subcontent,
                 onValueChange = {
-                    onRoutineValueChange(itemUiState.routine.copy(subcontent = it ))
+                    onRoutineValueChange(routineUiState.routine.copy(subcontent = it ))
                 },
                 label = { Text(stringResource(R.string.rontine_subcontent_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -156,12 +164,18 @@ fun SingleRoutineBody(
                 )
             }
         }
-        
         Button(
             onClick = {
-                onSaveClick()
+                if(rankText.isNotEmpty())
+                    onRoutineValueChange(routineUiState.routine.copy(rank = rankText.toInt() ))
+                else onRoutineValueChange(routineUiState.routine.copy(rank = -1))
+                val oldCredit=routineUiState.routine.credit.toString()
+                if(creditText.isNotEmpty())
+                    onRoutineValueChange(routineUiState.routine.copy(credit = creditText.toFloat()))
+                else onRoutineValueChange(routineUiState.routine.copy(credit = 0f))
+                onSaveClick(oldCredit,creditText)
                       },
-            enabled = itemUiState.isEntryValid,
+            enabled = routineUiState.isEntryValid,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = stringResource(R.string.save_action))

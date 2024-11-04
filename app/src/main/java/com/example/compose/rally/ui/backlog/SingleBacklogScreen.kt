@@ -9,7 +9,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.example.compose.rally.ui.AppViewModelProvider
-import com.example.compose.rally.ui.components.BacklogBody
+import com.example.compose.rally.ui.components.SingleBacklogBody
 import com.example.compose.rally.ui.components.RoutineRow
 import com.example.compose.rally.ui.navigation.RallyDestination
 import com.example.compose.rally.ui.routine.RoutineHomeViewModel
@@ -36,17 +36,13 @@ fun SingleBacklogScreen(
     viewModel: SingleBacklogViewModel= viewModel(factory = AppViewModelProvider.Factory),
     routineHomeViewModel: RoutineHomeViewModel= viewModel(factory = AppViewModelProvider.Factory),
 ) {
-    val uiState = viewModel.uiState.collectAsState()
+    val backlogUiState = viewModel.backlogUiState.collectAsState()
+    val backlog = backlogUiState.value.backlog
     val coroutineScope = rememberCoroutineScope()
-    
     val routineHomeUiState=routineHomeViewModel.homeUiState.collectAsState()
-    val backlog=uiState.value.backlog
     val routines=routineHomeUiState.value.routineList
-//    旧属性
-    
-    val amount=routines.map { routine ->routine.credit }.sum()
-    BacklogBody(
-        backlogId = backlog.id,
+    SingleBacklogBody(
+        backlog =backlog,
         newRoutineClick=navigateToNewRoutine,
         onDelete ={
             coroutineScope.launch {
@@ -55,9 +51,6 @@ fun SingleBacklogScreen(
             }
         },
         items=routines,
-        creditRatios= listOf(backlog.importCredit/amount,backlog.normalCredit/amount,backlog.faverCredit/amount),
-        amountsTotal=amount,
-        circleLabel=backlog.timeTitle,
     )
     { routine ->
         RoutineRow(

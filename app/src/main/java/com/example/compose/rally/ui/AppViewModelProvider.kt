@@ -21,13 +21,15 @@ object AppViewModelProvider {
         initializer {
             SingleRoutineViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.routinesRepository
+                inventoryApplication().container.routinesRepository,
+                inventoryApplication().container.backlogsRepository
             )
         }
 
 //            RoutineEntry
         initializer {
-            RoutineEntryViewModel(inventoryApplication().container.routinesRepository)
+            RoutineEntryViewModel(inventoryApplication().container.routinesRepository,
+                inventoryApplication().container.backlogsRepository)
         }
 //            RoutineHome
         initializer {

@@ -10,7 +10,7 @@ data class Backlog(
     val id: Int=0,
     val timeTitle: String ="yyyy-MM-dd",
     val routineListJson: String,
-    val importCredit: Float =4f,
+    val importCredit: Float =0f,
     val normalCredit: Float =0f,
-    val faverCredit: Float =2f,
+    val faverCredit: Float =0f,
     )

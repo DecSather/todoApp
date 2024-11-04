@@ -7,37 +7,33 @@ import androidx.lifecycle.viewModelScope
 import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.BacklogsRepository
 import com.example.compose.rally.data.fromListToJson
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 
+//SingleBacklog
 class SingleBacklogViewModel(
     savedStateHandle: SavedStateHandle,
     private val backlogsRepository: BacklogsRepository
 ) : ViewModel() {
-    private val backlogIdArg: Int = checkNotNull(savedStateHandle[SingleBacklogDestination.backlogIdArg])
+    private val backlogId: Int = checkNotNull(savedStateHandle[SingleBacklogDestination.backlogIdArg])
     
-    val uiState: StateFlow<BacklogDetailsUiState> =
-        backlogsRepository.getBacklogStream(backlogIdArg)
-            .filterNotNull()
-            .map {
-                BacklogDetailsUiState(backlog = it)
-            }.stateIn(
+    val backlogUiState: StateFlow<BacklogUiState> =
+        backlogsRepository.getBacklogStream(id = backlogId)
+            .map { BacklogUiState(it?:Backlog(timeTitle = "", routineListJson = "")) }
+            .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
-                initialValue = BacklogDetailsUiState()
+                started = SharingStarted.WhileSubscribed(5_000L),
+                initialValue = BacklogUiState()
             )
-    companion object {
-        private const val TIMEOUT_MILLIS = 5_000L
-    }
+    
     suspend fun deleteBacklogById(id:Int) {
         backlogsRepository.deleteBacklogById(id)
     }
+    
 }
-
-data class BacklogDetailsUiState(
+fun Backlog.toBacklogUiState():BacklogUiState=BacklogUiState(
+    backlog = this
+)
+data class BacklogUiState(
     val backlog: Backlog=
         Backlog(timeTitle="yyyy-MM-dd", routineListJson = fromListToJson(listOf(1,0)))
 )

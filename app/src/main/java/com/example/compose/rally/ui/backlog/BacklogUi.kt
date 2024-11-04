@@ -3,8 +3,6 @@ package com.example.compose.rally.ui.components
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -25,48 +23,52 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
+import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
+import com.example.compose.rally.ui.routine.formatedCredit
 import com.example.compose.rally.ui.theme.BackgroudBlue
 import com.example.compose.rally.ui.theme.Blue900
 import java.time.format.DateTimeFormatter
 
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 @Composable
-fun  BacklogBody(
-    backlogId: Int,
+fun  SingleBacklogBody(
+    backlog: Backlog,
     newRoutineClick:(Int)->Unit,
     onDelete: () -> Unit={},
-    items: List<Routine>,
-    creditRatios:List<Float>,
-    amountsTotal: Float,
-    circleLabel: String,
+    items:List<Routine>,
     rows: @Composable (Routine) -> Unit,
 ) {
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    
-    val coroutineScope = rememberCoroutineScope()
     Box(modifier=Modifier.fillMaxSize())
     {
+        val amount=(backlog.importCredit+backlog.normalCredit+backlog.faverCredit)
+        val creditRatios=
+            if(amount>0f)
+            listOf(backlog.importCredit/amount,backlog.normalCredit/amount,backlog.faverCredit/amount)
+        else listOf(0f,0f,1f)
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Box(Modifier.padding(16.dp)) {
+//                三色圈
                 ThreeColorCircle(
                     proportions = creditRatios
                 )
                 Spacer(Modifier.height(12.dp))
                 Column(modifier = Modifier.align(Alignment.Center)) {
                     Text(
-                        text = circleLabel,
+                        text = backlog.timeTitle,
                         style = MaterialTheme.typography.body1,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                     Text(
-                        text = amountsTotal.toString(),
+                        text = formatedCredit( amount.toString()),
                         style = MaterialTheme.typography.h2,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
                 }
             }
             Spacer(Modifier.height(10.dp))
+//            routineList
             Card {
                 Column(modifier = Modifier.padding(12.dp).weight(1f)){
                     items.map {
@@ -75,7 +77,7 @@ fun  BacklogBody(
                     }
 //                预加载空列
                     RoutineRow(
-                        modifier = Modifier.clickable{ newRoutineClick(backlogId)},
+                        modifier = Modifier.clickable{ newRoutineClick(backlog.id)},
                         content = "待办清单",
                         subcontent = "点击添加",
                         credit = 0f,
@@ -139,19 +141,6 @@ private fun DeleteConfirmationDialog(
             }
         })
 }
-
-private val RallyDefaultPadding = 12.dp
-
-private const val SHOWN_ITEMS = 3
-@Composable
-fun CommonCard(
-    modifier: Modifier=Modifier,
-    timeTitle: String,
-    data: List<Float>,
-    colors: List<Color>,
-) {
-}
-
 
 @Composable
 fun RoutineRow(

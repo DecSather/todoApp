@@ -35,9 +35,6 @@ class BacklogHomeViewModel(private val backlogsRepository: BacklogsRepository) :
             )
         ).toInt()
     }
-    suspend fun deleteBacklogById(id:Int) {
-        backlogsRepository.deleteBacklogById(id)
-    }
 }
 
 /**
