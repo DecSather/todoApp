@@ -50,20 +50,20 @@ fun SingleBacklogScreen(
                 navigateBack()
             }
         },
+        navigateBack=navigateBack,
         items=routines,
     )
     { routine ->
         RoutineRow(
             modifier = Modifier.clickable {navigateToSingleRoutine(routine.id)},
-            content = routine.content,
-            subcontent = routine.subcontent,
-            credit = routine.credit,
-            finished = routine.finished,
-            color = when(routine.rank){
-                0-> importColor
-                1-> faverColor
-                else -> normalColor
+            routine=routine,
+            onFinishedChange={ id,finished ->
+                coroutineScope.launch {
+                    routineHomeViewModel.onRoutineFinishedChange(id,finished)
+                }
             }
+            
+            
         )
         
     }

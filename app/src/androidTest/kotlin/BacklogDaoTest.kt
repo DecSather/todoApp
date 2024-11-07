@@ -7,7 +7,6 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.example.compose.rally.data.Backlog
-import com.example.compose.rally.data.fromListToJson
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
@@ -45,12 +44,10 @@ class BacklogDaoTest {
 //    }
 //
 //    private var item1=Backlog(
-//    timeTitle = "2024-1-1",
-//    routineListJson = fromListToJson(List<Int>(1,{0})),
+//    timeTitle = "2024-1-1"
 //    )
 //    private var item2 = Backlog(
-//    timeTitle = "2024-1-2",
-//    routineListJson = fromListToJson(List<Int>(1,{1})),
+//    timeTitle = "2024-1-2"
 //    )
 //    private suspend fun addOneItemToDb() {
 //        itemDao.insert(item1)

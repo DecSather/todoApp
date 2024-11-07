@@ -1,5 +1,6 @@
 package com.example.compose.rally.data
 
+import android.content.IntentSender.OnFinished
 import kotlinx.coroutines.flow.Flow
 
 class RoutinesRepository(private val routineDao: RoutineDao) {
@@ -14,4 +15,6 @@ class RoutinesRepository(private val routineDao: RoutineDao) {
      suspend fun deleteRoutineById(id:Int) = routineDao.deleteRoutineById(id)
 
      suspend fun updateRoutine(routine: Routine) = routineDao.update(routine)
+     
+     suspend fun updateFinished(id:Int,finished: Boolean)=routineDao.undateFinished(id,finished)
 }

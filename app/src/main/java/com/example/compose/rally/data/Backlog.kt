@@ -9,8 +9,4 @@ data class Backlog(
     @PrimaryKey(autoGenerate = true)
     val id: Int=0,
     val timeTitle: String ="yyyy-MM-dd",
-    val routineListJson: String,
-    val importCredit: Float =0f,
-    val normalCredit: Float =0f,
-    val faverCredit: Float =0f,
     )

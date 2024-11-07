@@ -12,7 +12,7 @@ interface RoutineDao {
     // 由于返回值类型为 Flow，Room 还会在后台线程上运行该查询，无需将其明确设为 suspend 函数并在协程作用域内调用它。
     @Query("SELECT * from routines ORDER BY id DESC")
     fun getAllRoutines(): Flow<List<Routine>>
-    @Query("SELECT * from routines WHERE backlogId = :backlogId ORDER BY id ASC")
+    @Query("SELECT * from routines WHERE backlogId = :backlogId ORDER BY finished ASC, id ASC")
     fun getRoutinesByBacklogId(backlogId:Int): Flow<List<Routine>>
 
     @Query("SELECT * from routines WHERE id = :id")
@@ -24,6 +24,9 @@ interface RoutineDao {
     //    @Update 注解与 insert() 方法类似，使用 suspend 关键字标记此函数。
     @Update
     suspend fun update(item: Routine)
+    
+    @Query("UPDATE routines SET finished = :finished WHERE id = :id")
+    suspend fun undateFinished(id:Int,finished:Boolean)
 
     @Query("DELETE FROM routines WHERE id = :id")
     suspend fun deleteRoutineById(id: Int)

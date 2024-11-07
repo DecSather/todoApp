@@ -1,5 +1,6 @@
 package com.example.compose.rally.ui.routine
 
+import android.content.IntentSender.OnFinished
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,10 @@ class RoutineHomeViewModel(
 
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
+    }
+    
+    suspend fun onRoutineFinishedChange(routineId:Int,finished: Boolean){
+        routinesRepository.updateFinished(routineId,finished)
     }
     
 }

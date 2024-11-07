@@ -48,7 +48,10 @@ object AppViewModelProvider {
         
 //            BacklogHome
         initializer {
-            BacklogHomeViewModel(inventoryApplication().container.backlogsRepository)
+            BacklogHomeViewModel(
+                inventoryApplication().container.backlogsRepository,
+                inventoryApplication().container.routinesRepository,
+                )
         }
     }
 }

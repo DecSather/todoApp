@@ -5,8 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
@@ -47,18 +50,12 @@ fun RoutineEntryScreen(
     val coroutineScope = rememberCoroutineScope()
     viewModel.updateRoutineUiState(viewModel.routineUiState.routine.copy(backlogId = backlogId ))
     RoutineEntryBody(
+        navigateBack=navigateBack,
         routineUiState = viewModel.routineUiState,
         onRoutineValueChange= viewModel::updateRoutineUiState,
         onSaveClick = {
             coroutineScope.launch {
                 viewModel.initBacklogUiState()
-                viewModel.updateBacklogUiState(
-                    when(viewModel.routineUiState.routine.rank){
-                        0 -> viewModel.backlogUiState.backlog.copy(importCredit = viewModel.backlogUiState.backlog.importCredit+viewModel.routineUiState.routine.credit)
-                        1 -> viewModel.backlogUiState.backlog.copy(normalCredit = viewModel.backlogUiState.backlog.normalCredit+viewModel.routineUiState.routine.credit)
-                        else -> viewModel.backlogUiState.backlog.copy(faverCredit = viewModel.backlogUiState.backlog.faverCredit+viewModel.routineUiState.routine.credit)
-                    }
-                )
                 viewModel.inseetRoutine()
                 navigateBack()
             }
@@ -68,6 +65,7 @@ fun RoutineEntryScreen(
 
 @Composable
 fun RoutineEntryBody(
+    navigateBack: ()->Unit,
     routineUiState: RoutineUiState,
     onRoutineValueChange:(Routine)->Unit,
     onSaveClick: () -> Unit,
@@ -78,6 +76,12 @@ fun RoutineEntryBody(
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         
+        IconButton(onClick = navigateBack) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBackIosNew,
+                contentDescription = stringResource(R.string.back_button)
+            )
+        }
         var rankText by remember { mutableStateOf("-1") }
         var creditText by remember { mutableStateOf("0.0") }
         val enabled=true
@@ -85,6 +89,7 @@ fun RoutineEntryBody(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+        
 //        content
             OutlinedTextField(
                 value = routineUiState.routine.content,

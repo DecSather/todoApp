@@ -6,8 +6,7 @@ import androidx.compose.foundation.layout.*
 
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -26,8 +25,7 @@ import com.example.compose.rally.R
 import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.routine.formatedCredit
-import com.example.compose.rally.ui.theme.BackgroudBlue
-import com.example.compose.rally.ui.theme.Blue900
+import com.example.compose.rally.ui.theme.*
 import java.time.format.DateTimeFormatter
 
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -36,23 +34,31 @@ fun  SingleBacklogBody(
     backlog: Backlog,
     newRoutineClick:(Int)->Unit,
     onDelete: () -> Unit={},
+    navigateBack:()->Unit,
     items:List<Routine>,
     rows: @Composable (Routine) -> Unit,
 ) {
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
     Box(modifier=Modifier.fillMaxSize())
     {
-        val amount=(backlog.importCredit+backlog.normalCredit+backlog.faverCredit)
+        val amount=items.map{ it -> it.credit}.sum()
         val creditRatios=
             if(amount>0f)
-            listOf(backlog.importCredit/amount,backlog.normalCredit/amount,backlog.faverCredit/amount)
+            items.map{it -> it.credit/amount}
         else listOf(0f,0f,1f)
+        
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Box(Modifier.padding(16.dp)) {
 //                三色圈
                 ThreeColorCircle(
                     proportions = creditRatios
                 )
+                IconButton(onClick = navigateBack) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBackIosNew,
+                        contentDescription = stringResource(R.string.back_button)
+                    )
+                }
                 Spacer(Modifier.height(12.dp))
                 Column(modifier = Modifier.align(Alignment.Center)) {
                     Text(
@@ -76,13 +82,10 @@ fun  SingleBacklogBody(
                         rows(item)
                     }
 //                预加载空列
-                    RoutineRow(
+                    EmptyRoutineRow(
                         modifier = Modifier.clickable{ newRoutineClick(backlog.id)},
                         content = "待办清单",
                         subcontent = "点击添加",
-                        credit = 0f,
-                        finished = false,
-                        color = Blue900
                     )
                 }
                 Spacer(Modifier.height(16.dp))
@@ -142,41 +145,37 @@ private fun DeleteConfirmationDialog(
         })
 }
 
+
+//需要写check逻辑
+
+
 @Composable
 fun RoutineRow(
     modifier: Modifier = Modifier,
-    content: String,
-    subcontent:String,
-    credit: Float,
-    finished:Boolean,
-    color: Color
+    routine:Routine,
+    onFinishedChange:(Int,Boolean)->Unit
 ) {
-    BaseRow(
-        modifier = modifier,
-        color = color,
-        title = content,
-        subtitle = subcontent,
-        amount = credit,
-        negative = finished
+    val content=routine.content
+    val subcontent=routine.subcontent
+    val credit=routine.credit
+    val color=when(routine.rank){
+        0-> importColor
+        1-> normalColor
+        else -> faverColor
+    }
+    val id=routine.id
+    
+    var finished by remember { mutableStateOf(routine.finished) }
+    val dollarSign ="$ "
+    val customColors = CheckboxDefaults.colors(
+        checkedColor =MaterialTheme.colors.primary, // 选中时的颜色
     )
-}
-
-@Composable
-private fun BaseRow(
-    modifier: Modifier = Modifier,
-    color: Color,
-    title: String,
-    subtitle: String,
-    amount: Float,
-    negative: Boolean
-) {
-    val dollarSign = if (negative) "–$ " else "$ "
     Row(
         modifier = modifier
             .height(68.dp)
             .clearAndSetSemantics {
                 contentDescription =
-                    "$title account ending in ${subtitle.takeLast(4)}, current balance $dollarSign$amount"
+                    "$content account ending in ${subcontent.takeLast(4)}, current balance $dollarSign$credit"
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -186,10 +185,18 @@ private fun BaseRow(
             modifier = Modifier
         )
         Spacer(Modifier.width(12.dp))
+        Checkbox(
+            colors = customColors,
+            checked = finished,
+            onCheckedChange = {
+                finished = it
+                onFinishedChange(id,finished)
+            }
+        )
         Column(Modifier) {
-            Text(text = title, style = typography.body1)
+            Text(text = content, style = typography.body1)
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = subtitle, style = typography.subtitle1)
+                Text(text = subcontent, style = typography.subtitle1)
             }
         }
         Spacer(Modifier.weight(1f))
@@ -202,7 +209,7 @@ private fun BaseRow(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
-                text = amount.toString(),
+                text = credit.toString(),
                 style = typography.h6,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -221,7 +228,60 @@ private fun BaseRow(
     }
     RallyDivider()
 }
-//列区分竖线
+@Composable
+fun EmptyRoutineRow(
+    modifier: Modifier = Modifier,
+    content: String,
+    subcontent:String,
+){
+    val dollarSign ="$ "
+    Row(
+        modifier = modifier
+            .height(68.dp)
+            .clearAndSetSemantics {
+                contentDescription =
+                    "$content account ending in ${subcontent.takeLast(4)}, current balance $dollarSign"
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val typography = MaterialTheme.typography
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier) {
+            Text(text = content, style = typography.body1)
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(text = subcontent, style = typography.subtitle1)
+            }
+        }
+        Spacer(Modifier.weight(1f))
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = dollarSign,
+                style = typography.h6,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+            Text(
+                text = "0.0",
+                style = typography.h6,
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
+        }
+        Spacer(Modifier.width(16.dp))
+        
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            Icon(
+                imageVector = Icons.Filled.ChevronRight,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(24.dp)
+            )
+        }
+    }
+    RallyDivider()
+}
+//列竖线
 @Composable
 private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
     Spacer(
@@ -230,7 +290,7 @@ private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
             .background(color = color)
     )
 }
-//列
+//进度线
 @Composable
 fun BaseDivider(
     total:Float,

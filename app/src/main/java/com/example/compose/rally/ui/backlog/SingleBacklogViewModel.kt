@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.BacklogsRepository
-import com.example.compose.rally.data.fromListToJson
 import kotlinx.coroutines.flow.*
 
 //SingleBacklog
@@ -18,7 +17,7 @@ class SingleBacklogViewModel(
     
     val backlogUiState: StateFlow<BacklogUiState> =
         backlogsRepository.getBacklogStream(id = backlogId)
-            .map { BacklogUiState(it?:Backlog(timeTitle = "", routineListJson = "")) }
+            .map { BacklogUiState(it?:Backlog(timeTitle = "")) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000L),
@@ -35,5 +34,5 @@ fun Backlog.toBacklogUiState():BacklogUiState=BacklogUiState(
 )
 data class BacklogUiState(
     val backlog: Backlog=
-        Backlog(timeTitle="yyyy-MM-dd", routineListJson = fromListToJson(listOf(1,0)))
+        Backlog(timeTitle="yyyy-MM-dd")
 )
