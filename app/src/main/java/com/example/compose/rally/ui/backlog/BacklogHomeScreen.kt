@@ -3,8 +3,7 @@ package com.example.compose.rally.ui.backlog
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -28,11 +27,9 @@ import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
 import com.example.compose.rally.ui.navigation.RallyDestination
 import com.example.compose.rally.ui.routine.formatedCredit
-import com.example.compose.rally.ui.theme.faverColor
-import com.example.compose.rally.ui.theme.importColor
-import com.example.compose.rally.ui.theme.normalColor
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 //日程-home页
 data object BacklogHome : RallyDestination {
@@ -46,78 +43,49 @@ fun BacklogHomeScreen(
     onBacklogClick:(Int)->Unit={},
     viewModel:BacklogHomeViewModel  = viewModel(factory = AppViewModelProvider.Factory)
 ) {
-    val backlogUiState by viewModel.homeUiState.collectAsState()
+    val backlogHomeUiState by viewModel.backlogUiState.collectAsState()
+    val backlogList = backlogHomeUiState.backlogList
+    
+//    积分属性-可优化-routineMap = remember { mutableStateMapOf<Int, Float>() }
+    val routineHomeUiState by viewModel.routineUiState.collectAsState()
+    val routineList= routineHomeUiState.routineList.filter { it.finished }
     val coroutineScope = rememberCoroutineScope()
-//    积分属性
-    val routineUiState by viewModel.routineUiState.collectAsState()
     
     val importTotal by rememberUpdatedState(
-        routineUiState.routineList.map { routine ->
+        routineList.map { routine ->
             if(routine.rank==0)routine.credit else 0f
         }.sum()
     )
     val normalTotal by rememberUpdatedState(
-        routineUiState.routineList.map { routine ->
+        routineList.map { routine ->
             if(routine.rank==1)routine.credit else 0f
         }.sum()
     )
     val faverTotal by rememberUpdatedState(
-        routineUiState.routineList.map { routine ->
+        routineList.map { routine ->
             if(routine.rank==2)routine.credit else 0f
         }.sum()
     )
     val creditsTotal =importTotal+normalTotal+faverTotal
-    
-//    样式设计
+//    界面
     Box(modifier = Modifier.fillMaxSize()){
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())
-                .semantics { contentDescription = "Backlogs Screen" }
-        ) {
-//        三色转圈
-            Box(Modifier.padding(16.dp)) {
-                ThreeColorCircle(
-                    proportions =if(creditsTotal>0f) listOf((importTotal/creditsTotal),(normalTotal/creditsTotal),(faverTotal/creditsTotal))
-                    else listOf(0f,0f,1f)
-                )
-                Spacer(Modifier.height(12.dp))
-                Column(modifier = Modifier.align(Alignment.Center)) {
-                    Text(
-                        text = stringResource(R.string.credit),
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    Text(
-                        text = formatedCredit( creditsTotal.toString()),
-                        style = MaterialTheme.typography.h2,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                }
-            }
-//        日志卡
-            backlogUiState.backlogList.map {
-                    backlog ->
-                    BacklogsCard(
-                        backlog = backlog,
-                        routineList = routineUiState.routineList.filter { it -> it .backlogId==backlog.id },
-                        onBacklogClick=onBacklogClick,
-                    )
-                Spacer(Modifier.height(12.dp))
-            }
-            
-        }
+        BacklogHomeBody(
+            creditsTotal=creditsTotal,
+            importTotal=importTotal,
+            normalTotal=normalTotal,
+            faverTotal=faverTotal,
+            backlogList=backlogList,
+            routineList = routineList,
+            onBacklogClick=onBacklogClick,
+            )
         //    每日新日程
         val currentDate = LocalDate.now()
         var formattedDate = currentDate.format(formatter)
-        if(backlogUiState.backlogList.isEmpty() || !backlogUiState.backlogList.first().timeTitle.equals(formattedDate)) {
+        if(backlogList.isEmpty() || !backlogList.first().timeTitle.equals(formattedDate)) {
             FloatingActionButton(
-                onClick ={
-                    coroutineScope.launch {
-                        onBacklogClick(viewModel.newCurrentBacklog(formattedDate))
-                    }
-                },
+                onClick = { coroutineScope.launch {
+                    onBacklogClick(viewModel.newCurrentBacklog(formattedDate))
+                } },
                 backgroundColor = MaterialTheme.colors.surface,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
@@ -132,7 +100,62 @@ fun BacklogHomeScreen(
         }
     }
 }
-
+@Composable
+fun BacklogHomeBody(
+    creditsTotal:Float,
+    importTotal:Float,
+    normalTotal:Float,
+    faverTotal:Float,
+    backlogList: List<Backlog>,
+    routineList: List<Routine>,
+    onBacklogClick:(Int)->Unit={},
+    
+){
+    Box(modifier = Modifier.fillMaxSize()){
+        LazyColumn(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .semantics { contentDescription = "Backlogs Screen" }
+        ) {
+//        三色转圈
+            var proportions =
+                if(creditsTotal>0f) listOf((importTotal/creditsTotal),(normalTotal/creditsTotal),(faverTotal/creditsTotal),0f)
+            else listOf(0f,0f,0f,1f)
+            item {
+                Box(Modifier.padding(16.dp)) {
+                    ThreeColorCircle(
+                        proportions =proportions,
+                        colorIndexs = listOf(0,1,2)
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Column(modifier = Modifier.align(Alignment.Center)) {
+                        Text(
+                            text = stringResource(R.string.credit),
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        Text(
+                            text = formatedCredit( creditsTotal.toString()),
+                            style = MaterialTheme.typography.h2,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
+            }
+//        日志卡
+            items(backlogList.size){index->
+                val backlog= backlogList[index]
+                BacklogsCard(
+                    backlog = backlog,
+                    routineList = routineList.filter { it -> it .backlogId==backlog.id },
+                    onBacklogClick=onBacklogClick,
+                )
+                Spacer(Modifier.height(12.dp))
+                
+            }
+        }
+    }
+}
 @Composable
 private fun BacklogsCard(
     backlog: Backlog,
@@ -153,12 +176,7 @@ private fun BacklogsCard(
                 Text(text = amountText, style = MaterialTheme.typography.subtitle2)
             }
             BaseDivider(creditTotal, routineList.map { it->it.credit },
-                routineList.map { it ->
-                    when(it.rank){
-                    0 -> importColor
-                    1-> normalColor
-                    else -> faverColor
-                } })
+                routineList.map { RoutineColors[it.rank]})
             Column(Modifier
                 .padding(start = 16.dp, top = 4.dp, end = 8.dp)
             ) {
@@ -171,3 +189,4 @@ private fun BacklogsCard(
         }
     }
 }
+val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")

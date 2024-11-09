@@ -13,6 +13,8 @@ class RoutinesRepository(private val routineDao: RoutineDao) {
      suspend fun insertRoutine(routine: Routine) = routineDao.insert(routine)
 
      suspend fun deleteRoutineById(id:Int) = routineDao.deleteRoutineById(id)
+     
+     suspend fun deleteRoutineByBacklogId(id:Int) = routineDao.deleteRoutineByBacklogId(id)
 
      suspend fun updateRoutine(routine: Routine) = routineDao.update(routine)
      

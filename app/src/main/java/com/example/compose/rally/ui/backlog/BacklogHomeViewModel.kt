@@ -1,9 +1,6 @@
 
 package com.example.compose.rally.ui.backlog
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.compose.rally.data.Backlog
@@ -11,17 +8,19 @@ import com.example.compose.rally.data.BacklogsRepository
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.data.RoutinesRepository
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 /**
  * BacklogHome
+ *  StateFlow-热流
+ *      热观察，共享数据，复杂但即时
  */
 class BacklogHomeViewModel(
     private val backlogsRepository: BacklogsRepository,
     private val routinesRepository: RoutinesRepository
 ) : ViewModel() {
 
-    val homeUiState:StateFlow<BacklogHomeUiState> =
+//    backlog insert方法
+    val backlogUiState:StateFlow<BacklogHomeUiState> =
         backlogsRepository.getAllBacklogsStream().map {
             BacklogHomeUiState(it)
         } .stateIn(
@@ -29,7 +28,7 @@ class BacklogHomeViewModel(
             started = SharingStarted.WhileSubscribed((TIMEOUT_MILLIS)),
             initialValue = BacklogHomeUiState()
         )
-    
+//    routine read-only
     val routineUiState:StateFlow<RoutineHomeUiState> =
         routinesRepository.getAllRoutinesStream().map {
             RoutineHomeUiState(it)
@@ -54,8 +53,5 @@ class BacklogHomeViewModel(
     
 }
 
-/**
- * Ui State for HomeScreen
- */
 data class BacklogHomeUiState(val backlogList: List<Backlog> = listOf())
 data class RoutineHomeUiState(val routineList: List<Routine> = listOf())

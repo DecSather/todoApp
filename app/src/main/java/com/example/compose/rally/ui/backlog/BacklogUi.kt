@@ -8,7 +8,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -22,111 +21,79 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
-import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
-import com.example.compose.rally.ui.routine.formatedCredit
 import com.example.compose.rally.ui.theme.*
-import java.time.format.DateTimeFormatter
 
-val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+/*
+* Common Ui
+* -进度线
+* -竖线色条
+*/
+
+//进度线
 @Composable
-fun  SingleBacklogBody(
-    backlog: Backlog,
-    newRoutineClick:(Int)->Unit,
-    onDelete: () -> Unit={},
-    navigateBack:()->Unit,
-    items:List<Routine>,
-    rows: @Composable (Routine) -> Unit,
-) {
-    var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    Box(modifier=Modifier.fillMaxSize())
-    {
-        val amount=items.map{ it -> it.credit}.sum()
-        val creditRatios=
-            if(amount>0f)
-            items.map{it -> it.credit/amount}
-        else listOf(0f,0f,1f)
-        
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-            Box(Modifier.padding(16.dp)) {
-//                三色圈
-                ThreeColorCircle(
-                    proportions = creditRatios
-                )
-                IconButton(onClick = navigateBack) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBackIosNew,
-                        contentDescription = stringResource(R.string.back_button)
+fun BaseDivider(total: Float, data: List<Float>, colors: List<Color>) {
+    var index=0
+    if(total>0.0) {
+        Row(Modifier.fillMaxWidth()) {
+            data.forEach { item ->
+                if(item>0.0){
+                    Spacer(
+                        modifier = Modifier
+                            .weight(item/total)
+                            .height(1.dp)
+                            .background(colors.get(index++))
                     )
-                }
-                Spacer(Modifier.height(12.dp))
-                Column(modifier = Modifier.align(Alignment.Center)) {
-                    Text(
-                        text = backlog.timeTitle,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    Text(
-                        text = formatedCredit( amount.toString()),
-                        style = MaterialTheme.typography.h2,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
+                    
                 }
             }
-            Spacer(Modifier.height(10.dp))
-//            routineList
-            Card {
-                Column(modifier = Modifier.padding(12.dp).weight(1f)){
-                    items.map {
-                        item ->
-                        rows(item)
-                    }
-//                预加载空列
-                    EmptyRoutineRow(
-                        modifier = Modifier.clickable{ newRoutineClick(backlog.id)},
-                        content = "待办清单",
-                        subcontent = "点击添加",
-                    )
-                }
-                Spacer(Modifier.height(16.dp))
-            }
-            Box(
+        }
+    }else{
+        Row(Modifier.fillMaxWidth()) {
+            Spacer(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
+                    .weight(1f)
+                    .height(1.dp)
                     .background(MaterialTheme.colors.background)
             )
         }
-        
-        FloatingActionButton(
-            onClick = { deleteConfirmationRequired = true },
-            backgroundColor = MaterialTheme.colors.surface,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(16.dp),
-        ) {
-            androidx.compose.material3.Icon(
-                imageVector = Icons.Default.DeleteForever,
-                contentDescription = "Delete Backlog"
-            )
     }
-        if (deleteConfirmationRequired) {
-            DeleteConfirmationDialog(
-                onDeleteConfirm = {
-                    deleteConfirmationRequired = false
-                    onDelete()
-                },
-                onDeleteCancel = { deleteConfirmationRequired = false },
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
-    
+}
+//列竖线
+@Composable
+private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
+    Spacer(
+        modifier
+            .size(4.dp, 36.dp)
+            .background(color = color)
+    )
 }
 
+/*
+* BacklogHome
+*/
 
 @Composable
-private fun DeleteConfirmationDialog(
+fun SeeAllButton(modifier: Modifier = Modifier) {
+    Box(modifier=modifier
+        .padding(16.dp) // 设置内边距，和 TextButton 一致
+        .fillMaxWidth()
+        .wrapContentSize(Alignment.Center)
+    ){
+        Text(
+            fontSize = 16.sp,
+            text= stringResource(R.string.see_all),
+            color = MaterialTheme.colors.primary
+        )
+    }
+}
+
+/*
+* Single Backlog
+*/
+//警示对话框-删除
+@Composable
+fun DeleteConfirmationDialog(
     onDeleteConfirm: () -> Unit, onDeleteCancel: () -> Unit, modifier: Modifier = Modifier
 ) {
     AlertDialog(onDismissRequest = { /* Do nothing */ },
@@ -144,11 +111,7 @@ private fun DeleteConfirmationDialog(
             }
         })
 }
-
-
-//需要写check逻辑
-
-
+//Routine列-修改
 @Composable
 fun RoutineRow(
     modifier: Modifier = Modifier,
@@ -158,13 +121,8 @@ fun RoutineRow(
     val content=routine.content
     val subcontent=routine.subcontent
     val credit=routine.credit
-    val color=when(routine.rank){
-        0-> importColor
-        1-> normalColor
-        else -> faverColor
-    }
+    val color=RoutineColors[routine.rank]
     val id=routine.id
-    
     var finished by remember { mutableStateOf(routine.finished) }
     val dollarSign ="$ "
     val customColors = CheckboxDefaults.colors(
@@ -189,8 +147,7 @@ fun RoutineRow(
             colors = customColors,
             checked = finished,
             onCheckedChange = {
-                finished = it
-                onFinishedChange(id,finished)
+                onFinishedChange(id,it)
             }
         )
         Column(Modifier) {
@@ -228,6 +185,7 @@ fun RoutineRow(
     }
     RallyDivider()
 }
+//Routine列-新增
 @Composable
 fun EmptyRoutineRow(
     modifier: Modifier = Modifier,
@@ -281,72 +239,19 @@ fun EmptyRoutineRow(
     }
     RallyDivider()
 }
-//列竖线
-@Composable
-private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
-    Spacer(
-        modifier
-            .size(4.dp, 36.dp)
-            .background(color = color)
-    )
-}
-//进度线
-@Composable
-fun BaseDivider(
-    total:Float,
-    data: List<Float>,
-    colors: List<Color>
-) {
-    var index=0
-    if(total>0.0) {
-        Row(Modifier.fillMaxWidth()) {
-            data.forEach { item ->
-                if(item>0.0){
-                    Spacer(
-                        modifier = Modifier
-                            .weight(item/total)
-                            .height(1.dp)
-                            .background(colors.get(index++))
-                    )
-                    
-                }
-            }
-        }
-    }else{
-        Row(Modifier.fillMaxWidth()) {
-            Spacer(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(1.dp)
-                    .background(BackgroudBlue)
-            )
-        }
-    }
-}
 
 
-@Composable
-fun SeeAllButton(modifier: Modifier = Modifier) {
-    Box(modifier=modifier
-        .padding(16.dp) // 设置内边距，和 TextButton 一致
-        .fillMaxWidth()
-        .wrapContentSize(Alignment.Center)
-    ){
-        Text(
-            fontSize = 16.sp,
-            text= stringResource(R.string.see_all),
-            color = MaterialTheme.colors.primary
-        )
-    }
-}
 
+//三色圈改通用圈
 //三色圆圈动画
 
 private const val DividerLengthInDegrees = 1.8f
+val RoutineColors= listOf(importColor, normalColor, faverColor)
 
 @Composable
 fun ThreeColorCircle(
     proportions:List<Float>,
+    colorIndexs:List<Int>,
     modifier: Modifier = Modifier
         .height(300.dp)
         .fillMaxWidth()
@@ -397,36 +302,28 @@ fun ThreeColorCircle(
         val size = Size(innerRadius * 2, innerRadius * 2)
         var startAngle = shift - 90f
         var sweep:Float
-        if(proportions.get(0)>0){
-            sweep = proportions.get(0) * angleOffset
-            drawArc(
-                color = Color(0xFF005D57),
-                startAngle = startAngle + DividerLengthInDegrees / 2,
-                sweepAngle = sweep - DividerLengthInDegrees,
-                topLeft = topLeft,
-                size = size,
-                useCenter = false,
-                style = stroke
-            )
-            startAngle += sweep
+        var index=0
+        colorIndexs.map { it ->
+            sweep = proportions[index] * angleOffset
+            if(proportions[index]>0f) {
+                drawArc(
+                    color = RoutineColors[it],
+                    startAngle = startAngle + DividerLengthInDegrees / 2,
+                    sweepAngle = sweep - DividerLengthInDegrees,
+                    topLeft = topLeft,
+                    size = size,
+                    useCenter = false,
+                    style = stroke
+                )
+                startAngle += sweep
+            }
+            index++
         }
-        if(proportions.get(1)>0) {
-            sweep = proportions.get(1) * angleOffset
+        
+        sweep = proportions[index] * angleOffset
+        if(proportions[index]>0f) {
             drawArc(
-                color = Color(0xFF039667),
-                startAngle = startAngle + DividerLengthInDegrees / 2,
-                sweepAngle = sweep - DividerLengthInDegrees,
-                topLeft = topLeft,
-                size = size,
-                useCenter = false,
-                style = stroke
-            )
-            startAngle += sweep
-        }
-        if(proportions.get(2)>0) {
-            sweep = proportions.get(2) * angleOffset
-            drawArc(
-                color = Color(0xFF04B97F),
+                color = unfinishedColor,
                 startAngle = startAngle + DividerLengthInDegrees / 2,
                 sweepAngle = sweep - DividerLengthInDegrees,
                 topLeft = topLeft,

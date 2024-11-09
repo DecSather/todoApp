@@ -16,6 +16,8 @@ val BackgroudBlue=Color(0xFF94B0C6)
 val importColor: Color =Color(0xFF005D57)
 val normalColor: Color =Color(0xFF039667)
 val faverColor: Color = Color(0xFF04B97F)
+val unfinishedColor: Color=Color(0xFF6F847D)
+
 val LightColorPalette= lightColors(
     primary = Blue500,
     surface = Blue900,

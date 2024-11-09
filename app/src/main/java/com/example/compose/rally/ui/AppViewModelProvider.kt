@@ -42,7 +42,8 @@ object AppViewModelProvider {
         initializer {
             SingleBacklogViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.backlogsRepository
+                inventoryApplication().container.backlogsRepository,
+                inventoryApplication().container.routinesRepository
             )
         }
         

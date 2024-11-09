@@ -19,7 +19,8 @@ import com.example.compose.rally.ui.routine.RoutineEntryDestination
 import com.example.compose.rally.ui.routine.RoutineEntryScreen
 import com.example.compose.rally.ui.routine.SingleRoutineDestination
 import com.example.compose.rally.ui.routine.SingleRoutineScreen
-
+//waiting implement:页面转化的过渡
+//      https://codelabs.developers.google.cn/codelabs/material-motion-android?hl=zh_cn#3
 @Composable
 fun RallyNavHost(
     navController: NavHostController,

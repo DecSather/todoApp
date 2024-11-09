@@ -37,7 +37,7 @@ object SingleRoutineDestination : RallyDestination {
         navArgument(routineIdArg) { type = NavType.IntType }
     )
 }
-//waiting implement: 色圈有问题，需要同步routine数据
+
 @Composable
 fun SingleRoutineScreen(
     navigateBack: () -> Unit,

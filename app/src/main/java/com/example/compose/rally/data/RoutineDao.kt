@@ -27,9 +27,11 @@ interface RoutineDao {
     
     @Query("UPDATE routines SET finished = :finished WHERE id = :id")
     suspend fun undateFinished(id:Int,finished:Boolean)
-
+    
     @Query("DELETE FROM routines WHERE id = :id")
     suspend fun deleteRoutineById(id: Int)
+    @Query("DELETE FROM routines WHERE backlogId = :id")
+    suspend fun deleteRoutineByBacklogId(id: Int)
 
 
 }
