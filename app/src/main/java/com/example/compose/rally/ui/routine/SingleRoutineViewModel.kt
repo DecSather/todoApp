@@ -20,42 +20,30 @@ import kotlinx.coroutines.launch
  */
 class SingleRoutineViewModel(
     savedStateHandle: SavedStateHandle,
-    private val routinesRepository: RoutinesRepository,
-    private  val backlRepository: BacklogsRepository
+    private val routinesRepository: RoutinesRepository
 ) : ViewModel() {
-    var routineUiState by mutableStateOf(RoutineUiState())
-        private set
-    var backlogUiState by mutableStateOf(BacklogUiState())
-    private set
     
     private val routineId: Int = checkNotNull(savedStateHandle[SingleRoutineDestination.routineIdArg])
+    var routineUiState by mutableStateOf(RoutineUiState())
+        private set
     init {
         viewModelScope.launch {
             routineUiState=routinesRepository.getRoutineStream(routineId)
                 .filterNotNull()
                 .first()
                 .toRoutineUiState(true)
-            backlogUiState= backlRepository.getBacklogStream(routineUiState.routine.backlogId)
-                .filterNotNull()
-                .first()
-                .toBacklogUiState()
         }
     }
     
     suspend fun updateRoutine() {
         if (validateInput(routineUiState.routine)) {
             routinesRepository.updateRoutine(routineUiState.routine)
-            backlRepository.updateBacklog(backlogUiState.backlog)
         }
     }
     
     fun updateRoutineUiState(routine: Routine) {
         routineUiState=
             RoutineUiState(routine=routine, isEntryValid = validateInput(routine))
-    }
-    fun updateBacklogUiState(backlog:Backlog) {
-        backlogUiState=
-            BacklogUiState(backlog=backlog)
     }
     private fun validateInput(uiState: Routine = routineUiState.routine): Boolean {
         return with(uiState) {

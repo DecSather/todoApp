@@ -55,7 +55,6 @@ fun RoutineEntryScreen(
         onRoutineValueChange= viewModel::updateRoutineUiState,
         onSaveClick = {
             coroutineScope.launch {
-                viewModel.initBacklogUiState()
                 viewModel.inseetRoutine()
                 navigateBack()
             }
@@ -65,8 +64,8 @@ fun RoutineEntryScreen(
 
 @Composable
 fun RoutineEntryBody(
-    navigateBack: ()->Unit,
     routineUiState: RoutineUiState,
+    navigateBack: ()->Unit,
     onRoutineValueChange:(Routine)->Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier

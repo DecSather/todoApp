@@ -20,18 +20,14 @@ import java.text.DecimalFormat
  * AddRoutineEntry
  */
 class RoutineEntryViewModel(
-    private val routinesRepository: RoutinesRepository,
-    private  val backlRepository: BacklogsRepository
+    private val routinesRepository: RoutinesRepository
 ) : ViewModel() {
     
     var routineUiState by mutableStateOf(RoutineUiState())
         private set
-    var backlogUiState by mutableStateOf(BacklogUiState())
-        private set
     suspend fun inseetRoutine() {
         if (validateInput(routineUiState.routine)) {
             routinesRepository.insertRoutine(routineUiState.routine)
-            backlRepository.updateBacklog(backlogUiState.backlog)
         }
     }
     
@@ -40,17 +36,7 @@ class RoutineEntryViewModel(
             RoutineUiState(routine = routine, isEntryValid = validateInput(routine))
     }
     
-    suspend fun initBacklogUiState(){
-        backlogUiState=backlRepository.getBacklogStream(routineUiState.routine.backlogId)
-            .filterNotNull()
-            .first()
-            .toBacklogUiState()
-    }
     
-    fun updateBacklogUiState(backlog:Backlog) {
-        backlogUiState=
-            BacklogUiState(backlog=backlog)
-    }
     private fun validateInput(uiState: Routine = routineUiState.routine): Boolean {
         return with(uiState) {
             content.isNotBlank() &&rank>=0 && credit>0.0

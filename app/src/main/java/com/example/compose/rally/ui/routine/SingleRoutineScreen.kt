@@ -44,11 +44,9 @@ fun SingleRoutineScreen(
     routineViewModel: SingleRoutineViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val routineUiState = routineViewModel.routineUiState
-    val backlogUiState=routineViewModel.backlogUiState
     SingleRoutineBody(
+        routineUiState = routineViewModel.routineUiState,
         navigateBack=navigateBack,
-        routineUiState = routineUiState,
         onRoutineValueChange= routineViewModel::updateRoutineUiState,
         onSaveClick = {
             coroutineScope.launch {
@@ -61,8 +59,8 @@ fun SingleRoutineScreen(
 
 @Composable
 fun SingleRoutineBody(
-    navigateBack:()->Unit,
     routineUiState: RoutineUiState,
+    navigateBack:()->Unit,
     onRoutineValueChange:(Routine) -> Unit,
     onSaveClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -70,6 +68,7 @@ fun SingleRoutineBody(
     var rankText by remember { mutableStateOf("-1") }
     var creditText by remember { mutableStateOf("0.0") }
     val enabled=true
+    
     Column(
         modifier = modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
