@@ -5,7 +5,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.compose.rally.RallyApplication
+import com.example.compose.rally.ToDoApplication
 import com.example.compose.rally.ui.backlog.BacklogHomeViewModel
 import com.example.compose.rally.ui.backlog.SingleBacklogViewModel
 import com.example.compose.rally.ui.routine.RoutineEntryViewModel
@@ -47,5 +47,5 @@ object AppViewModelProvider {
     }
 }
 
-fun CreationExtras.inventoryApplication(): RallyApplication =
-    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as RallyApplication)
+fun CreationExtras.inventoryApplication(): ToDoApplication =
+    (this[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY] as ToDoApplication)

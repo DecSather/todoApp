@@ -25,11 +25,11 @@ import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
-import com.example.compose.rally.ui.navigation.RallyDestination
+import com.example.compose.rally.ui.navigation.BaseDestination
 import com.example.compose.rally.ui.routine.formatedCredit
 import kotlinx.coroutines.launch
 
-object SingleBacklogDestination : RallyDestination {
+object SingleBacklogDestination : BaseDestination {
     override val route = "single_backlog"
     override val icon = Icons.Filled.Timer
     const val backlogIdArg = "backlogId"

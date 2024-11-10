@@ -2,44 +2,22 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     
     <application
-            android:name=".RallyApplication"
+            android:name=".ToDoApplication"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"
             android:label="@string/app_name"
             android:supportsRtl="true"
-            android:theme="@style/Theme.Rally">
+            android:theme="@style/Theme.ToDo">
         <activity
                 android:name=".MainActivity"
                 android:windowSoftInputMode="adjustResize"
                 android:exported="true"
                 android:label="@string/app_name"
-                android:theme="@style/Theme.Rally">
+                android:theme="@style/Theme.ToDo">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-<!-- &lt;!&ndash;             new Routine Entry &ndash;&gt; -->
-<!--             <intent-filter> -->
-<!--                 <action android:name="android.intent.action.VIEW" /> -->
-<!--                 <category android:name="android.intent.category.DEFAULT" /> -->
-<!--                 <category android:name="android.intent.category.BROWSABLE" /> -->
-<!--                 <data android:scheme="rally" android:host="routine_entry" /> -->
-<!--             </intent-filter> -->
-<!-- &lt;!&ndash;             Single Backlog &ndash;&gt; -->
-<!--             <intent-filter> -->
-<!--                 <action android:name="android.intent.action.VIEW" /> -->
-<!--                 <category android:name="android.intent.category.DEFAULT" /> -->
-<!--                 <category android:name="android.intent.category.BROWSABLE" /> -->
-<!--                 <data android:scheme="rally" android:host="single_backlog" /> -->
-<!--             </intent-filter> -->
-            
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="rally" android:host="single_account" />
-            </intent-filter>
-            
         </activity>
     </application>
 </manifest>

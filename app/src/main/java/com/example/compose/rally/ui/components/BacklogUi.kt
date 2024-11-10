@@ -241,6 +241,10 @@ fun EmptyRoutineRow(
 }
 
 
+@Composable
+fun RallyDivider(modifier: Modifier = Modifier) {
+    Divider(color = MaterialTheme.colors.background, thickness = 1.dp, modifier = modifier)
+}
 
 //三色圈改通用圈
 //三色圆圈动画

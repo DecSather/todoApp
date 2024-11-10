@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.sp
  * A [MaterialTheme] for Rally.
  */
 @Composable
-fun RallyTheme(content: @Composable () -> Unit) {
+fun ToDoTheme(content: @Composable () -> Unit) {
     if(isSystemInDarkTheme())
     MaterialTheme(colors = DarkColorPalette, typography = Typography, content = content)
     else

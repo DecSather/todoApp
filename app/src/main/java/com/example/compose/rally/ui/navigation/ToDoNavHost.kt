@@ -2,27 +2,31 @@ package com.example.compose.rally.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
-import com.example.compose.rally.ui.accounts.AccountsScreen
-import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.ui.backlog.BacklogHome
 import com.example.compose.rally.ui.backlog.BacklogHomeScreen
 import com.example.compose.rally.ui.backlog.SingleBacklogDestination
 import com.example.compose.rally.ui.backlog.SingleBacklogScreen
-import com.example.compose.rally.ui.overview.OverviewScreen
+import com.example.compose.rally.ui.comesoon.ComeSoon
+import com.example.compose.rally.ui.comesoon.ComeSoonScreen
 import com.example.compose.rally.ui.routine.RoutineEntryDestination
 import com.example.compose.rally.ui.routine.RoutineEntryScreen
 import com.example.compose.rally.ui.routine.SingleRoutineDestination
 import com.example.compose.rally.ui.routine.SingleRoutineScreen
 //waiting implement:页面转化的过渡
-//      https://codelabs.developers.google.cn/codelabs/material-motion-android?hl=zh_cn#3
+
+
+interface BaseDestination {
+    val icon: ImageVector
+    val route: String
+}
+
 @Composable
-fun RallyNavHost(
+fun ToDoNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
@@ -54,25 +58,9 @@ fun RallyNavHost(
                 navigateToSingleRoutine ={navController.navigate("${SingleRoutineDestination.route}/${it}")}
             )
         }
-        composable(route = Overview.route) {
-            OverviewScreen(
-                onClickSeeAllAccounts = {
-                    navController.navigateSingleTopTo(Accounts.route)
-                },
-                onAccountClick = { accountType ->
-                    navController.navigateToSingleAccount(accountType)
-                },
-            )
+        composable(route = ComeSoon.route) {
+            ComeSoonScreen()
         }
-        composable(route = Accounts.route) {
-            AccountsScreen(
-//                跳转单个账户
-                onAccountClick = { accountType ->
-                    navController.navigateToSingleAccount(accountType)
-                }
-            )
-        }
-
 //            Entry new Routine
         composable(
             route = RoutineEntryDestination.routeWithArgs,
@@ -94,12 +82,6 @@ fun RallyNavHost(
                 navigateBack= { navController.popBackStack() },
             )
         }
-        
-        composable(route = SingleAccount.routeWithArgs, arguments = SingleAccount.arguments, deepLinks = SingleAccount.deepLinks) { navBackStackEntry ->
-            val accountType =
-                navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
-            SingleAccountScreen(accountType)
-        }
     }
 }
 
@@ -113,13 +95,6 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         launchSingleTop = true
         restoreState = true
     }
-
-
-private fun NavHostController.navigateToSingleAccount(accountType: String) {
-    this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
-}
-
-
 
 
 

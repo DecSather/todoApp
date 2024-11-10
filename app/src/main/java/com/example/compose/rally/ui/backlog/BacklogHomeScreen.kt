@@ -25,14 +25,14 @@ import com.example.compose.rally.R
 import com.example.compose.rally.data.*
 import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
-import com.example.compose.rally.ui.navigation.RallyDestination
+import com.example.compose.rally.ui.navigation.BaseDestination
 import com.example.compose.rally.ui.routine.formatedCredit
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 //日程-home页
-data object BacklogHome : RallyDestination {
+data object BacklogHome : BaseDestination {
     override val icon =Icons.Filled.Timer
     override val route ="backlogs"
 }
