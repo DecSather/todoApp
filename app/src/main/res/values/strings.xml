@@ -4,18 +4,23 @@
     <string name="attention">Attention</string>
 <!--     Backlog -->
     <string name="credit">Credit</string>
+    <string name="formatter">yyyy-MM-dd</string>
     <!--     Routine -->
+    <string name="click_to_add">Click To Add</string>
+    <string name="todo_list">ToDo List</string>
     <string name="required_fields">*required fields</string>
     <string name="rontine_content_req">Routine Content*</string>
     <string name="rontine_rank_req">Rank*</string>
     <string name="rontine_credit_req">Credit*</string>
     <string name="rontine_subcontent_req">Remark</string>
 <!--     Function -->
-    <string name="see_all">SEE ALL</string>
+    <string name="see_all">DETAIL</string>
     <string name="back_button">Back</string>
     <string name="save_action">Save</string>
     <string name="delete">Delete</string>
     <string name="delete_question">Are you sure you want to delete?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="show_less">Show Less</string>
+    <string name="show_more">Show More</string>
 </resources>

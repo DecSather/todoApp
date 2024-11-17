@@ -1,5 +1,7 @@
+
 package com.example.compose.rally.ui.backlog
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -39,8 +41,11 @@ object SingleBacklogDestination : BaseDestination {
     })
 }
 //记得添加删除键
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SingleBacklogScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     navigateBack: () -> Unit,
     navigateToNewRoutine:(Int)->Unit,
     navigateToSingleRoutine: (Int) -> Unit={},
@@ -55,6 +60,8 @@ fun SingleBacklogScreen(
     val coroutineScope = rememberCoroutineScope()
     SingleBacklogBody(
         backlog =backlog,
+        sharedTransitionScope=sharedTransitionScope,
+        animatedContentScope=animatedContentScope,
         newRoutineClick=navigateToNewRoutine,
         onDelete ={
             coroutineScope.launch {
@@ -68,7 +75,7 @@ fun SingleBacklogScreen(
         unfinishedItems=unfinishedRoutines,
     )
     { routine ->
-        RoutineRow(
+        DetailRoutineRow(
             modifier = Modifier.clickable {navigateToSingleRoutine(routine.id)},
             routine=routine,
             onFinishedChange={ id,finished ->
@@ -80,9 +87,12 @@ fun SingleBacklogScreen(
         
     }
 }
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun  SingleBacklogBody(
     backlog: Backlog,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     newRoutineClick:(Int)->Unit,
     onDelete: () -> Unit={},
     navigateBack:()->Unit,
@@ -115,16 +125,32 @@ fun  SingleBacklogBody(
                 }
                 Spacer(Modifier.height(12.dp))
                 Column(modifier = Modifier.align(Alignment.Center)) {
-                    Text(
-                        text = backlog.timeTitle,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
-                    Text(
-                        text = formatedCredit( finishedAmount.toString()),
-                        style = MaterialTheme.typography.h2,
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
+                    with(sharedTransitionScope){
+                        Text(
+                            text = backlog.timeTitle,
+                            style = MaterialTheme.typography.body1,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .wrapContentWidth()
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        key = backlog.timeTitle
+                                    ),
+                                    animatedVisibilityScope = animatedContentScope,
+                                    enter = fadeIn(),
+                                    exit = fadeOut(),
+                                    resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                                )
+                        
+                        )
+                        Text(
+                            text = formatedCredit( finishedAmount.toString()),
+                            style = MaterialTheme.typography.h2,
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                        )
+                        
+                    }
                 }
             }
             Spacer(Modifier.height(10.dp))
@@ -136,10 +162,10 @@ fun  SingleBacklogBody(
                         rows(item)
                     }
 //                预加载空列
-                    EmptyRoutineRow(
+                    DetailEmptyRow(
                         modifier = Modifier.clickable{ newRoutineClick(backlog.id)},
-                        content = "待办清单",
-                        subcontent = "点击添加",
+                        content = stringResource(R.string.todo_list),
+                        subcontent = stringResource(R.string.click_to_add),
                     )
                     finishedItems.map {
                             item ->

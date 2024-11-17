@@ -172,7 +172,6 @@ fun RoutineEntryBody(
         }
         Button(
             onClick = {
-                
                 onSaveClick()
             },
             enabled = routineUiState.isEntryValid,

@@ -1,5 +1,7 @@
 package com.example.compose.rally.ui.navigation
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -7,10 +9,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.compose.rally.ui.backlog.BacklogHome
-import com.example.compose.rally.ui.backlog.BacklogHomeScreen
-import com.example.compose.rally.ui.backlog.SingleBacklogDestination
-import com.example.compose.rally.ui.backlog.SingleBacklogScreen
+import com.example.compose.rally.ui.backlog.*
 import com.example.compose.rally.ui.comesoon.ComeSoon
 import com.example.compose.rally.ui.comesoon.ComeSoonScreen
 import com.example.compose.rally.ui.routine.RoutineEntryDestination
@@ -25,63 +24,78 @@ interface BaseDestination {
     val route: String
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ToDoNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = BacklogHome.route,
-        modifier = modifier
-    ) {
+    SharedTransitionLayout{
+        NavHost(
+            navController = navController,
+            startDestination = BacklogHome.route,
+            modifier = modifier
+        ) {
 //            Backlog Home
-        composable(route = BacklogHome.route) {
-            BacklogHomeScreen(
-                onBacklogClick = {
-                    navController.navigate("${SingleBacklogDestination.route}/${it}")
-                }
-            )
-        }
+            composable(route = BacklogHome.route) {
+                BacklogHomeScreen(
+                    this@SharedTransitionLayout,
+                    this@composable,
+                    onBacklogDetailClick = {
+                        navController.navigate("${SingleBacklogDestination.route}/${it}")
+                    }
+                )
+            }
 
 //        Single Backlog
-        composable(
-            route = SingleBacklogDestination.routeWithArgs,
-            arguments = SingleBacklogDestination.arguments
-        ){
-            val baklogId=it.arguments?.getInt("backlogId")
-            SingleBacklogScreen(
-                navigateBack= { navController.popBackStack() },
+            composable(
+                route = SingleBacklogDestination.routeWithArgs,
+                arguments = SingleBacklogDestination.arguments,
+//                动画效果-淡入
+                enterTransition = {
+                    slideInVertically() + fadeIn(
+                        animationSpec = tween(2000),
+                    )
+                },
+            ){
+                val baklogId=it.arguments?.getInt("backlogId")
+                SingleBacklogScreen(
+                    this@SharedTransitionLayout,
+                    this@composable,
+                    navigateBack= { navController.popBackStack() },
 //                跳转新增待办
-                navigateToNewRoutine = {navController.navigate("${RoutineEntryDestination.route}/${baklogId}")},
+                    navigateToNewRoutine = {navController.navigate("${RoutineEntryDestination.route}/${baklogId}")},
 //                跳转指定待办
-                navigateToSingleRoutine ={navController.navigate("${SingleRoutineDestination.route}/${it}")}
-            )
-        }
-        composable(route = ComeSoon.route) {
-            ComeSoonScreen()
-        }
-//            Entry new Routine
-        composable(
-            route = RoutineEntryDestination.routeWithArgs,
-            arguments = RoutineEntryDestination.arguments
-        ) {
-            val backlogId=it.arguments?.getInt("backlogId")?:0
-            RoutineEntryScreen(
-                backlogId =backlogId,
-                navigateBack= { navController.popBackStack() }
-            )
+                    navigateToSingleRoutine ={navController.navigate("${SingleRoutineDestination.route}/${it}")}
+                )
+            }
             
-        }
+            composable(route = ComeSoon.route) {
+                ComeSoonScreen()
+            }
+//            Entry new Routine
+            composable(
+                route = RoutineEntryDestination.routeWithArgs,
+                arguments = RoutineEntryDestination.arguments
+            ) {
+                val backlogId=it.arguments?.getInt("backlogId")?:0
+                RoutineEntryScreen(
+                    backlogId =backlogId,
+                    navigateBack= { navController.popBackStack() }
+                )
+                
+            }
 //        Single Routine
-        composable(
-            route = SingleRoutineDestination.routeWithArgs,
-            arguments = SingleRoutineDestination.arguments
-        ) {
-            SingleRoutineScreen(
-                navigateBack= { navController.popBackStack() },
-            )
+            composable(
+                route = SingleRoutineDestination.routeWithArgs,
+                arguments = SingleRoutineDestination.arguments
+            ) {
+                SingleRoutineScreen(
+                    navigateBack= { navController.popBackStack() },
+                )
+            }
         }
+        
     }
 }
 

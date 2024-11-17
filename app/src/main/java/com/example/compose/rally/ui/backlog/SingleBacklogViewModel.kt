@@ -21,7 +21,7 @@ class SingleBacklogViewModel(
 //    backlog delete
     val backlogUiState: StateFlow<BacklogUiState> =
         backlogsRepository.getBacklogStream(id = backlogId)
-            .map { BacklogUiState(it?:Backlog(timeTitle = "")) }
+            .map { BacklogUiState(it?:Backlog()) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),

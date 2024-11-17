@@ -1,13 +1,14 @@
 package com.example.compose.rally.ui.components
 
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -21,14 +22,133 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
+import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.theme.*
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.Card
+import androidx.compose.material3.IconButton
 
 /*
 * Common Ui
+* -Backlog Detail Card
 * -进度线
 * -竖线色条
 */
+
+/*
+* Backlog Detail Card
+    -主页用
+ */
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun BacklogDetailCard(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
+    
+    backlog: Backlog,
+    routineList:List<Routine>,
+    
+    onBacklogDetailClick: (Int) -> Unit,
+    onBacklogEditClick:(Backlog,Routine) -> Unit
+    
+) {
+    val creditTotal:Float =routineList.map { it.credit }.sum()
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    
+    Card {
+        Column {
+            Column(Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+                .animateContentSize()
+            
+            ) {
+                with(sharedTransitionScope) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = backlog.timeTitle,
+                            style = MaterialTheme.typography.h2,
+                            modifier = Modifier
+                                .weight(1f)
+                                .sharedBounds(
+                                    rememberSharedContentState(
+                                        key = backlog.timeTitle
+                                    ),
+                                    animatedVisibilityScope = animatedContentScope,
+                                    enter = fadeIn(),
+                                    exit = fadeOut(),
+                                    resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                                )
+                                .clickable {
+                                    onBacklogEditClick(backlog,  Routine())
+                                }
+                        )
+                        IconButton(onClick = { expanded = !expanded }) {
+                            androidx.compose.material3.Icon(
+                                imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = if (expanded) {
+                                    stringResource(R.string.show_less)
+                                } else {
+                                    stringResource(R.string.show_more)
+                                }
+                            )
+                        }
+                    }
+                    val amountText = "$" + creditTotal+" unfinished"
+                    Text(
+                        text = amountText,
+                        style = MaterialTheme.typography.subtitle2,
+                    )
+                    if(expanded){
+                        /*
+                        * 考虑使用backlog点击编辑删除列编辑*/
+                        routineList.map{it ->
+                            BriefRoutineRow(
+                                modifier = Modifier
+                                    .clickable { onBacklogEditClick(Backlog(),it) },
+                                routine=it,
+                                onFinishedChange={ id,finished ->{}/*
+                                    coroutineScope.launch {
+                                        viewModel.onRoutineFinishedChange(id,finished)
+                                    }*/
+                                }
+                            )
+                        }
+                        BriefEmptyRow(
+                            modifier = Modifier
+                                .clickable { onBacklogEditClick(Backlog(),Routine()) },
+                            content = stringResource(R.string.click_to_add)
+                        )
+                    }
+                }
+                
+            }
+
+//            进度横线
+            BaseDivider(creditTotal, routineList.map {it.credit },
+                routineList.map { RoutineColors[it.rank]})
+            Column(Modifier
+                .padding(start = 16.dp, top = 4.dp, end = 8.dp)
+            ) {
+//                展开所有
+                SeeAllButton(
+                    modifier = Modifier.clearAndSetSemantics {
+                        contentDescription = "All ${backlog.timeTitle}'s Routines"
+                    }.clickable { onBacklogDetailClick(backlog.id) }
+                )
+            }
+        }
+    }
+}
+//* -Backlog Edit Card
+
+
+
 
 //进度线
 @Composable
@@ -59,20 +179,10 @@ fun BaseDivider(total: Float, data: List<Float>, colors: List<Color>) {
         }
     }
 }
-//列竖线
-@Composable
-private fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
-    Spacer(
-        modifier
-            .size(4.dp, 36.dp)
-            .background(color = color)
-    )
-}
 
 /*
 * BacklogHome
 */
-
 @Composable
 fun SeeAllButton(modifier: Modifier = Modifier) {
     Box(modifier=modifier
@@ -111,147 +221,8 @@ fun DeleteConfirmationDialog(
             }
         })
 }
-//Routine列-修改
-@Composable
-fun RoutineRow(
-    modifier: Modifier = Modifier,
-    routine:Routine,
-    onFinishedChange:(Int,Boolean)->Unit
-) {
-    val content=routine.content
-    val subcontent=routine.subcontent
-    val credit=routine.credit
-    val color=RoutineColors[routine.rank]
-    val id=routine.id
-    var finished by remember { mutableStateOf(routine.finished) }
-    val dollarSign ="$ "
-    val customColors = CheckboxDefaults.colors(
-        checkedColor =MaterialTheme.colors.primary, // 选中时的颜色
-    )
-    Row(
-        modifier = modifier
-            .height(68.dp)
-            .clearAndSetSemantics {
-                contentDescription =
-                    "$content account ending in ${subcontent.takeLast(4)}, current balance $dollarSign$credit"
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val typography = MaterialTheme.typography
-        RowIndicator(
-            color = color,
-            modifier = Modifier
-        )
-        Spacer(Modifier.width(12.dp))
-        Checkbox(
-            colors = customColors,
-            checked = finished,
-            onCheckedChange = {
-                onFinishedChange(id,it)
-            }
-        )
-        Column(Modifier) {
-            Text(text = content, style = typography.body1)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = subcontent, style = typography.subtitle1)
-            }
-        }
-        Spacer(Modifier.weight(1f))
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = dollarSign,
-                style = typography.h6,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Text(
-                text = credit.toString(),
-                style = typography.h6,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-        }
-        Spacer(Modifier.width(16.dp))
-        
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Icon(
-                imageVector = Icons.Filled.ChevronRight,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(24.dp)
-            )
-        }
-    }
-    RallyDivider()
-}
-//Routine列-新增
-@Composable
-fun EmptyRoutineRow(
-    modifier: Modifier = Modifier,
-    content: String,
-    subcontent:String,
-){
-    val dollarSign ="$ "
-    Row(
-        modifier = modifier
-            .height(68.dp)
-            .clearAndSetSemantics {
-                contentDescription =
-                    "$content account ending in ${subcontent.takeLast(4)}, current balance $dollarSign"
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val typography = MaterialTheme.typography
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier) {
-            Text(text = content, style = typography.body1)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = subcontent, style = typography.subtitle1)
-            }
-        }
-        Spacer(Modifier.weight(1f))
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = dollarSign,
-                style = typography.h6,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Text(
-                text = "0.0",
-                style = typography.h6,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-        }
-        Spacer(Modifier.width(16.dp))
-        
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Icon(
-                imageVector = Icons.Filled.ChevronRight,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(24.dp)
-            )
-        }
-    }
-    RallyDivider()
-}
 
-
-@Composable
-fun RallyDivider(modifier: Modifier = Modifier) {
-    Divider(color = MaterialTheme.colors.background, thickness = 1.dp, modifier = modifier)
-}
-
-//三色圈改通用圈
 //三色圆圈动画
-
-private const val DividerLengthInDegrees = 1.8f
-val RoutineColors= listOf(importColor, normalColor, faverColor)
-
 @Composable
 fun ThreeColorCircle(
     proportions:List<Float>,
@@ -340,4 +311,6 @@ fun ThreeColorCircle(
     }
 }
 private enum class ThreeCircleProgress { START, END }
+private const val DividerLengthInDegrees = 1.8f
+val RoutineColors= listOf(importColor, normalColor, faverColor)
 

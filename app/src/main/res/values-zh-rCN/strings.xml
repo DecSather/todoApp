@@ -7,13 +7,18 @@
     <string name="rontine_content_req">标题*</string>
     <string name="rontine_rank_req">分级*</string>
     <string name="rontine_credit_req">积分*</string>
-    <string name="see_all">全展开</string>
+    <string name="see_all">详情</string>
     <string name="back_button">返回</string>
     <string name="delete">删除</string>
     <string name="delete_question">请确认删除操作</string>
     <string name="no">取消</string>
     <string name="yes">确认</string>
     <string name="save_action">保存</string>
+    <string name="formatter">年-月-日</string>
     <string name="required_fields">*必填</string>
     <string name="rontine_subcontent_req">备注</string>
+    <string name="show_less">不展开</string>
+    <string name="show_more">展开</string>
+    <string name="click_to_add">点击添加</string>
+    <string name="todo_list">待办清单</string>
 </resources>

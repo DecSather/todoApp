@@ -49,6 +49,9 @@ android {
 }
 
 dependencies {
+//    动画效果
+    implementation("androidx.compose.animation:animation:1.5.0")
+    
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation("androidx.compose.material:material:1.7.4")
@@ -72,6 +75,7 @@ dependencies {
 //    Room
     implementation("androidx.room:room-common:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
+    implementation("com.google.android.material:material:1.12.0")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     // SQLite Testing

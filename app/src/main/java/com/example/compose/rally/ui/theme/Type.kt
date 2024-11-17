@@ -72,6 +72,7 @@ val Typography = Typography(
         lineHeight = 20.sp,
         letterSpacing = 0.1.em
     ),
+    
     button = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,
