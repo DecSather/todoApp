@@ -17,6 +17,8 @@ val normalColor: Color =Color(0xFF039667)
 val faverColor: Color = Color(0xFF04B97F)
 val unfinishedColor: Color=Color(0xFF6F847D)
 
+val errorColor = Color(0xFF6F94CD)
+
 val LightColorPalette= lightColors(
     primary = Blue500,
     surface = Blue900,

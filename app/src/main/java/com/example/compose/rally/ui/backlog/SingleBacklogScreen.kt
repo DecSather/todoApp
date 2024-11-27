@@ -2,8 +2,11 @@
 package com.example.compose.rally.ui.backlog
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,7 +20,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -29,7 +38,10 @@ import com.example.compose.rally.ui.AppViewModelProvider
 import com.example.compose.rally.ui.components.*
 import com.example.compose.rally.ui.navigation.BaseDestination
 import com.example.compose.rally.ui.routine.formatedCredit
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 object SingleBacklogDestination : BaseDestination {
     override val route = "single_backlog"
@@ -66,7 +78,6 @@ fun SingleBacklogScreen(
         onDelete ={
             coroutineScope.launch {
                 viewModel.deleteBacklogById(backlog.id)
-                viewModel.deleteBacklogById(535)
                 navigateBack()
             }
         },
@@ -82,7 +93,10 @@ fun SingleBacklogScreen(
                 coroutineScope.launch {
                     viewModel.onRoutineFinishedChange(id,finished)
                 }
-            }
+            },
+            swipeToDelete ={ coroutineScope.launch {
+                viewModel.deleteRoutineById(routine.id)
+            } },
         )
         
     }
@@ -207,3 +221,4 @@ fun  SingleBacklogBody(
     }
     
 }
+

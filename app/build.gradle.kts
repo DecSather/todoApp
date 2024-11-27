@@ -49,6 +49,10 @@ android {
 }
 
 dependencies {
+//    fragment
+    val fragment_version = "1.8.3"
+    implementation("androidx.fragment:fragment-ktx:$fragment_version")
+
 //    动画效果
     implementation("androidx.compose.animation:animation:1.5.0")
     

@@ -54,7 +54,7 @@ class BacklogHomeViewModel(
         private const val TIMEOUT_MILLIS = 5_000L
     }
 
-//    backlog state 单次单个频繁更新
+//    backlog edit 单次单个频繁更新
     var backlogUiState by mutableStateOf(BacklogUiState())
 
     fun updatBacklogUiState(backlog: Backlog) {
@@ -67,7 +67,7 @@ class BacklogHomeViewModel(
         }
     }
 
-//    routine state 单次单个频繁更新
+//    routine edit 频繁更新
     var routineUiState  by mutableStateOf(RoutineUiState())
     private set
     suspend fun inseetRoutine() {
@@ -79,13 +79,23 @@ class BacklogHomeViewModel(
     fun updateRoutineUiState(routine: Routine) {
         routineUiState =
             RoutineUiState(routine = routine, isEntryValid = validateInput(routine))
+        println("update rout: "+routineUiState.routine)
+        
     }
     suspend fun updateRoutine() {
         if (validateInput(routineUiState.routine)) {
             routinesRepository.updateRoutine(routineUiState.routine)
+            println("save rout in DAO: "+routineUiState.routine)
+        }else {
+            routinesRepository.deleteRoutineById(routineUiState.routine.id)
+            println("delete rout in DAO: "+routineUiState.routine)
+            
         }
     }
-
+    
+    suspend fun onRoutineFinishedChange(routineId:Int,finished: Boolean){
+        routinesRepository.updateFinished(routineId,finished)
+    }
     private fun validateInput(uiState: Routine = routineUiState.routine): Boolean {
         return with(uiState) {
             content.isNotBlank() &&rank>=0 && credit>0.0

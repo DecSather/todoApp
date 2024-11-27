@@ -13,10 +13,12 @@
     <string name="rontine_rank_req">Rank*</string>
     <string name="rontine_credit_req">Credit*</string>
     <string name="rontine_subcontent_req">Remark</string>
+    <string name="routine_empty_error">Can\'t be empty</string>
 <!--     Function -->
     <string name="see_all">DETAIL</string>
     <string name="back_button">Back</string>
     <string name="save_action">Save</string>
+    <string name="cancel_action">Cancel</string>
     <string name="delete">Delete</string>
     <string name="delete_question">Are you sure you want to delete?</string>
     <string name="yes">Yes</string>

@@ -7,8 +7,10 @@
     <string name="rontine_content_req">标题*</string>
     <string name="rontine_rank_req">分级*</string>
     <string name="rontine_credit_req">积分*</string>
+    <string name="routine_empty_error">不能为空</string>
     <string name="see_all">详情</string>
     <string name="back_button">返回</string>
+    <string name="cancel_action">取消</string>
     <string name="delete">删除</string>
     <string name="delete_question">请确认删除操作</string>
     <string name="no">取消</string>

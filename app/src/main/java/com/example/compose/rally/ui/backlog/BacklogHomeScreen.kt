@@ -46,7 +46,7 @@ fun BacklogHomeScreen(
 //    元素共享-动画效果
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-//    导航-跳转单独页面
+//    导航
     onBacklogDetailClick:(Int)->Unit={},
 //    数据管理
     viewModel:BacklogHomeViewModel  = viewModel(factory = AppViewModelProvider.Factory)
@@ -87,7 +87,6 @@ fun BacklogHomeScreen(
         BacklogHomeBody(
             sharedTransitionScope=sharedTransitionScope,
             animatedContentScope=animatedContentScope,
-            
             onNewBacklog={
                 coroutineScope.launch {
                     onBacklogDetailClick(viewModel.newCurrentBacklog(formattedDate))
@@ -95,11 +94,27 @@ fun BacklogHomeScreen(
                          },
             formattedDate=formattedDate,
             onBacklogDetailClick=onBacklogDetailClick,
+            onFinishedChange={ id,finished ->
+                coroutineScope.launch {
+                    viewModel.onRoutineFinishedChange(id,finished)
+                }
+            },
             
             backlogUiState = viewModel.backlogUiState,
             routineUiState = viewModel.routineUiState,
             updateBacklogUiState=viewModel::updatBacklogUiState,
             updateRoutineUiState=viewModel::updateRoutineUiState,
+            
+            onSaveBacklog={
+                coroutineScope.launch {
+                    viewModel.updateBacklog()
+                }
+            },
+            onSaveRoutine={
+                coroutineScope.launch {
+                    viewModel.updateRoutine()
+                }
+            },
         insertRoutineClick={
             coroutineScope.launch {
                 viewModel.inseetRoutine()
@@ -125,11 +140,15 @@ fun BacklogHomeBody(
     formattedDate: String,
     onNewBacklog:() -> Unit,
     onBacklogDetailClick:(Int)->Unit={},
+    onFinishedChange:(Int,Boolean)->Unit,
+    
     insertRoutineClick:() ->Unit,
     backlogUiState: BacklogUiState,
     routineUiState: RoutineUiState,
     updateRoutineUiState:(Routine) -> Unit,
     updateBacklogUiState:(Backlog) -> Unit,
+    onSaveBacklog:() -> Unit,
+    onSaveRoutine:() -> Unit,
     
     creditsTotal:Float,
     importTotal:Float,
@@ -138,7 +157,9 @@ fun BacklogHomeBody(
     backlogList: List<Backlog>,
     routineList: List<Routine>,
     ){
-    var EditCardVisible by rememberSaveable { mutableStateOf(false) }
+    var showEditDialog by remember { mutableStateOf(false) }
+    
+    var clickPart by rememberSaveable { mutableStateOf(0)}
     
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
@@ -183,11 +204,12 @@ fun BacklogHomeBody(
                     routineList = routineListForBacklog,
                     
                     onBacklogDetailClick=onBacklogDetailClick,
-                    onBacklogEditClick = { back,rout ->
+                    onFinishedChange = onFinishedChange,
+                    onBacklogEditClick = { back,rout,clickpart ->
                         updateBacklogUiState(back)
                         updateRoutineUiState(rout)
-                        println("Entry Click: "+back.id+"   Edit: ")
-                        EditCardVisible =!EditCardVisible
+                        clickPart=clickpart
+                        showEditDialog =!showEditDialog
                     }
                 )
                 Spacer(Modifier.height(12.dp))
@@ -213,27 +235,44 @@ fun BacklogHomeBody(
     
 //    设置可见与否
 //    backlogid -> routinelist
-//    初始化viewmodel
-    if(EditCardVisible){
-        BacklogEditCard(
+    if(showEditDialog){
+        EditDialogModal(
+            onDateSelected = {
+                showEditDialog = false
+            },
+            onDismiss = { showEditDialog = false },
+            clickPart = clickPart,
+            onClickPart ={it -> clickPart=it},
             routineList = routineList.filter { it.backlogId==backlogUiState.backlog.id },
             backlogUiState=backlogUiState,
             routineUiState = routineUiState,
             /*
             * 考虑routinelist
             *   查询一次
-            * 每次失去焦点就更新-则热观察提供的list也可以
-            * 修改频繁的具体值考虑限定在文字更改
-            * 忽略提供的分级选项或视作不频繁修改
-            * 需要添加分数修改，属于不频繁修改
+            * 不要使用热观察作为数据流，是异步的会延迟更新
+            * 修改频繁的 文字更改
+            * 不频繁修改 忽略提供的分级选项或视作
+            * 不频繁修改 需要添加分数修改，属于
             * 不修改备注*/
-            
+
 //            ！！修改uistate全为字符串以优化代码！！
-            updateBacklogUiState =updateBacklogUiState,
+            updateBacklogUiState = {
+                updateBacklogUiState(it)
+                onSaveBacklog()
+                                   },
             insertRoutineClick = insertRoutineClick,
             updateRoutineUiState =updateRoutineUiState,
+            
+            onModelSaveClick = {
+                onSaveRoutine()
+                showEditDialog=!showEditDialog
+                            },
+            
+            onSaveRoutine = {
+                onSaveRoutine()
+            }
         )
-        
+
     }
 }
 val formatter = DateTimeFormatter.ofPattern(DateFormatter)
