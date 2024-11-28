@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.Icon
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -159,7 +159,7 @@ fun BacklogHomeBody(
     ){
     var showEditDialog by remember { mutableStateOf(false) }
     
-    var clickPart by rememberSaveable { mutableStateOf(0)}
+    var clickPart by rememberSaveable { mutableIntStateOf(0) }
     
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
@@ -181,12 +181,12 @@ fun BacklogHomeBody(
                     Column(modifier = Modifier.align(Alignment.Center)) {
                         Text(
                             text = stringResource(R.string.credit),
-                            style = MaterialTheme.typography.body1,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                         Text(
                             text = formatedCredit( creditsTotal.toString()),
-                            style = MaterialTheme.typography.h2,
+                            style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
                     }
@@ -216,21 +216,20 @@ fun BacklogHomeBody(
 
             }
         }
-        if(backlogList.isEmpty() || !backlogList.first().timeTitle.equals(formattedDate)) {
-            FloatingActionButton(
-                onClick = onNewBacklog,
-                backgroundColor = MaterialTheme.colors.surface,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(16.dp),
-                
-                ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Backlog"
-                )
-            }
+        FloatingActionButton(
+            shape = CircleShape,
+            onClick = onNewBacklog,
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .padding(16.dp),
+            
+            ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Backlog"
+            )
         }
+        
     }
     
 //    设置可见与否

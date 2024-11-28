@@ -2,16 +2,10 @@ package com.example.compose.rally.ui.routine
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -90,9 +84,9 @@ fun SingleRoutineBody(
                 },
                 label = { Text(stringResource(R.string.rontine_content_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colors.surface,
-                    unfocusedContainerColor = MaterialTheme.colors.surface,
-                    disabledContainerColor = MaterialTheme.colors.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
@@ -100,21 +94,16 @@ fun SingleRoutineBody(
             )
 //        rank
             OutlinedTextField(
-                value = if(rankText.equals("-1"))routineUiState.routine.rank.toString() else rankText,
-                onValueChange ={
-                        newText ->
-                    rankText = newText
-                    if(rankText.isNotEmpty()&&!rankText.equals("-1"))
-                        onRoutineValueChange(routineUiState.routine.copy(rank = rankText.toInt() ))
-                    onRoutineValueChange(routineUiState.routine.copy(rank = -1 ))
-                        
+                value = routineUiState.routine.content,
+                onValueChange = {
+                    onRoutineValueChange(routineUiState.routine.copy(content = it ))
+                    
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                label = { Text(stringResource(R.string.rontine_rank_req)) },
+                label = { Text(stringResource(R.string.rontine_content_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colors.surface,
-                    unfocusedContainerColor = MaterialTheme.colors.surface,
-                    disabledContainerColor = MaterialTheme.colors.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled,
@@ -134,9 +123,9 @@ fun SingleRoutineBody(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 label = { Text(stringResource(R.string.rontine_credit_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colors.surface,
-                    unfocusedContainerColor = MaterialTheme.colors.surface,
-                    disabledContainerColor = MaterialTheme.colors.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
                 leadingIcon = { Text("$") },
                 modifier = Modifier.fillMaxWidth(),
@@ -151,9 +140,9 @@ fun SingleRoutineBody(
                 },
                 label = { Text(stringResource(R.string.rontine_subcontent_req)) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colors.surface,
-                    unfocusedContainerColor = MaterialTheme.colors.surface,
-                    disabledContainerColor = MaterialTheme.colors.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    disabledContainerColor = MaterialTheme.colorScheme.surface,
                 ),
                 modifier = Modifier.fillMaxWidth(),
                 enabled = enabled

@@ -8,9 +8,9 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material.Text
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -117,7 +117,7 @@ fun EditDialogModal(
                 onDismiss()
             }) {
                 Text(
-                    color = MaterialTheme.colors.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     text = stringResource(R.string.save_action),
                 )
             }
@@ -125,7 +125,7 @@ fun EditDialogModal(
         dismissButton = {
             androidx.compose.material.TextButton(onClick = onDismiss) {
                 Text(
-                    color = MaterialTheme.colors.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     text = stringResource(R.string.cancel_action),
                     
                     )
@@ -150,8 +150,8 @@ fun showDatePickerDialog(
         label = { Text(stringResource(R.string.formatter)) },
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = Color.Transparent,
-            focusedBorderColor =MaterialTheme.colors.primary,
-            unfocusedBorderColor =  MaterialTheme.colors.primary.copy(alpha = 0.8f),
+            focusedBorderColor =MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor =  MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
         ),
         modifier = modifier
             .fillMaxWidth()
@@ -188,34 +188,34 @@ fun DatePickerModal(
 ) {
     val datePickerState = rememberDatePickerState(selectedDate?.let { convertLocalDateToMillis(it) })
     val datePickerColors = DatePickerDefaults.colors(
-        containerColor = MaterialTheme.colors.surface,
-        weekdayContentColor =MaterialTheme.colors.primary,
-        todayDateBorderColor =MaterialTheme.colors.primary,
-        selectedYearContainerColor =MaterialTheme.colors.primary,
-        selectedDayContainerColor = MaterialTheme.colors.primary,
-        navigationContentColor =MaterialTheme.colors.primary,
-        dividerColor = MaterialTheme.colors.primary,
-        todayContentColor = MaterialTheme.colors.primary,
-        currentYearContentColor = MaterialTheme.colors.primary,
+        containerColor = MaterialTheme.colorScheme.surface,
+        weekdayContentColor =MaterialTheme.colorScheme.primary,
+        todayDateBorderColor =MaterialTheme.colorScheme.primary,
+        selectedYearContainerColor =MaterialTheme.colorScheme.primary,
+        selectedDayContainerColor = MaterialTheme.colorScheme.primary,
+        navigationContentColor =MaterialTheme.colorScheme.primary,
+        dividerColor = MaterialTheme.colorScheme.primary,
+        todayContentColor = MaterialTheme.colorScheme.primary,
+        currentYearContentColor = MaterialTheme.colorScheme.primary,
     )
     DatePickerDialog(
         colors= datePickerColors,
         onDismissRequest = onDismiss,
         confirmButton = {
-            androidx.compose.material3.TextButton(onClick = {
+            TextButton(onClick = {
                 onDateSelected(LocalDate.parse(datePickerState.selectedDateMillis?.let { convertMillisToDate(it) }, formatter) )
                 onDismiss()
             }) {
                 Text(
-                    color = MaterialTheme.colors.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     text = stringResource(R.string.save_action),
                 )
             }
         },
         dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text(
-                    color = MaterialTheme.colors.primary,
+                    color = MaterialTheme.colorScheme.primary,
                     text = stringResource(R.string.cancel_action),
                     
                     )
@@ -263,7 +263,8 @@ fun BacklogEditRow(
 
         )
         OutlinedTextField(
-            placeholder = { Text(text= stringResource(R.string.routine_empty_error), style = MaterialTheme.typography.subtitle2) },
+//                                                                                                        subtitle2
+            placeholder = { Text(text= stringResource(R.string.routine_empty_error), style = MaterialTheme.typography.titleMedium) },
             value = if(routineUiState.routine.id==routine.id )routineUiState.routine.content else routine.content,
             onValueChange= {it ->
                 if(routineUiState.routine.id!=routine.id )
@@ -274,7 +275,8 @@ fun BacklogEditRow(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
             ),
-            textStyle =  MaterialTheme.typography.body1,
+//                                                    body1
+            textStyle =  MaterialTheme.typography.bodyMedium,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
@@ -317,7 +319,8 @@ fun BacklogEmptyRow(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
             ),
-            textStyle = MaterialTheme.typography.body1,
+//                                                  body1
+            textStyle = MaterialTheme.typography.bodyMedium,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,

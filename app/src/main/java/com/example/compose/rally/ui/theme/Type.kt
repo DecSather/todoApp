@@ -25,6 +25,7 @@ val Typography = Typography(
         fontWeight = FontWeight.W100,
         fontSize = 96.sp,
     ),
+//    headlineLarge
     h2 = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 44.sp,
@@ -56,12 +57,14 @@ val Typography = Typography(
         lineHeight = 20.sp,
         letterSpacing = 3.sp
     ),
-    subtitle2 = TextStyle(
+//    titleMedium
+    subtitle2 =TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         letterSpacing = 0.1.em
     ),
-    body1 = TextStyle(
+//    bodyMedium
+    body1= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         letterSpacing = 0.1.em
@@ -72,7 +75,7 @@ val Typography = Typography(
         lineHeight = 20.sp,
         letterSpacing = 0.1.em
     ),
-    
+
     button = TextStyle(
         fontWeight = FontWeight.Bold,
         fontSize = 14.sp,

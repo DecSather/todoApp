@@ -3,11 +3,7 @@ package com.example.compose.rally.ui.components
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,30 +27,12 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.*
 import androidx.compose.material.Icon
 import androidx.compose.material3.*
 import androidx.compose.material3.IconButton
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.vector.DefaultStrokeLineWidth
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.window.DialogProperties
-import com.example.compose.rally.ui.backlog.BacklogEditRow
-import com.example.compose.rally.ui.backlog.BacklogEmptyRow
-import com.example.compose.rally.ui.backlog.BacklogUiState
-import com.example.compose.rally.ui.backlog.formatter
-import com.example.compose.rally.ui.routine.RoutineUiState
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.text.SimpleDateFormat
-import java.time.ZoneOffset
-import java.util.*
 
 
 /*
