@@ -35,7 +35,7 @@ fun ToDoApp(navController: NavHostController = rememberNavController()) {
                     || (it == ComeSoon && currentDestination?.route?.startsWith( ComeSoon.route ) == true)
         } ?: BacklogHome
         Scaffold(
-            containerColor = if(isSystemInDarkTheme()) Color(0xFF26282F) else MaterialTheme.colors.background,
+            containerColor = MaterialTheme.colors.background,
 //            导航栏样式
             topBar = {
                 TopTabRow(

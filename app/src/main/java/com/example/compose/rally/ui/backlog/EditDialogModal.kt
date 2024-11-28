@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -23,7 +23,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -35,7 +34,6 @@ import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.components.RoutineColors
 import com.example.compose.rally.ui.routine.RoutineUiState
-import com.example.compose.rally.ui.theme.errorColor
 import com.example.compose.rally.ui.theme.unfinishedColor
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -148,13 +146,13 @@ fun showDatePickerDialog(
     var showModal by remember { mutableStateOf(onForceShowDate) }
     OutlinedTextField(
         value = selectedDate.format(DateTimeFormatter.ISO_DATE),
-        colors = TextFieldDefaults.outlinedTextFieldColors(
+        onValueChange = {},
+        label = { Text(stringResource(R.string.formatter)) },
+        colors = OutlinedTextFieldDefaults.colors(
             cursorColor = Color.Transparent,
             focusedBorderColor =MaterialTheme.colors.primary,
             unfocusedBorderColor =  MaterialTheme.colors.primary.copy(alpha = 0.8f),
         ),
-        onValueChange = {},
-        label = { Text(stringResource(R.string.formatter)) },
         modifier = modifier
             .fillMaxWidth()
             .padding(5.dp)
@@ -166,7 +164,7 @@ fun showDatePickerDialog(
                         showModal = true
                     }
                 }
-            }
+            },
     )
     if (showModal) {
         DatePickerModal(
@@ -277,7 +275,7 @@ fun BacklogEditRow(
                 imeAction = ImeAction.Done,
             ),
             textStyle =  MaterialTheme.typography.body1,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
             ),
@@ -320,7 +318,7 @@ fun BacklogEmptyRow(
                 imeAction = ImeAction.Done,
             ),
             textStyle = MaterialTheme.typography.body1,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
+            colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent,
             ),
