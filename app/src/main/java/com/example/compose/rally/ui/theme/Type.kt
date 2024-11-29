@@ -44,6 +44,7 @@ val Typography = Typography(
         fontWeight = FontWeight.W700,
         fontSize = 24.sp
     ),
+//    headlineMedium
     h6 = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp,
@@ -51,6 +52,7 @@ val Typography = Typography(
         fontFamily = EczarFontFamily,
         letterSpacing = 3.sp
     ),
+//    titleLarge
     subtitle1 = TextStyle(
         fontWeight = FontWeight.Light,
         fontSize = 14.sp,
@@ -69,6 +71,7 @@ val Typography = Typography(
         fontSize = 16.sp,
         letterSpacing = 0.1.em
     ),
+//    bodySmall
     body2 = TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,

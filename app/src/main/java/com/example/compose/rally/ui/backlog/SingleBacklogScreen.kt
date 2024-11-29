@@ -9,22 +9,17 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.Icon
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -132,7 +127,7 @@ fun  SingleBacklogBody(
                     colorIndexs =finishedItems.map { it -> it.rank }
                 )
                 IconButton(onClick = navigateBack) {
-                    androidx.compose.material.Icon(
+                    Icon(
                         imageVector = Icons.Filled.ArrowBackIosNew,
                         contentDescription = stringResource(R.string.back_button)
                     )
@@ -142,7 +137,7 @@ fun  SingleBacklogBody(
                     with(sharedTransitionScope){
                         Text(
                             text = backlog.timeTitle,
-                            style = MaterialTheme.typography.body1,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
                                 .wrapContentWidth()
@@ -159,7 +154,7 @@ fun  SingleBacklogBody(
                         )
                         Text(
                             text = formatedCredit( finishedAmount.toString()),
-                            style = MaterialTheme.typography.h2,
+                            style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier
                                 .align(Alignment.CenterHorizontally)
                         )
@@ -170,7 +165,7 @@ fun  SingleBacklogBody(
             Spacer(Modifier.height(10.dp))
 //            routineList
             Card {
-                Column(modifier = Modifier.padding(12.dp).weight(1f)){
+                Column(modifier = Modifier.padding(12.dp).fillMaxWidth()){
                     unfinishedItems.map {
                             item ->
                         rows(item)
@@ -188,17 +183,12 @@ fun  SingleBacklogBody(
                 }
                 Spacer(Modifier.height(16.dp))
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(MaterialTheme.colors.background)
-            )
         }
         
         FloatingActionButton(
+            shape = CircleShape,
             onClick = { deleteConfirmationRequired = true },
-            backgroundColor = MaterialTheme.colors.surface,
+            contentColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(16.dp),

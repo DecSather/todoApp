@@ -1,10 +1,9 @@
 package com.example.compose.rally.ui.comesoon
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddHome
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,16 +27,16 @@ fun ComeSoonScreen() {
         Text(
             modifier = Modifier.padding(8.dp),
             text = "Coming soon",
-            style = MaterialTheme.typography.h2,
+            style = MaterialTheme.typography.headlineLarge,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colorScheme.primary
         )
         Text(
             modifier = Modifier.padding(horizontal = 8.dp),
             text = "waiting implement",
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.surface
+            color = MaterialTheme.colorScheme.surface
         )
     }
 }

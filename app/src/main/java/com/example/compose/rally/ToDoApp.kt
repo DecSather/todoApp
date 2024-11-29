@@ -1,14 +1,12 @@
 package com.example.compose.rally
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -20,7 +18,6 @@ import com.example.compose.rally.ui.comesoon.ComeSoon
 import com.example.compose.rally.ui.theme.ToDoTheme
 // Screens to be displayed in the top RallyTabRow
 val rallyTabRowScreens = listOf(BacklogHome, ComeSoon)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ToDoApp(navController: NavHostController = rememberNavController()) {
     ToDoNavHost(navController = navController)
@@ -35,7 +32,7 @@ fun ToDoApp(navController: NavHostController = rememberNavController()) {
                     || (it == ComeSoon && currentDestination?.route?.startsWith( ComeSoon.route ) == true)
         } ?: BacklogHome
         Scaffold(
-            containerColor = MaterialTheme.colors.background,
+            containerColor = MaterialTheme.colorScheme.background,
 //            导航栏样式
             topBar = {
                 TopTabRow(

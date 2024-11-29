@@ -5,6 +5,9 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -23,16 +26,6 @@ import com.example.compose.rally.R
 import com.example.compose.rally.data.Backlog
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.theme.*
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.*
-import androidx.compose.material.Icon
-import androidx.compose.material3.*
-import androidx.compose.material3.IconButton
 
 
 /*
@@ -81,7 +74,7 @@ fun BacklogDetailCard(
                     ) {
                         Text(
                             text = backlog.timeTitle,
-                            style = MaterialTheme.typography.h2,
+                            style = MaterialTheme.typography.headlineLarge,
                             modifier = Modifier
                                 .weight(1f)
                                 .sharedBounds(
@@ -111,7 +104,7 @@ fun BacklogDetailCard(
                     val amountText = "$" + creditTotal+" unfinished"
                     Text(
                         text = amountText,
-                        style = MaterialTheme.typography.subtitle2,
+                        style = MaterialTheme.typography.titleMedium,
                     )
                     if(expanded){
                         /*
@@ -179,7 +172,7 @@ fun BaseDivider(total: Float, data: List<Float>, colors: List<Color>) {
                 modifier = Modifier
                     .weight(1f)
                     .height(1.dp)
-                    .background(MaterialTheme.colors.background)
+                    .background(MaterialTheme.colorScheme.background)
             )
         }
     }
@@ -198,7 +191,7 @@ fun SeeAllButton(modifier: Modifier = Modifier) {
         Text(
             fontSize = 16.sp,
             text= stringResource(R.string.see_all),
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colorScheme.primary
         )
     }
 }

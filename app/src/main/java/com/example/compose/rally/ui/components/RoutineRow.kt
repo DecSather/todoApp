@@ -3,19 +3,16 @@ package com.example.compose.rally.ui.components
 import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -23,12 +20,8 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import com.example.compose.rally.data.Routine
 import com.example.compose.rally.ui.theme.unfinishedColor
 import kotlinx.coroutines.coroutineScope
@@ -71,7 +64,7 @@ fun BriefRoutineRow(
     var finished by remember { mutableStateOf(routine.finished) }
     val dollarSign ="$ "
     val customColors = CheckboxDefaults.colors(
-        checkedColor = MaterialTheme.colors.primary, // 选中时的颜色
+        checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
     Row(
         modifier = modifier
@@ -92,7 +85,7 @@ fun BriefRoutineRow(
             }
         )
         Column{
-            Text(text = content, style = typography.body1)
+            Text(text = content, style = typography.bodyMedium)
         }
         Spacer(Modifier.weight(1f))
         Row(
@@ -100,12 +93,12 @@ fun BriefRoutineRow(
         ) {
             Text(
                 text = dollarSign,
-                style = typography.h6,
+                style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
                 text = credit.toString(),
-                style = typography.h6,
+                style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
@@ -118,7 +111,7 @@ fun BriefEmptyRow(
     content: String,
 ) {
     val customColors = CheckboxDefaults.colors(
-        checkedColor = MaterialTheme.colors.primary, // 选中时的颜色
+        checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
     Row(
         modifier = modifier
@@ -137,7 +130,7 @@ fun BriefEmptyRow(
             onCheckedChange = {}
         )
         Column{
-            Text(text = content, style = typography.body1)
+            Text(text = content, style = typography.bodyMedium)
         }
         Spacer(Modifier.weight(1f))
         
@@ -165,7 +158,7 @@ fun DetailRoutineRow(
     var finished by remember { mutableStateOf(routine.finished) }
     val dollarSign ="$ "
     val customColors = CheckboxDefaults.colors(
-        checkedColor =MaterialTheme.colors.primary, // 选中时的颜色
+        checkedColor =MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
     Row(
         modifier = modifier
@@ -191,10 +184,10 @@ fun DetailRoutineRow(
             }
         )
         Column(Modifier) {
-            Text(text = content, style = typography.body1)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = subcontent, style = typography.subtitle1)
-            }
+            Text(text = content, style = typography.bodyMedium)
+//            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(text = subcontent, style = typography.titleLarge)
+//            }
         }
         Spacer(Modifier.weight(1f))
         Row(
@@ -202,18 +195,18 @@ fun DetailRoutineRow(
         ) {
             Text(
                 text = dollarSign,
-                style = typography.h6,
+                style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
                 text = credit.toString(),
-                style = typography.h6,
+                style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
         Spacer(Modifier.width(16.dp))
         
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+//        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
                 contentDescription = null,
@@ -221,7 +214,7 @@ fun DetailRoutineRow(
                     .padding(end = 12.dp)
                     .size(24.dp)
             )
-        }
+//        }
     }
     RallyDivider()
 }
@@ -246,10 +239,10 @@ fun DetailEmptyRow(
         val typography = MaterialTheme.typography
         Spacer(Modifier.width(12.dp))
         Column(Modifier) {
-            Text(text = content, style = typography.body1)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Text(text = subcontent, style = typography.subtitle1)
-            }
+            Text(text = content, style = typography.bodyMedium)
+//            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Text(text = subcontent, style = typography.titleLarge)
+//            }
         }
         Spacer(Modifier.weight(1f))
         Row(
@@ -257,18 +250,18 @@ fun DetailEmptyRow(
         ) {
             Text(
                 text = dollarSign,
-                style = typography.h6,
+                style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             Text(
                 text = "0.0",
-                style = typography.h6,
+                style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
         }
         Spacer(Modifier.width(16.dp))
         
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+//        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
             Icon(
                 imageVector = Icons.Filled.ChevronRight,
                 contentDescription = null,
@@ -276,14 +269,14 @@ fun DetailEmptyRow(
                     .padding(end = 12.dp)
                     .size(24.dp)
             )
-        }
+//        }
     }
     RallyDivider()
 }
 @Composable
 fun RallyDivider(
     modifier: Modifier = Modifier,
-    color:Color =MaterialTheme.colors.background
+    color:Color =MaterialTheme.colorScheme.background
 ) {
     Divider(color = color, thickness = 1.dp, modifier = modifier)
 }

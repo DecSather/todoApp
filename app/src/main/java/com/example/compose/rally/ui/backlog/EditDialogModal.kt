@@ -8,10 +8,6 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -63,7 +59,7 @@ fun EditDialogModal(
     onModelSaveClick :() ->Unit,
     onSaveRoutine: () -> Unit
 ) {
-    androidx.compose.material.AlertDialog(
+    AlertDialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
         ),
@@ -111,7 +107,7 @@ fun EditDialogModal(
         },
         onDismissRequest = onDismiss,
         confirmButton = {
-            androidx.compose.material.TextButton(onClick = {
+            TextButton(onClick = {
                 onDateSelected()
                 onModelSaveClick()
                 onDismiss()
@@ -123,7 +119,7 @@ fun EditDialogModal(
             }
         },
         dismissButton = {
-            androidx.compose.material.TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismiss) {
                 Text(
                     color = MaterialTheme.colorScheme.primary,
                     text = stringResource(R.string.cancel_action),
