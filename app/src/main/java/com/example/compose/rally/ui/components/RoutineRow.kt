@@ -216,7 +216,7 @@ fun DetailRoutineRow(
             )
 //        }
     }
-    RallyDivider()
+    BaseDivider()
 }
 //Routine列-新增
 @Composable
@@ -271,14 +271,14 @@ fun DetailEmptyRow(
             )
 //        }
     }
-    RallyDivider()
+    BaseDivider()
 }
 @Composable
-fun RallyDivider(
+fun BaseDivider(
     modifier: Modifier = Modifier,
     color:Color =MaterialTheme.colorScheme.background
 ) {
-    Divider(color = color, thickness = 1.dp, modifier = modifier)
+    HorizontalDivider(color = color, thickness = 1.dp, modifier = modifier)
 }
 
 /**

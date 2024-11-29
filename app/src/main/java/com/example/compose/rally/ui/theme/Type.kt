@@ -24,7 +24,7 @@ val Typography = Typography(
 //        fontSize = 96.sp,
 //    ),
 //    h2
-            headlineLarge= TextStyle(
+    headlineLarge= TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 44.sp,
         fontFamily = EczarFontFamily,
@@ -44,7 +44,7 @@ val Typography = Typography(
 //    ),
 //    h6
     
-            headlineMedium= TextStyle(
+    headlineMedium= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp,
         lineHeight = 20.sp,
@@ -52,26 +52,26 @@ val Typography = Typography(
         letterSpacing = 3.sp
     ),
 //    subtitle1
-     titleLarge= TextStyle(
+    titleLarge= TextStyle(
         fontWeight = FontWeight.Light,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 3.sp
     ),
 //    subtitle2
-     titleMedium=TextStyle(
+    titleMedium=TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
 //        letterSpacing = 0.1.em
     ),
 //    body1
-     bodyMedium= TextStyle(
+    bodyMedium= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
 //        letterSpacing = 0.1.em
     ),
 //    body2
-     bodySmall= TextStyle(
+    bodySmall= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,

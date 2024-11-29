@@ -107,13 +107,16 @@ fun EditDialogModal(
         },
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = {
+            TextButton(
+                onClick = {
                 onDateSelected()
                 onModelSaveClick()
                 onDismiss()
-            }) {
+            },
+            ) {
                 Text(
                     color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineMedium,
                     text = stringResource(R.string.save_action),
                 )
             }
@@ -122,6 +125,7 @@ fun EditDialogModal(
             TextButton(onClick = onDismiss) {
                 Text(
                     color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineMedium,
                     text = stringResource(R.string.cancel_action),
                     
                     )

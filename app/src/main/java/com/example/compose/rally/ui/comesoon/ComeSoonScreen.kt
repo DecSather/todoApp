@@ -36,7 +36,7 @@ fun ComeSoonScreen() {
             text = "waiting implement",
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.surface
+            color = MaterialTheme.colorScheme.primaryContainer
         )
     }
 }

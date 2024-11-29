@@ -59,7 +59,7 @@ private fun RallyTab(
     onSelected: () -> Unit,
     selected: Boolean
 ) {
-    val color = MaterialTheme.colorScheme.onSurface
+    val color = MaterialTheme.colorScheme.primary
     val durationMillis = if (selected) TabFadeInAnimationDuration else TabFadeOutAnimationDuration
     val animSpec = remember {
         tween<Color>(

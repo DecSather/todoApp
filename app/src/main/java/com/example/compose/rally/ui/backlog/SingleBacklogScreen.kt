@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -143,7 +144,7 @@ fun  SingleBacklogBody(
                                 .wrapContentWidth()
                                 .sharedBounds(
                                     rememberSharedContentState(
-                                        key = backlog.timeTitle
+                                        key = "${backlog.id}/${backlog.timeTitle}"
                                     ),
                                     animatedVisibilityScope = animatedContentScope,
                                     enter = fadeIn(),
@@ -164,7 +165,10 @@ fun  SingleBacklogBody(
             }
             Spacer(Modifier.height(10.dp))
 //            routineList
-            Card {
+            Card(
+                shape = RectangleShape,
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            )) {
                 Column(modifier = Modifier.padding(12.dp).fillMaxWidth()){
                     unfinishedItems.map {
                             item ->
@@ -188,7 +192,6 @@ fun  SingleBacklogBody(
         FloatingActionButton(
             shape = CircleShape,
             onClick = { deleteConfirmationRequired = true },
-            contentColor = MaterialTheme.colorScheme.surface,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(16.dp),

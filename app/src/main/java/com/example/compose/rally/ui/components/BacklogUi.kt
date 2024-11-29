@@ -59,7 +59,7 @@ fun BacklogDetailCard(
     val creditTotal:Float =routineList.map { it.credit }.sum()
     var expanded by rememberSaveable { mutableStateOf(false) }
     
-    Card {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
         Column {
             Column(Modifier
                 .fillMaxWidth()
@@ -79,7 +79,7 @@ fun BacklogDetailCard(
                                 .weight(1f)
                                 .sharedBounds(
                                     rememberSharedContentState(
-                                        key = backlog.timeTitle
+                                        key ="${backlog.id}/${backlog.timeTitle}"
                                     ),
                                     animatedVisibilityScope = animatedContentScope,
                                     enter = fadeIn(),
@@ -131,7 +131,7 @@ fun BacklogDetailCard(
             BaseDivider(creditTotal, routineList.map {it.credit },
                 routineList.map { RoutineColors[it.rank]})
             Column(Modifier
-                .padding(start = 16.dp, top = 4.dp, end = 8.dp)
+                .padding(start = 16.dp, top = 4.dp, end = 16.dp)
             ) {
 //                展开所有
                 SeeAllButton(
