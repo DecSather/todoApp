@@ -1,8 +1,8 @@
 
 package com.example.compose.rally.ui.theme
 
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 val Green500 = Color(0xFF1EB980)
@@ -20,14 +20,14 @@ val unfinishedColor: Color=Color(0xFF6F847D)
 
 val errorColor = Color(0xFF6F94CD)
 
-val LightColorPalette= lightColors(
+val LightColorPalette= lightColorScheme(
     primary = Blue500,
     surface = Blue900,
     onSurface = Color.Black,
     background = Blue300,
     onBackground = Color.Black
 )
-val DarkColorPalette = darkColors(
+val DarkColorPalette = darkColorScheme(
     primary = Green500,
     surface = DarkBlue900,
     onSurface = Color.White,

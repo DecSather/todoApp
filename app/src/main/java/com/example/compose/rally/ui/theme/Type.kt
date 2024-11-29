@@ -1,11 +1,10 @@
 package com.example.compose.rally.ui.theme
 
-import androidx.compose.material.Typography
+import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import com.example.compose.rally.R
 
@@ -20,77 +19,77 @@ private val RobotoCondensed = FontFamily(
 )
 
 val Typography = Typography(
-    defaultFontFamily = RobotoCondensed,
-    h1 = TextStyle(
-        fontWeight = FontWeight.W100,
-        fontSize = 96.sp,
-    ),
-//    headlineLarge
-    h2 = TextStyle(
+//    h1 = TextStyle(
+//        fontWeight = FontWeight.W100,
+//        fontSize = 96.sp,
+//    ),
+//    h2
+            headlineLarge= TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 44.sp,
         fontFamily = EczarFontFamily,
         letterSpacing = 1.5.sp
     ),
-    h3 = TextStyle(
-        fontWeight = FontWeight.W400,
-        fontSize = 14.sp
-    ),
-    h4 = TextStyle(
-        fontWeight = FontWeight.W700,
-        fontSize = 34.sp
-    ),
-    h5 = TextStyle(
-        fontWeight = FontWeight.W700,
-        fontSize = 24.sp
-    ),
-//    headlineMedium
-    h6 = TextStyle(
+//    h3 = TextStyle(
+//        fontWeight = FontWeight.W400,
+//        fontSize = 14.sp
+//    ),
+//    h4 = TextStyle(
+//        fontWeight = FontWeight.W700,
+//        fontSize = 34.sp
+//    ),
+//    h5 = TextStyle(
+//        fontWeight = FontWeight.W700,
+//        fontSize = 24.sp
+//    ),
+//    h6
+    
+            headlineMedium= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp,
         lineHeight = 20.sp,
         fontFamily = EczarFontFamily,
         letterSpacing = 3.sp
     ),
-//    titleLarge
-    subtitle1 = TextStyle(
+//    subtitle1
+     titleLarge= TextStyle(
         fontWeight = FontWeight.Light,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 3.sp
     ),
-//    titleMedium
-    subtitle2 =TextStyle(
+//    subtitle2
+     titleMedium=TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        letterSpacing = 0.1.em
+//        letterSpacing = 0.1.em
     ),
-//    bodyMedium
-    body1= TextStyle(
+//    body1
+     bodyMedium= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-        letterSpacing = 0.1.em
+//        letterSpacing = 0.1.em
     ),
-//    bodySmall
-    body2 = TextStyle(
+//    body2
+     bodySmall= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
-        letterSpacing = 0.1.em
+//        letterSpacing = 0.1.em
     ),
 
-    button = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 14.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.2.em
-    ),
-    caption = TextStyle(
-        fontWeight = FontWeight.W500,
-        fontSize = 12.sp
-    ),
-    overline = TextStyle(
-        fontWeight = FontWeight.W500,
-        fontSize = 10.sp
-    )
+//    button = TextStyle(
+//        fontWeight = FontWeight.Bold,
+//        fontSize = 14.sp,
+//        lineHeight = 16.sp,
+//        letterSpacing = 0.2.em
+//    ),
+//    caption = TextStyle(
+//        fontWeight = FontWeight.W500,
+//        fontSize = 12.sp
+//    ),
+//    overline = TextStyle(
+//        fontWeight = FontWeight.W500,
+//        fontSize = 10.sp
+//    )
 )
