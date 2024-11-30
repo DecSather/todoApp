@@ -34,4 +34,5 @@ class BacklogsRepository(private val backlogDao: BacklogDao) {
      suspend fun deleteBacklogById(id:Int) = backlogDao.deleteBacklogById(id)
     
      suspend fun updateBacklog(backlog: Backlog) = backlogDao.update(backlog)
+     suspend fun onExpandChange(id:Int,isExpand:Boolean) =backlogDao.onExpandChange(id,isExpand)
 }

@@ -46,7 +46,8 @@ class RoutineEntryViewModel(
 data class RoutineUiState(
     val routine: Routine = Routine(
         backlogId=0,
-        content=""
+        content="",
+        sortId = 0
     ),
     val isEntryValid: Boolean = false
 )

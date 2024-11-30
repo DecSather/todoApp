@@ -49,7 +49,6 @@ fun EditDialogModal(
 //      -1- backlog
 //      >=0- routine
     clickPart:Int,
-    onClickPart:(Int) ->Unit,
     routineList:List<Routine>,
     backlogUiState: BacklogUiState,
     routineUiState : RoutineUiState,
@@ -93,7 +92,6 @@ fun EditDialogModal(
                         routineUiState =routineUiState,
                         onRoutineValueChange = updateRoutineUiState,
                         onSaveRoutine = onSaveRoutine,
-                        onClickPart=onClickPart,
                     
                     )
                     if (it.id==clickPart)
@@ -140,7 +138,12 @@ fun showDatePickerDialog(
     backlog:Backlog,
     updateBacklogUiState:(Backlog) -> Unit,
 ) {
-    val initialDate = LocalDate.parse(backlog.timeTitle, formatter)
+    println("edit backlog: "+backlog)
+    val initialDate =
+        if(backlog.timeTitle.isNotEmpty())
+            LocalDate.parse(backlog.timeTitle, formatter)
+        else LocalDate.now()
+    
     var selectedDate by remember { mutableStateOf(initialDate) }
     
     var showModal by remember { mutableStateOf(onForceShowDate) }
@@ -202,12 +205,15 @@ fun DatePickerModal(
         colors= datePickerColors,
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = {
-                onDateSelected(LocalDate.parse(datePickerState.selectedDateMillis?.let { convertMillisToDate(it) }, formatter) )
-                onDismiss()
-            }) {
+            TextButton(
+                onClick = {
+                    onDateSelected(LocalDate.parse(datePickerState.selectedDateMillis?.let { convertMillisToDate(it) }, formatter) )
+                    onDismiss()
+                }
+            ) {
                 Text(
                     color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineMedium,
                     text = stringResource(R.string.save_action),
                 )
             }
@@ -216,6 +222,7 @@ fun DatePickerModal(
             TextButton(onClick = onDismiss) {
                 Text(
                     color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.headlineMedium,
                     text = stringResource(R.string.cancel_action),
                     
                     )
@@ -224,20 +231,21 @@ fun DatePickerModal(
     ) {
         DatePicker(
             colors=datePickerColors,
-            state = datePickerState
+            state = datePickerState,
+            title = {},
+            dateFormatter = DatePickerDefaults.dateFormatter("yyyy-MM","yyyy-MM-dd","yyyy-MM-dd")
         )
     }
 }
 
 fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat(DateFormatter)
+    val formatter = SimpleDateFormat("yyyy-MM-dd")
     return formatter.format(Date(millis))
 }
 fun convertLocalDateToMillis(localDate: LocalDate): Long {
     val zonedDateTime = localDate.atStartOfDay(ZoneOffset.UTC)
     return zonedDateTime.toInstant().toEpochMilli()
 }
-val DateFormatter ="yyyy-MM-dd"
 @Composable
 fun BacklogEditRow(
     modifier: Modifier,
@@ -245,7 +253,6 @@ fun BacklogEditRow(
     routineUiState : RoutineUiState,
     onRoutineValueChange:(Routine)->Unit,
     onSaveRoutine:() ->Unit,
-    onClickPart:(Int) ->Unit,
 ){
     Row(
         modifier = Modifier
@@ -260,10 +267,8 @@ fun BacklogEditRow(
                 .clip(RoundedCornerShape(percent = 50))
 //                设置颜色改展开列动画或弹出卡片
                 .background(color = RoutineColors[routine.rank])
-
         )
         OutlinedTextField(
-//                                                                                                        subtitle2
             placeholder = { Text(text= stringResource(R.string.routine_empty_error), style = MaterialTheme.typography.titleMedium) },
             value = if(routineUiState.routine.id==routine.id )routineUiState.routine.content else routine.content,
             onValueChange= {it ->
@@ -275,7 +280,6 @@ fun BacklogEditRow(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
             ),
-//                                                    body1
             textStyle =  MaterialTheme.typography.bodyMedium,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,
@@ -285,7 +289,6 @@ fun BacklogEditRow(
                 .fillMaxWidth()
                 .onFocusChanged {
                     if(it.hasFocus) {
-                        onClickPart(routine.id)
                         onSaveRoutine()
                     }
                                 },
@@ -319,7 +322,6 @@ fun BacklogEmptyRow(
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
             ),
-//                                                  body1
             textStyle = MaterialTheme.typography.bodyMedium,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color.Transparent,

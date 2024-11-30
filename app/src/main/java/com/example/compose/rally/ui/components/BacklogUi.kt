@@ -46,18 +46,18 @@ import com.example.compose.rally.ui.theme.*
 fun BacklogDetailCard(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    
+    onExpandClick:(Boolean)->Unit,
     backlog: Backlog,
     routineList:List<Routine>,
     
     onFinishedChange:(Int,Boolean)->Unit,
     onBacklogDetailClick: (Int) -> Unit,
     
-    onBacklogEditClick:(Backlog,Routine,Int) -> Unit
+    onBacklogEditClick:(Int) -> Unit
     
 ) {
     val creditTotal:Float =routineList.map { it.credit }.sum()
-    var expanded by rememberSaveable { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(backlog.isExpand) }
     
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
         Column {
@@ -87,12 +87,17 @@ fun BacklogDetailCard(
                                     resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
                                 )
                                 .clickable {
-                                    onBacklogEditClick(backlog,  Routine(),-1)
+                                    onBacklogEditClick(-1)
                                 }
                         )
-                        IconButton(onClick = { expanded = !expanded }) {
+                        IconButton(onClick = {
+                            expanded = !expanded
+                            onExpandClick(expanded)
+                        }) {
                             Icon(
-                                imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                imageVector =
+                                if (expanded)
+                                    Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
                                 contentDescription = if (expanded) {
                                     stringResource(R.string.show_less)
                                 } else {
@@ -101,25 +106,23 @@ fun BacklogDetailCard(
                             )
                         }
                     }
-                    val amountText = "$" + creditTotal+" unfinished"
+                    val amountText = ""+routineList.size+ stringResource(R.string.unfinished)
                     Text(
                         text = amountText,
                         style = MaterialTheme.typography.titleMedium,
                     )
                     if(expanded){
-                        /*
-                        * 考虑使用backlog点击编辑删除列编辑*/
                         routineList.map{it ->
                             BriefRoutineRow(
                                 modifier = Modifier
-                                    .clickable { onBacklogEditClick(backlog,it,it.id) },
+                                    .clickable { onBacklogEditClick(it.id) },
                                 routine=it,
                                 onFinishedChange=onFinishedChange,
                             )
                         }
                         BriefEmptyRow(
                             modifier = Modifier
-                                .clickable { onBacklogEditClick(backlog,Routine(),-2) },
+                                .clickable { onBacklogEditClick(-2) },
                             content = stringResource(R.string.click_to_add)
                         )
                     }
@@ -191,6 +194,7 @@ fun SeeAllButton(modifier: Modifier = Modifier) {
         Text(
             fontSize = 16.sp,
             text= stringResource(R.string.see_all),
+            style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.primary
         )
     }
@@ -210,12 +214,18 @@ fun DeleteConfirmationDialog(
         modifier = modifier,
         dismissButton = {
             TextButton(onClick = onDeleteCancel) {
-                Text(text = stringResource(R.string.no))
+                Text(
+                    text = stringResource(R.string.no),
+                    style = MaterialTheme.typography.headlineMedium,
+                    )
             }
         },
         confirmButton = {
             TextButton(onClick = onDeleteConfirm) {
-                Text(text = stringResource(R.string.yes))
+                Text(
+                    text = stringResource(R.string.yes),
+                    style = MaterialTheme.typography.headlineMedium,
+                    )
             }
         })
 }

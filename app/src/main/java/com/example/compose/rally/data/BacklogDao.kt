@@ -27,6 +27,8 @@ interface BacklogDao {
     //    @Update 注解与 insert() 方法类似，使用 suspend 关键字标记此函数。
     @Update
     suspend fun update(item: Backlog)
+    @Query("UPDATE backlogs SET isExpand = :isExpand WHERE id = :id")
+    suspend fun onExpandChange(id:Int,isExpand:Boolean)
     
     @Query("DELETE FROM backlogs WHERE id = :id")
     suspend fun deleteBacklogById(id: Int)

@@ -34,6 +34,7 @@ class BacklogHomeViewModel(
         )
     
     suspend fun newCurrentBacklog(timeTitle:String):Int{
+        println("new timeTitle: "+timeTitle)
         return backlogsRepository.insertBacklog(
             Backlog(
                 timeTitle =timeTitle
@@ -58,6 +59,7 @@ class BacklogHomeViewModel(
     var backlogUiState by mutableStateOf(BacklogUiState())
 
     fun updatBacklogUiState(backlog: Backlog) {
+        println("update backlogUi: "+backlog)
         backlogUiState =
             BacklogUiState(backlog = backlog)
     }
@@ -65,6 +67,9 @@ class BacklogHomeViewModel(
         if(backlogUiState.backlog.timeTitle.isNotEmpty()) {
             backlogsRepository.updateBacklog(backlogUiState.backlog)
         }
+    }
+    suspend fun onExpandChange(id:Int,isExpand:Boolean) {
+            backlogsRepository.onExpandChange(id,isExpand)
     }
 
 //    routine edit 频繁更新
@@ -79,16 +84,13 @@ class BacklogHomeViewModel(
     fun updateRoutineUiState(routine: Routine) {
         routineUiState =
             RoutineUiState(routine = routine, isEntryValid = validateInput(routine))
-        println("update rout: "+routineUiState.routine)
         
     }
     suspend fun updateRoutine() {
         if (validateInput(routineUiState.routine)) {
             routinesRepository.updateRoutine(routineUiState.routine)
-            println("save rout in DAO: "+routineUiState.routine)
         }else {
             routinesRepository.deleteRoutineById(routineUiState.routine.id)
-            println("delete rout in DAO: "+routineUiState.routine)
             
         }
     }

@@ -63,6 +63,10 @@ fun BacklogHomeScreen(
 //    特殊属性-主页面
 //      -可优化
 //      -routineMap = remember { mutableStateMapOf<Int, Float>() }
+    
+    var showEditDialog by remember { mutableStateOf(false) }
+    
+    var clickPart by rememberSaveable { mutableIntStateOf(0) }
     val importTotal by rememberUpdatedState(
         finishedRoutineList.map { routine ->
             if(routine.rank==0)routine.credit else 0f
@@ -89,11 +93,27 @@ fun BacklogHomeScreen(
             animatedContentScope=animatedContentScope,
             onNewBacklog={
                 coroutineScope.launch {
-                    onBacklogDetailClick(viewModel.newCurrentBacklog(formattedDate))
+                    viewModel.updatBacklogUiState(
+                        Backlog(
+                            id = viewModel.newCurrentBacklog(formattedDate),
+                            timeTitle = formattedDate
+                        )
+                    )
+                    clickPart = -1
+                    showEditDialog =!showEditDialog
                 }
-                         },
+                         } ,
+            clickPart=clickPart,
+            showEditDialog =showEditDialog,
+            onChangeEditStatus ={showEditDialog = !showEditDialog},
             formattedDate=formattedDate,
-            onBacklogDetailClick=onBacklogDetailClick,
+            onBacklogDetailClick = onBacklogDetailClick,
+            onExpandChange ={ id,isExpand ->
+                coroutineScope.launch {
+                    viewModel.onExpandChange(id,isExpand)
+                }
+            
+            },
             onFinishedChange={ id,finished ->
                 coroutineScope.launch {
                     viewModel.onRoutineFinishedChange(id,finished)
@@ -102,7 +122,11 @@ fun BacklogHomeScreen(
             
             backlogUiState = viewModel.backlogUiState,
             routineUiState = viewModel.routineUiState,
-            updateBacklogUiState=viewModel::updatBacklogUiState,
+            updateBacklogUiState={backlog ->
+                viewModel.updatBacklogUiState(backlog)
+                clickPart=-1
+                
+            },
             updateRoutineUiState=viewModel::updateRoutineUiState,
             
             onSaveBacklog={
@@ -120,8 +144,6 @@ fun BacklogHomeScreen(
                 viewModel.inseetRoutine()
             }
         },
-            
-            
             creditsTotal=creditsTotal,
             importTotal=importTotal,
             normalTotal=normalTotal,
@@ -139,7 +161,11 @@ fun BacklogHomeBody(
     
     formattedDate: String,
     onNewBacklog:() -> Unit,
+    clickPart:Int,
+    showEditDialog :Boolean,
+    onChangeEditStatus:()->Unit,
     onBacklogDetailClick:(Int)->Unit={},
+    onExpandChange:(Int,Boolean)->Unit,
     onFinishedChange:(Int,Boolean)->Unit,
     
     insertRoutineClick:() ->Unit,
@@ -157,9 +183,6 @@ fun BacklogHomeBody(
     backlogList: List<Backlog>,
     routineList: List<Routine>,
     ){
-    var showEditDialog by remember { mutableStateOf(false) }
-    
-    var clickPart by rememberSaveable { mutableIntStateOf(0) }
     
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
@@ -199,17 +222,16 @@ fun BacklogHomeBody(
                 BacklogDetailCard(
                     sharedTransitionScope=sharedTransitionScope,
                     animatedContentScope=animatedContentScope,
-                    
                     backlog = backlog,
+                    onExpandClick = {
+                        onExpandChange(backlog.id,it)
+                    },
                     routineList = routineListForBacklog,
                     
                     onBacklogDetailClick=onBacklogDetailClick,
                     onFinishedChange = onFinishedChange,
-                    onBacklogEditClick = { back,rout,clickpart ->
-                        updateBacklogUiState(back)
-                        updateRoutineUiState(rout)
-                        clickPart=clickpart
-                        showEditDialog =!showEditDialog
+                    onBacklogEditClick = {
+                        updateBacklogUiState(backlog)
                     }
                 )
                 Spacer(Modifier.height(12.dp))
@@ -218,7 +240,9 @@ fun BacklogHomeBody(
         }
         FloatingActionButton(
             shape = CircleShape,
-            onClick = onNewBacklog,
+            onClick = {
+                onNewBacklog()
+                      },
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(16.dp),
@@ -236,26 +260,13 @@ fun BacklogHomeBody(
 //    backlogid -> routinelist
     if(showEditDialog){
         EditDialogModal(
-            onDateSelected = {
-                showEditDialog = false
-            },
-            onDismiss = { showEditDialog = false },
+            onDateSelected = onChangeEditStatus,
+            onDismiss =onChangeEditStatus,
             clickPart = clickPart,
-            onClickPart ={it -> clickPart=it},
             routineList = routineList.filter { it.backlogId==backlogUiState.backlog.id },
             backlogUiState=backlogUiState,
             routineUiState = routineUiState,
-            /*
-            * 考虑routinelist
-            *   查询一次
-            * 不要使用热观察作为数据流，是异步的会延迟更新
-            * 修改频繁的 文字更改
-            * 不频繁修改 忽略提供的分级选项或视作
-            * 不频繁修改 需要添加分数修改，属于
-            * 不修改备注*/
-
-//            ！！修改uistate全为字符串以优化代码！！
-            updateBacklogUiState = {
+            updateBacklogUiState = {it
                 updateBacklogUiState(it)
                 onSaveBacklog()
                                    },
@@ -264,14 +275,13 @@ fun BacklogHomeBody(
             
             onModelSaveClick = {
                 onSaveRoutine()
-                showEditDialog=!showEditDialog
+                onChangeEditStatus()
                             },
-            
             onSaveRoutine = {
                 onSaveRoutine()
-            }
+            },
         )
 
     }
 }
-val formatter = DateTimeFormatter.ofPattern(DateFormatter)
+val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")

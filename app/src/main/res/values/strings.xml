@@ -5,6 +5,7 @@
 <!--     Backlog -->
     <string name="credit">Credit</string>
     <string name="formatter">yyyy-MM-dd</string>
+    <string name="unfinished"> unfinished</string>
     <!--     Routine -->
     <string name="click_to_add">Click To Add</string>
     <string name="todo_list">ToDo List</string>

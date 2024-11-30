@@ -10,9 +10,9 @@ interface RoutineDao {
     // 将返回值类型设为 Flow 后，只要数据库中的数据发生更改，您就会收到通知。
     // 也就是说，您只需要显式获取一次数据。
     // 由于返回值类型为 Flow，Room 还会在后台线程上运行该查询，无需将其明确设为 suspend 函数并在协程作用域内调用它。
-    @Query("SELECT * from routines ORDER BY id DESC")
+    @Query("SELECT * from routines ORDER BY sortId ASC, id ASC")
     fun getAllRoutines(): Flow<List<Routine>>
-    @Query("SELECT * from routines WHERE backlogId = :backlogId ORDER BY finished ASC, id ASC")
+    @Query("SELECT * from routines WHERE backlogId = :backlogId ORDER BY sortId ASC, id ASC")
     fun getRoutinesByBacklogId(backlogId:Int): Flow<List<Routine>>
 
     @Query("SELECT * from routines WHERE id = :id")
