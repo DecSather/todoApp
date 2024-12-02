@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.compose.rally"
+    namespace = "com.example.compose.sather"
     compileSdk = 34
     
     defaultConfig {
-        applicationId = "com.example.compose.rally"
+        applicationId = "com.example.compose.sather"
         minSdk = 34
         targetSdk = 34
         versionCode = 1
@@ -49,12 +49,14 @@ android {
 }
 
 dependencies {
-//    fragment
+implementation("androidx.wear.compose:compose-material:1.4.0")
+    //    fragment
     val fragment_version = "1.8.3"
     implementation("androidx.fragment:fragment-ktx:$fragment_version")
 
 //    动画效果
     implementation("androidx.compose.animation:animation:1.5.0")
+    implementation("androidx.compose.foundation:foundation:1.7.5")
     
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("androidx.navigation:navigation-compose:2.8.3")
