@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.compose.sather.R
+import com.sather.todo.R
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.navigation.BaseDestination

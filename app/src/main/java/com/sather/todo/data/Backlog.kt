@@ -8,5 +8,5 @@ data class Backlog(
     @PrimaryKey(autoGenerate = true)
     val id: Int=0,
     val timeTitle: String ="",
-    val isExpand :Boolean =false,
+    val isExpand :Boolean =true,
     )

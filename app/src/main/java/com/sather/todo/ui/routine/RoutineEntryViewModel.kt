@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.data.RoutinesRepository
 import java.math.RoundingMode
@@ -42,10 +43,11 @@ data class RoutineUiState(
     val routine: Routine = Routine(
         backlogId=0,
         content="",
-        sortId = 0
+        sortId = 0,
     ),
     val isEntryValid: Boolean = false
 )
+
 fun Routine.toRoutineUiState(isEntryValid: Boolean = false): RoutineUiState = RoutineUiState(
     routine = this,
     isEntryValid = isEntryValid

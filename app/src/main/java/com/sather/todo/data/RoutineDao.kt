@@ -19,7 +19,7 @@ interface RoutineDao {
     fun getRoutine(id: Int?): Flow<Routine>
 //    suspend关键词-单独线程运行-Room 不允许在主线程上访问数据库
     @Insert
-    suspend fun insert(item: Routine)
+    suspend fun insert(item: Routine):Long
 
     //    @Update 注解与 insert() 方法类似，使用 suspend 关键字标记此函数。
     @Update

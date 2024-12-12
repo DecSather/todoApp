@@ -33,8 +33,10 @@ class BacklogHomeViewModel(
             initialValue = BacklogHomeUiState()
         )
     
-    suspend fun newCurrentBacklog(timeTitle:String):Int{
-        println("new timeTitle: "+timeTitle)
+    suspend fun onExpandChange(id:Int,isExpand:Boolean) {
+        backlogsRepository.onExpandChange(id,isExpand)
+    }
+    suspend fun addBacklog(timeTitle:String):Int{
         return backlogsRepository.insertBacklog(
             Backlog(
                 timeTitle =timeTitle
@@ -55,6 +57,10 @@ class BacklogHomeViewModel(
                 started = SharingStarted.WhileSubscribed((TIMEOUT_MILLIS)),
                 initialValue = RoutineHomeUiState()
             )
+    
+    suspend fun onRoutineFinishedChange(routineId:Int,finished: Boolean){
+        routinesRepository.updateFinished(routineId,finished)
+    }
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
@@ -63,7 +69,6 @@ class BacklogHomeViewModel(
     var backlogUiState by mutableStateOf(BacklogUiState())
 
     fun updatBacklogUiState(backlog: Backlog) {
-        println("update backlogUi: "+backlog)
         backlogUiState =
             BacklogUiState(backlog = backlog)
     }
@@ -72,37 +77,24 @@ class BacklogHomeViewModel(
             backlogsRepository.updateBacklog(backlogUiState.backlog)
         }
     }
-    suspend fun onExpandChange(id:Int,isExpand:Boolean) {
-            backlogsRepository.onExpandChange(id,isExpand)
-    }
 
-//    routine edit 频繁更新
-    var routineUiState  by mutableStateOf(RoutineUiState())
-    private set
-    suspend fun inseetRoutine() {
-        if (validateInput(routineUiState.routine)) {
-            routinesRepository.insertRoutine(routineUiState.routine)
+//    RoutineUiState edit/empty
+    suspend fun updateRoutine(routine: Routine) {
+        if (validateInput(routine)) {
+            routinesRepository.updateRoutine(routine)
+        }else{
+            routinesRepository.deleteRoutineById(routine.id)
         }
     }
-
-    fun updateRoutineUiState(routine: Routine) {
-        routineUiState =
-            RoutineUiState(routine = routine, isEntryValid = validateInput(routine))
-        
-    }
-    suspend fun updateRoutine() {
-        if (validateInput(routineUiState.routine)) {
-            routinesRepository.updateRoutine(routineUiState.routine)
+    suspend fun insertRoutine(routine: Routine):Int {
+        if(validateInput(routine)){
+            return routinesRepository.insertRoutine(routine).toInt()
         }else {
-            routinesRepository.deleteRoutineById(routineUiState.routine.id)
-            
+            return -1
         }
     }
     
-    suspend fun onRoutineFinishedChange(routineId:Int,finished: Boolean){
-        routinesRepository.updateFinished(routineId,finished)
-    }
-    private fun validateInput(uiState: Routine = routineUiState.routine): Boolean {
+    private fun validateInput(uiState: Routine): Boolean {
         return with(uiState) {
             content.isNotBlank() &&rank>=0 && credit>0.0
         }

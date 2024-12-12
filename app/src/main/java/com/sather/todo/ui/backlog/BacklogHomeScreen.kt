@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -13,16 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.compose.sather.R
+import com.sather.todo.R
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.navigation.BaseDestination
-import com.sather.todo.ui.routine.RoutineUiState
 import com.sather.todo.ui.routine.formatedCredit
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
@@ -94,64 +96,69 @@ fun BacklogHomeScreen(
         BacklogHomeBody(
             sharedTransitionScope=sharedTransitionScope,
             animatedContentScope=animatedContentScope,
-            onNewBacklog={
-                coroutineScope.launch {
-                    viewModel.updatBacklogUiState(
-                        Backlog(
-                            id = viewModel.newCurrentBacklog(formattedDate),
-                            timeTitle = formattedDate
-                        )
+            onNewAndUpdateBackUi={
+                viewModel.updatBacklogUiState(
+                    Backlog(
+                        id=-1,
+                        timeTitle = formattedDate
                     )
-                    clickPart = -1
-                    showEditDialog =!showEditDialog
-                }
-                         } ,
-            onDelete ={ it ->
+                )
+                clickPart = -1
+                showEditDialog =!showEditDialog
+            } ,
+            susDeleteBacklogById ={
                 coroutineScope.launch {
                     viewModel.deleteBacklogById(it)
                 }
             },
-                    clickPart=clickPart,
-            showEditDialog =showEditDialog,
-            onChangeEditStatus ={showEditDialog = !showEditDialog},
-            formattedDate=formattedDate,
-            onBacklogDetailClick = onBacklogDetailClick,
+            
+            susUpdateBacklog={
+                coroutineScope.launch {
+                    viewModel.updateBacklog()
+                }
+            },
+            susAddBacklogAndUpdate ={ timeTitle ->
+                coroutineScope.launch {
+                    viewModel.updatBacklogUiState(
+                        Backlog(
+                            id =viewModel.addBacklog(timeTitle),
+                            timeTitle = timeTitle,
+                        )
+                    )
+                }
+            },
             onExpandChange ={ id,isExpand ->
                 coroutineScope.launch {
                     viewModel.onExpandChange(id,isExpand)
                 }
-            
             },
             onFinishedChange={ id,finished ->
                 coroutineScope.launch {
                     viewModel.onRoutineFinishedChange(id,finished)
                 }
             },
+            clickPart=clickPart,
+            showEditDialog =showEditDialog,
+            onChangeEditStatus ={showEditDialog = !showEditDialog},
+            onChangeClickPart = {clickPart=it},
+            
+            formattedDate=formattedDate,
+            onBacklogDetailClick = onBacklogDetailClick,
             
             backlogUiState = viewModel.backlogUiState,
-            routineUiState = viewModel.routineUiState,
-            updateBacklogUiState={backlog ->
-                viewModel.updatBacklogUiState(backlog)
-                clickPart=-1
-                
-            },
-            updateRoutineUiState=viewModel::updateRoutineUiState,
+            updateBacklogUiState=viewModel::updatBacklogUiState,
             
-            onSaveBacklog={
+            updateRoutine = { routine ->
                 coroutineScope.launch {
-                    viewModel.updateBacklog()
+                    viewModel.updateRoutine(routine)
                 }
             },
-            onSaveRoutine={
+            insertRoutine ={ routine ->
                 coroutineScope.launch {
-                    viewModel.updateRoutine()
+                    viewModel.insertRoutine(routine)
                 }
             },
-        insertRoutineClick={
-            coroutineScope.launch {
-                viewModel.inseetRoutine()
-            }
-        },
+            
             creditsTotal=creditsTotal,
             importTotal=importTotal,
             normalTotal=normalTotal,
@@ -168,22 +175,26 @@ fun BacklogHomeBody(
     animatedContentScope: AnimatedContentScope,
     
     formattedDate: String,
-    onNewBacklog:() -> Unit,
-    onDelete:(Int)->Unit,
     clickPart:Int,
     showEditDialog :Boolean,
     onChangeEditStatus:()->Unit,
+    onChangeClickPart:(Int)->Unit,
+    
     onBacklogDetailClick:(Int)->Unit={},
     onExpandChange:(Int,Boolean)->Unit,
     onFinishedChange:(Int,Boolean)->Unit,
     
-    insertRoutineClick:() ->Unit,
     backlogUiState: BacklogUiState,
-    routineUiState: RoutineUiState,
-    updateRoutineUiState:(Routine) -> Unit,
+    
     updateBacklogUiState:(Backlog) -> Unit,
-    onSaveBacklog:() -> Unit,
-    onSaveRoutine:() -> Unit,
+    onNewAndUpdateBackUi:() -> Unit,
+    
+    susDeleteBacklogById:(Int)->Unit,
+    susUpdateBacklog:() -> Unit,
+    susAddBacklogAndUpdate:(String) ->Unit,
+    
+    updateRoutine:(Routine)->Unit,
+    insertRoutine:(Routine)->Unit,
     
     creditsTotal:Float,
     importTotal:Float,
@@ -192,7 +203,7 @@ fun BacklogHomeBody(
     backlogList: List<Backlog>,
     routineList: List<Routine>,
     ){
-    val density = LocalDensity.current
+    
     
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
@@ -226,39 +237,35 @@ fun BacklogHomeBody(
                 }
             }
 //        日志卡
-            
-                items(backlogList.size) { index ->
-                    val backlog = backlogList[index]
-                    val routineListForBacklog = routineList.filter { it -> it.backlogId == backlog.id }
-                    key(backlog.id) {
-                        BacklogDetailCard(
-                            sharedTransitionScope = sharedTransitionScope,
-                            animatedContentScope = animatedContentScope,
-                            backlog = backlog,
-                            onExpandClick = {
-                                onExpandChange(backlog.id, it)
-                            },
-                            routineList = routineListForBacklog,
-                            onDelete = onDelete,
-                            
-                            onBacklogDetailClick = onBacklogDetailClick,
-                            onFinishedChange = onFinishedChange,
-                            onBacklogEditClick = {
-                                updateBacklogUiState(backlog)
-                                onChangeEditStatus()
-                            }
-                        )
-                        
+            items(items = backlogList,key = {it.id}) { backlog ->
+                val routineList =
+                    routineList.filter { it ->it.backlogId == backlog.id}
+                BacklogDetailCard(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    modifier = Modifier.animateItem(),
+                    
+                    backlog = backlog,
+                    routineList = routineList,
+                    
+                    onExpandClick = onExpandChange,
+                    onFinishedChange = onFinishedChange,
+                    
+                    onDelete = susDeleteBacklogById,
+                    
+                    onBacklogDetailClick = onBacklogDetailClick,
+                    onBacklogEditClick = {
+                        updateBacklogUiState(backlog)
+                        onChangeClickPart(it)
+                        onChangeEditStatus()
                     }
-                    Spacer(Modifier.height(12.dp))
-                }
-            
+                )
+                Spacer(Modifier.height(12.dp))
+            }
         }
         FloatingActionButton(
             shape = CircleShape,
-            onClick = {
-                onNewBacklog()
-                      },
+            onClick = onNewAndUpdateBackUi,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(16.dp),
@@ -271,33 +278,24 @@ fun BacklogHomeBody(
         }
         
     }
-    
-//    设置可见与否
-//    backlogid -> routinelist
+//    编辑卡片
     if(showEditDialog){
-        EditDialogModal(
-            onDateSelected = onChangeEditStatus,
+        EditCardDialog(
             onDismiss =onChangeEditStatus,
             clickPart = clickPart,
-            routineList = routineList.filter { it.backlogId==backlogUiState.backlog.id },
-            backlogUiState=backlogUiState,
-            routineUiState = routineUiState,
-            updateBacklogUiState = {it
-                updateBacklogUiState(it)
-                onSaveBacklog()
-                                   },
-            insertRoutineClick = insertRoutineClick,
-            updateRoutineUiState =updateRoutineUiState,
+            onChangeClickPart=onChangeClickPart,
             
-            onModelSaveClick = {
-                onSaveRoutine()
-                onChangeEditStatus()
-                            },
-            onSaveRoutine = {
-                onSaveRoutine()
-            },
+            backlogUiState=backlogUiState,
+            routineList = routineList.filter { it.backlogId == backlogUiState.backlog.id },
+            
+            addBacklog = susAddBacklogAndUpdate,
+            updateBacklogUiState = updateBacklogUiState,
+            onUpdateBacklog=susUpdateBacklog,
+            
+            updateRoutine = updateRoutine,
+            insertRoutine = insertRoutine,
+            
         )
-
     }
     
 }

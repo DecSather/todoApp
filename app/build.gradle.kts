@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.compose.sather"
+    namespace = "com.sather.todo"
     compileSdk = 34
     
     defaultConfig {
-        applicationId = "com.example.compose.sather"
+        applicationId = "com.sather.todo"
         minSdk = 34
         targetSdk = 34
         versionCode = 1

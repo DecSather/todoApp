@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.compose.sather.R
+import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.theme.faverColor
@@ -146,124 +146,146 @@ enum class DragAnchors {
 fun BacklogDetailCard(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    onExpandClick:(Boolean)->Unit,
+    
+    modifier: Modifier,
     backlog: Backlog,
     routineList:List<Routine>,
-    onDelete:(Int)->Unit,
     
+    onExpandClick:(Int,Boolean)->Unit,
     onFinishedChange:(Int,Boolean)->Unit,
-    onBacklogDetailClick: (Int) -> Unit,
     
+    onDelete:(Int)->Unit,
+    onBacklogDetailClick: (Int) -> Unit,
     onBacklogEditClick:(Int) -> Unit
     
 ) {
     val creditTotal:Float =routineList.map { it.credit }.sum()
     var expanded by rememberSaveable { mutableStateOf(backlog.isExpand) }
     
-    SwipeBox(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        actionWidth = 100.dp,
-        startAction = listOf{
-            FloatingActionButton(
-                shape = CircleShape,
-                modifier = Modifier.align(Alignment.Center),
-                onClick = {
-                    onDelete(backlog.id)
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.DeleteForever,
-                    contentDescription = "Delete Backlog No.${backlog.id}"
-                )
-            }
-        }
+    val animVisibleState = remember {  MutableTransitionState(false).apply {  targetState = true  }  }
+    
+    if (!animVisibleState.targetState &&
+        !animVisibleState.currentState
     ) {
-        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
-            Column {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                        .animateContentSize()
+        onDelete(backlog.id)
+        return
+    }
+    AnimatedVisibility(
+        visibleState = animVisibleState,
+        enter = expandIn(
+            expandFrom = Alignment.TopCenter
+        ) + fadeIn(),
+        exit = shrinkOut(
+            shrinkTowards = Alignment.TopCenter
+        ) + fadeOut(
+//            animationSpec = tween(durationMillis = 900)
+        )
+    ) {
+        SwipeBox(
+            modifier = modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            actionWidth = 100.dp,
+            startAction = listOf {
+                FloatingActionButton(
+                    shape = CircleShape,
+                    modifier = Modifier.align(Alignment.Center),
+                    onClick = {
+                        animVisibleState.targetState = false
+                    },
                 ) {
-                    with(sharedTransitionScope) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = backlog.timeTitle,
-                                style = MaterialTheme.typography.headlineLarge,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .sharedBounds(
-                                        rememberSharedContentState(
-                                            key = "${backlog.id}/${backlog.timeTitle}"
-                                        ),
-                                        animatedVisibilityScope = animatedContentScope,
-                                        enter = fadeIn(),
-                                        exit = fadeOut(),
-                                        resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
-                                    )
-                                    .clickable {
-                                        onBacklogEditClick(-1)
-                                    }
-                            )
-                            IconButton(onClick = {
-                                expanded = !expanded
-                                onExpandClick(expanded)
-                            }) {
-                                Icon(
-                                    imageVector =
-                                    if (expanded)
-                                        Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                                    contentDescription = if (expanded) {
-                                        stringResource(R.string.show_less)
-                                    } else {
-                                        stringResource(R.string.show_more)
-                                    }
-                                )
-                            }
-                        }
-                        val amountText = "" + routineList.size + stringResource(R.string.unfinished)
-                        Text(
-                            text = amountText,
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                        if (expanded) {
-                            routineList.map { it ->
-                                BriefRoutineRow(
-                                    modifier = Modifier
-                                        .clickable { onBacklogEditClick(it.id) },
-                                    routine = it,
-                                    onFinishedChange = onFinishedChange,
-                                )
-                            }
-                            BriefEmptyRow(
-                                modifier = Modifier
-                                    .clickable { onBacklogEditClick(-2) },
-                                content = stringResource(R.string.click_to_add)
-                            )
-                        }
-                    }
-                    
+                    Icon(
+                        imageVector = Icons.Default.DeleteForever,
+                        contentDescription = "Delete Backlog No.${backlog.id}"
+                    )
                 }
+            }
+        ) {
+            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+                Column {
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                            .animateContentSize()
+                    ) {
+                        with(sharedTransitionScope) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = backlog.timeTitle,
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .sharedBounds(
+                                            rememberSharedContentState(
+                                                key = "${backlog.id}/${backlog.timeTitle}"
+                                            ),
+                                            animatedVisibilityScope = animatedContentScope,
+                                            enter = fadeIn(),
+                                            exit = fadeOut(),
+                                            resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                                        )
+                                        .clickable {
+                                            onBacklogEditClick(-1)
+                                        }
+                                )
+                                IconButton(onClick = {
+                                    expanded = !expanded
+                                    onExpandClick(backlog.id,expanded)
+                                }) {
+                                    Icon(
+                                        imageVector =
+                                        if (expanded)
+                                            Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                        contentDescription = if (expanded) {
+                                            stringResource(R.string.show_less)
+                                        } else {
+                                            stringResource(R.string.show_more)
+                                        }
+                                    )
+                                }
+                            }
+                            val amountText = "" + routineList.size + stringResource(R.string.unfinished)
+                            Text(
+                                text = amountText,
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            if (expanded) {
+                                routineList.map { it ->
+                                    BriefRoutineRow(
+                                        modifier = Modifier
+                                            .clickable { onBacklogEditClick(it.id) },
+                                        routine = it,
+                                        onFinishedChange = onFinishedChange,
+                                    )
+                                }
+                                BriefEmptyRow(
+                                    modifier = Modifier
+                                        .clickable { onBacklogEditClick(-2) },
+                                    content = stringResource(R.string.click_to_add)
+                                )
+                            }
+                        }
+                        
+                    }
 
 //            进度横线
-                BaseDivider(creditTotal, routineList.map { it.credit },
-                    routineList.map { RoutineColors[it.rank] })
-                Column(
-                    Modifier
-                        .padding(start = 16.dp, top = 4.dp, end = 16.dp)
-                ) {
+                    BaseDivider(creditTotal, routineList.map { it.credit },
+                        routineList.map { RoutineColors[it.rank] })
+                    Column(
+                        Modifier
+                            .padding(start = 16.dp, top = 4.dp, end = 16.dp)
+                    ) {
 //                展开所有
-                    SeeAllButton(
-                        modifier = Modifier.clearAndSetSemantics {
-                            contentDescription = "All ${backlog.timeTitle}'s Routines"
-                        }.clickable { onBacklogDetailClick(backlog.id) }
-                    )
+                        SeeAllButton(
+                            modifier = Modifier.clearAndSetSemantics {
+                                contentDescription = "All ${backlog.timeTitle}'s Routines"
+                            }.clickable { onBacklogDetailClick(backlog.id) }
+                        )
+                    }
                 }
             }
         }
