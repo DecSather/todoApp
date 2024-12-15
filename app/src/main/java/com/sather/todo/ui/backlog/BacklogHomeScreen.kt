@@ -283,7 +283,6 @@ fun BacklogHomeBody(
         EditCardDialog(
             onDismiss =onChangeEditStatus,
             clickPart = clickPart,
-            onChangeClickPart=onChangeClickPart,
             
             backlogUiState=backlogUiState,
             routineList = routineList.filter { it.backlogId == backlogUiState.backlog.id },

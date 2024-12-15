@@ -2,6 +2,7 @@ package com.sather.todo.ui.backlog
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -16,12 +17,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -49,7 +49,6 @@ fun EditCardDialog(
 //      -1- backlog
 //      >=0- routine
     clickPart: Int,
-    onChangeClickPart:(Int)->Unit,
     
     backlogUiState: BacklogUiState,
     routineList: List<Routine>,
@@ -63,15 +62,17 @@ fun EditCardDialog(
     
     ) {
     val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(routineList) {
+    LaunchedEffect(Unit) {
         focusRequester.requestFocus()
     }
     AlertDialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false,
         ),
         modifier = Modifier
-            .padding(16.dp),
+            .padding(16.dp)
+            .imePadding(),
         text = {
             Column(
                 Modifier
@@ -79,6 +80,7 @@ fun EditCardDialog(
                     .semantics { contentDescription = "Backlog Edit Card" }
                     .animateContentSize()
                     .verticalScroll(rememberScrollState())
+                    .focusGroup()
             
             ) {
                 Row(
@@ -86,12 +88,8 @@ fun EditCardDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 //                        时间选择
-                    showDatePickerDialog(
+                    ShowDatePickerDialog(
                         modifier = if (clickPart == -1) Modifier.focusRequester(focusRequester)
-                            .onFocusChanged { focusState ->
-                                if(focusState.hasFocus)
-                                onChangeClickPart(-1)
-                            }
                         else Modifier,
                         clickPart == -1,
                         backlog = backlogUiState.backlog,
@@ -102,7 +100,7 @@ fun EditCardDialog(
                 routineList.map{ it ->
                     key(it.id){
                         BacklogEditRow(
-                            modifier = if(it.id<=clickPart)Modifier.focusRequester(focusRequester)
+                            modifier = if(it.id==clickPart)Modifier.focusRequester(focusRequester)
                             else Modifier,
                             routine = it,
                             onUpdateRoutine = updateRoutine,
@@ -112,13 +110,9 @@ fun EditCardDialog(
                 }
                 BacklogEmptyRow(
                     modifier =if (clickPart == -2) Modifier.focusRequester(focusRequester)
-                        .onFocusChanged { focusState ->
-                            if(focusState.hasFocus)
-                            onChangeClickPart(-2)
-                        }
                     else Modifier,
                     routine = Routine(
-                        sortId = routineList.size,
+                        sortId = routineList.last().sortId+1,
                         backlogId = backlogUiState.backlog.id,
                         content = "",
                     ),
@@ -161,7 +155,7 @@ fun EditCardDialog(
 }
 
 @Composable
-fun showDatePickerDialog(
+fun ShowDatePickerDialog(
     modifier: Modifier,
     onForceShowDate: Boolean = false,
     backlog: Backlog,
@@ -299,6 +293,7 @@ fun BacklogEditRow(
     onUpdateRoutine: (Routine) -> Unit ={ },
 ) {
     var routineUiState by remember { mutableStateOf(RoutineUiState(routine))  }
+    val focusManager = LocalFocusManager.current
     Row(
         modifier = Modifier
             .height(68.dp)
@@ -333,6 +328,7 @@ fun BacklogEditRow(
             keyboardActions = KeyboardActions(
                 onDone = {
                     onUpdateRoutine(routineUiState.routine)
+                    focusManager.moveFocus(FocusDirection.Next)
                 }
             ),
             textStyle = MaterialTheme.typography.bodyMedium,

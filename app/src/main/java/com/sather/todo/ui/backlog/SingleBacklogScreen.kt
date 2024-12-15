@@ -1,4 +1,3 @@
-
 package com.sather.todo.ui.backlog
 
 import androidx.compose.animation.*
@@ -166,7 +165,9 @@ fun  SingleBacklogBody(
                 Column(modifier = Modifier.padding(12.dp).fillMaxWidth()){
                     unfinishedItems.map {
                             item ->
-                        rows(item)
+                        key(item.id) {
+                            rows(item)
+                        }
                     }
 //                预加载空列
                     DetailEmptyRow(
@@ -176,7 +177,9 @@ fun  SingleBacklogBody(
                     )
                     finishedItems.map {
                             item ->
-                        rows(item)
+                        key(item.id) {
+                            rows(item)
+                        }
                     }
                 }
                 Spacer(Modifier.height(16.dp))
