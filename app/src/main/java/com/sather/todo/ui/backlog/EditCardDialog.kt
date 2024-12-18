@@ -1,20 +1,24 @@
 package com.sather.todo.ui.backlog
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
-import androidx.compose.foundation.focusGroup
+import androidx.compose.animation.core.animate
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.*
@@ -34,6 +38,7 @@ import com.sather.todo.data.Routine
 import com.sather.todo.ui.components.RoutineColors
 import com.sather.todo.ui.routine.RoutineUiState
 import com.sather.todo.ui.theme.unfinishedColor
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -41,6 +46,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun EditCardDialog(
     onDismiss: () -> Unit,
@@ -80,45 +86,44 @@ fun EditCardDialog(
                     .semantics { contentDescription = "Backlog Edit Card" }
                     .animateContentSize()
                     .verticalScroll(rememberScrollState())
-                    .focusGroup()
+                    .focusGroup(),
             
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
 //                        时间选择
-                    ShowDatePickerDialog(
-                        modifier = if (clickPart == -1) Modifier.focusRequester(focusRequester)
-                        else Modifier,
-                        clickPart == -1,
-                        backlog = backlogUiState.backlog,
-                        updateBacklogUiState = updateBacklogUiState,
-                        addBacklog=addBacklog,
-                    )
-                }
-                routineList.map{ it ->
-                    key(it.id){
+                        ShowDatePickerDialog(
+                            modifier = if (clickPart == -1) Modifier.focusRequester(focusRequester)
+                            else Modifier,
+                            clickPart == -1,
+                            backlog = backlogUiState.backlog,
+                            updateBacklogUiState = updateBacklogUiState,
+                            addBacklog=addBacklog,
+                        )
+                    }
+                routineList.map{
+                    key(it.id) {
                         BacklogEditRow(
-                            modifier = if(it.id==clickPart)Modifier.focusRequester(focusRequester)
+                            modifier = if (it.id == clickPart) Modifier.focusRequester(focusRequester)
                             else Modifier,
                             routine = it,
                             onUpdateRoutine = updateRoutine,
                         )
-                        
                     }
                 }
                 BacklogEmptyRow(
-                    modifier =if (clickPart == -2) Modifier.focusRequester(focusRequester)
+                    modifier =if (-2 == clickPart) Modifier.focusRequester(focusRequester)
                     else Modifier,
                     routine = Routine(
-                        sortId = routineList.last().sortId+1,
+                        sortId = if(routineList.isNotEmpty())routineList.last().sortId+1 else 0,
                         backlogId = backlogUiState.backlog.id,
                         content = "",
                     ),
                     insertRoutine = {
                         insertRoutine(it)
-                                    },
+                    },
                 )
             }
         },
@@ -169,9 +174,6 @@ fun ShowDatePickerDialog(
     
     var selectedDate by remember { mutableStateOf(initialDate) }
     var showModal by remember { mutableStateOf(onForceShowDate) }
-    
-    
-    
     OutlinedTextField(
         value = selectedDate.format(DateTimeFormatter.ISO_DATE),
         onValueChange = {},
@@ -341,6 +343,7 @@ fun BacklogEditRow(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun BacklogEmptyRow(
     modifier: Modifier,
