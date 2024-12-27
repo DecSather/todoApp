@@ -172,14 +172,14 @@ fun BacklogDetailCard(
     }
     AnimatedVisibility(
         visibleState = animVisibleState,
-        enter = expandIn(
-            expandFrom = Alignment.TopCenter
-        ) + fadeIn(),
-        exit = shrinkOut(
-            shrinkTowards = Alignment.TopCenter
-        ) + fadeOut(
-//            animationSpec = tween(durationMillis = 900)
-        )
+//        enter = fadeIn(),
+//        expandIn(
+//            expandFrom = Alignment.TopCenter
+//        ),
+//        exit = fadeOut(),
+//        shrinkOut(
+//            shrinkTowards = Alignment.TopCenter
+//        ),
     ) {
         SwipeBox(
             modifier = modifier
