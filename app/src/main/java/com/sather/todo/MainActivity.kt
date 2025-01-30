@@ -11,5 +11,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ToDoApp()
         }
+        
+        
     }
 }

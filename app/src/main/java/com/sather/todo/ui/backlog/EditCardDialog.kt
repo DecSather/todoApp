@@ -2,15 +2,13 @@ package com.sather.todo.ui.backlog
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.animate
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -18,7 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.*
@@ -29,27 +26,28 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.components.RoutineColors
-import com.sather.todo.ui.routine.RoutineUiState
-import com.sather.todo.ui.theme.unfinishedColor
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.absoluteValue
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun EditCardDialog(
-    onDismiss: () -> Unit,
+    onDismiss: (List<Routine>) -> Unit,
 //    需要判断点击部位
 //      -2- empty routine
 //      -1- backlog
@@ -59,221 +57,193 @@ fun EditCardDialog(
     backlogUiState: BacklogUiState,
     routineList: List<Routine>,
     
-    addBacklog:(String) ->Unit,
     updateBacklogUiState: (Backlog) -> Unit,
     onUpdateBacklog:()->Unit,
     
-    updateRoutine:(Routine)->Unit,
-    insertRoutine:(Routine)->Unit,
     
     ) {
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-    AlertDialog(
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false,
-        ),
-        modifier = Modifier
-            .padding(16.dp)
-            .imePadding(),
-        text = {
-            Column(
-                Modifier
-                    .fillMaxWidth()
-                    .semantics { contentDescription = "Backlog Edit Card" }
-                    .animateContentSize()
-                    .verticalScroll(rememberScrollState())
-                    .focusGroup(),
-            
-            ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-//                        时间选择
-                        ShowDatePickerDialog(
-                            modifier = if (clickPart == -1) Modifier.focusRequester(focusRequester)
-                            else Modifier,
-                            clickPart == -1,
-                            backlog = backlogUiState.backlog,
-                            updateBacklogUiState = updateBacklogUiState,
-                            addBacklog=addBacklog,
+    
+    val backlog = backlogUiState.backlog
+    val initialDate =LocalDate.parse(backlog.timeTitle, formatter)
+    var selectedDate by remember { mutableStateOf(initialDate) }
+    var showDatePickerModal by remember { mutableStateOf((clickPart == -1)) }
+    
+    val tempRoutineList = remember {
+        mutableStateListOf<Routine>().apply {
+            addAll(routineList)
+            if(clickPart == -2) {
+                if(routineList.size == 0) {
+                    add(
+                        Routine(
+                            id = clickPart,
+                            backlogId = backlog.id,
+                            sortId = 0,
+                            rank = 3,
+                            content = "",
                         )
-                    }
-                routineList.map{
-                    key(it.id) {
-                        BacklogEditRow(
-                            modifier = if (it.id == clickPart) Modifier.focusRequester(focusRequester)
-                            else Modifier,
-                            routine = it,
-                            onUpdateRoutine = updateRoutine,
-                        )
-                    }
-                }
-                BacklogEmptyRow(
-                    modifier =if (-2 == clickPart) Modifier.focusRequester(focusRequester)
-                    else Modifier,
-                    routine = Routine(
-                        sortId = if(routineList.isNotEmpty())routineList.last().sortId+1 else 0,
-                        backlogId = backlogUiState.backlog.id,
-                        content = "",
-                    ),
-                    insertRoutine = {
-                        insertRoutine(it)
-                    },
-                )
-            }
-        },
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    if(backlogUiState.backlog.id ==-1)
-                        addBacklog(backlogUiState.backlog.timeTitle)
-                    onUpdateBacklog()
-                    onDismiss()
-                },
-            ) {
-                Text(
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineMedium,
-                    text = stringResource(R.string.save_action),
-                )
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss
-            ) {
-                Text(
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineMedium,
-                    text = stringResource(R.string.cancel_action),
-                    
                     )
+                }else{
+                    add(
+                        Routine(
+                            id = -routineList.last().id-3,
+                            backlogId = backlog.id,
+                            sortId = routineList.size,
+                            rank = 3,
+                            content = "",
+                        )
+                    )
+                }
             }
         }
-    )
-}
-
-@Composable
-fun ShowDatePickerDialog(
-    modifier: Modifier,
-    onForceShowDate: Boolean = false,
-    backlog: Backlog,
-    updateBacklogUiState: (Backlog) -> Unit,
-    addBacklog:(String) ->Unit,
-) {
-    val initialDate =
-        if (backlog.timeTitle.isNotEmpty())
-            LocalDate.parse(backlog.timeTitle, formatter)
-        else LocalDate.now()
+    }
     
-    var selectedDate by remember { mutableStateOf(initialDate) }
-    var showModal by remember { mutableStateOf(onForceShowDate) }
-    OutlinedTextField(
-        value = selectedDate.format(DateTimeFormatter.ISO_DATE),
-        onValueChange = {},
-        readOnly = true,
-        label = { Text(stringResource(R.string.formatter)) },
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-        ),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(5.dp)
-            .pointerInput(selectedDate) {
-                awaitEachGesture {
-                    awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
-                        showModal = true
+    
+    val listState = rememberLazyListState()
+    var targetIndex by remember { mutableStateOf(if(clickPart !=-2)clickPart else routineList.size) }
+    
+    val focusRequester = remember { FocusRequester() }
+    
+    if(clickPart != -1) {
+        LaunchedEffect(targetIndex) {
+            if(targetIndex>=0) {
+                listState.animateScrollToItem(targetIndex)
+                delay(1)
+                focusRequester.requestFocus()
+            }else{
+                listState.animateScrollToItem(0)
+                delay(1)
+                focusRequester.requestFocus()
+                onDismiss(tempRoutineList)
+            }
+        }
+        AlertDialog(
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+            ),
+            
+            modifier = Modifier
+                .padding(16.dp)
+                .heightIn(max = 480.dp)
+                .imePadding(),
+            text = {
+                LazyColumn(
+                    Modifier
+                        .fillMaxWidth()
+                        .semantics { contentDescription = "Backlog Edit Card" }
+                        .heightIn(max =300.dp)
+                        .animateContentSize()
+                        .focusGroup(),
+                    state = listState,
+
+                    ) {
+                    item {
+                        Row(
+                            modifier =if(targetIndex == -1) Modifier.focusRequester(focusRequester) else Modifier,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+//                        时间选择
+                            OutlinedTextField(
+                                value = selectedDate.format(DateTimeFormatter.ISO_DATE),
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text(stringResource(R.string.formatter)) },
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(5.dp)
+                                    .pointerInput(selectedDate) {
+                                        awaitEachGesture {
+                                            awaitFirstDown(pass = PointerEventPass.Initial)
+                                            val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                                            if (upEvent != null) {
+                                                showDatePickerModal = true
+                                            }
+                                        }
+                                    },
+                            )
+                        }
+                    }
+                    itemsIndexed(items = tempRoutineList, key = { _,item -> item.id}) {
+                        index,item ->
+                        BacklogEditRow(
+                            modifier =if(index == targetIndex) Modifier.focusRequester(focusRequester) else Modifier,
+                            routine = item.copy(sortId = index),
+                            updateRoutine = { routine ->
+                                tempRoutineList[index]=routine
+                                              },
+                            addRoutine = { newKey ->
+                                tempRoutineList.add(index+1,
+                                    Routine(
+                                        id = -newKey-3,
+                                        backlogId = backlog.id,
+                                        sortId = index+1,
+                                        rank = 3,
+                                        content = "",
+                                    )
+                                )
+                            },
+                            changeTarget = {newIndex ->
+                                targetIndex = newIndex
+                            },
+                        )
                     }
                 }
+                
             },
-    )
-    if (showModal) {
+            onDismissRequest = { onDismiss(tempRoutineList.toList()) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        /*
+                        * 三个操作：
+                        * * 更新Backlog标题
+                        */
+                        targetIndex = -1
+                        onUpdateBacklog()
+                    },
+                ) {
+                    Text(
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineMedium,
+                        text = stringResource(R.string.save_action),
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { onDismiss(tempRoutineList.toList()) },
+                ) {
+                    Text(
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineMedium,
+                        text = stringResource(R.string.cancel_action),
+                        
+                        )
+                }
+            }
+        )
+    }
+    if (showDatePickerModal) {
         DatePickerModal(
             selectedDate = selectedDate,
             onDateSelected = {
                 selectedDate = it
-                if(backlog.id ==-1)
-                    addBacklog(selectedDate.format(DateTimeFormatter.ISO_DATE))
-                else
-                    updateBacklogUiState(
-                        backlog.copy(
-                            timeTitle = selectedDate.format(DateTimeFormatter.ISO_DATE)
-                        )
+                updateBacklogUiState(
+                    backlog.copy(
+                        timeTitle = selectedDate.format(DateTimeFormatter.ISO_DATE)
                     )
-                
-            },
-            onDismiss = { showModal = false },
-            
-            )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DatePickerModal(
-    selectedDate: LocalDate,
-    onDateSelected: (LocalDate?) -> Unit,
-    onDismiss: () -> Unit
-) {
-    val datePickerState = rememberDatePickerState(selectedDate?.let { convertLocalDateToMillis(it) })
-    val datePickerColors = DatePickerDefaults.colors(
-        containerColor = MaterialTheme.colorScheme.surface,
-        weekdayContentColor = MaterialTheme.colorScheme.primary,
-        todayDateBorderColor = MaterialTheme.colorScheme.primary,
-        selectedYearContainerColor = MaterialTheme.colorScheme.primary,
-        selectedDayContainerColor = MaterialTheme.colorScheme.primary,
-        navigationContentColor = MaterialTheme.colorScheme.primary,
-        dividerColor = MaterialTheme.colorScheme.primary,
-        todayContentColor = MaterialTheme.colorScheme.primary,
-        currentYearContentColor = MaterialTheme.colorScheme.primary,
-    )
-    DatePickerDialog(
-        colors = datePickerColors,
-        onDismissRequest = onDismiss,
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    onDateSelected(
-                        LocalDate.parse(
-                            datePickerState.selectedDateMillis?.let { convertMillisToDate(it) },
-                            formatter
-                        )
-                    )
-                    onDismiss()
-                }
-            ) {
-                Text(
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineMedium,
-                    text = stringResource(R.string.save_action),
                 )
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineMedium,
-                    text = stringResource(R.string.cancel_action),
-                    
-                    )
-            }
-        }
-    ) {
-        DatePicker(
-            colors = datePickerColors,
-            state = datePickerState,
-            title = {},
-            dateFormatter = DatePickerDefaults.dateFormatter("yyyy-MM", "yyyy-MM-dd", "yyyy-MM-dd")
+            },
+            onDismiss = {
+                showDatePickerModal = false
+                if(clickPart == -1) {
+                    onUpdateBacklog()
+                    onDismiss(listOf())
+                }
+                        },
         )
     }
 }
@@ -292,10 +262,19 @@ fun convertLocalDateToMillis(localDate: LocalDate): Long {
 fun BacklogEditRow(
     modifier: Modifier,
     routine: Routine,
-    onUpdateRoutine: (Routine) -> Unit ={ },
+    updateRoutine: (Routine) -> Unit ={ },
+    addRoutine: (Int) -> Unit = {},
+    changeTarget: (Int) -> Unit,
 ) {
-    var routineUiState by remember { mutableStateOf(RoutineUiState(routine))  }
-    val focusManager = LocalFocusManager.current
+    var textFieldValueState by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = routine.content,
+                selection = TextRange(routine.content.length),
+            )
+        )
+    }
+    var wasFocused by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .height(68.dp)
@@ -312,16 +291,30 @@ fun BacklogEditRow(
         )
         OutlinedTextField(
             modifier = modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .onFocusEvent { focusState ->
+                    if(focusState.isFocused) {
+                        wasFocused = true
+                    }
+                    if(!focusState.isFocused && wasFocused){
+                        println("update from focusState: "+routine.sortId)
+                        if(textFieldValueState.text.isNotEmpty() && routine.rank == 3){
+                            updateRoutine(routine.copy(content = textFieldValueState.text, rank = 1))
+                        }else{
+                            updateRoutine(routine.copy(content = textFieldValueState.text))
+                        }
+                        wasFocused = false
+                    }
+                },
             placeholder = {
                 Text(
                     text = stringResource(R.string.routine_empty_error),
                     style = MaterialTheme.typography.titleMedium
                 )
             },
-            value = routineUiState.routine.content,
-            onValueChange = { it ->
-                routineUiState=RoutineUiState(routine=routineUiState.routine.copy(content = it))
+            value = textFieldValueState,
+            onValueChange = {
+                textFieldValueState = it
             },
             
             keyboardOptions = KeyboardOptions(
@@ -329,62 +322,8 @@ fun BacklogEditRow(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    onUpdateRoutine(routineUiState.routine)
-                    focusManager.moveFocus(FocusDirection.Next)
-                }
-            ),
-            textStyle = MaterialTheme.typography.bodyMedium,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color.Transparent,
-                unfocusedBorderColor = Color.Transparent,
-            ),
-        )
-        
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun BacklogEmptyRow(
-    modifier: Modifier,
-    routine: Routine,
-    insertRoutine: (Routine) -> Unit,
-) {
-    var routineUiState by remember { mutableStateOf(RoutineUiState(routine)) }
-    Row(
-        modifier = Modifier
-            .height(68.dp)
-            .padding(start = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        
-        Box(
-            modifier = Modifier
-                .size(20.dp) // 设置圆的大小
-                .clip(RoundedCornerShape(percent = 50))
-                .background(color = unfinishedColor)
-        )
-        OutlinedTextField(
-            modifier = modifier
-                .fillMaxWidth(),
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.click_to_add),
-                    style = MaterialTheme.typography.titleMedium
-                )
-            },
-            value = routineUiState.routine.content,
-            onValueChange = { it ->
-                routineUiState=RoutineUiState(routine=routineUiState.routine.copy(content = it))
-            },
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    val newRoutine = routineUiState.routine
-                    insertRoutine(newRoutine)
-                    routineUiState=RoutineUiState(routine=routineUiState.routine.copy(content = ""))
+                    addRoutine(routine.id.absoluteValue)
+                    changeTarget(routine.sortId+1)
                 }
             ),
             textStyle = MaterialTheme.typography.bodyMedium,

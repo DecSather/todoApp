@@ -82,14 +82,18 @@ class BacklogHomeViewModel(
     suspend fun updateRoutine(routine: Routine) {
         if (validateInput(routine)) {
             routinesRepository.updateRoutine(routine)
+            println("update routine: " + routine)
         }else{
+            println("update routine failed and delete now: " + routine)
             routinesRepository.deleteRoutineById(routine.id)
         }
     }
     suspend fun insertRoutine(routine: Routine):Int {
         if(validateInput(routine)){
-            return routinesRepository.insertRoutine(routine).toInt()
+            println("insert routine: " + routine)
+            return routinesRepository.insertRoutine(routine.copy(id = 0,rank = 1)).toInt()
         }else {
+            println("insert routine failed: " + routine)
             return -1
         }
     }

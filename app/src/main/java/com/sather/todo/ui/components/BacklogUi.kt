@@ -172,15 +172,8 @@ fun BacklogDetailCard(
     }
     AnimatedVisibility(
         visibleState = animVisibleState,
-//        enter = fadeIn(),
-//        expandIn(
-//            expandFrom = Alignment.TopCenter
-//        ),
-//        exit = fadeOut(),
-//        shrinkOut(
-//            shrinkTowards = Alignment.TopCenter
-//        ),
     ) {
+        
         SwipeBox(
             modifier = modifier
                 .fillMaxWidth()
@@ -234,7 +227,7 @@ fun BacklogDetailCard(
                                 )
                                 IconButton(onClick = {
                                     expanded = !expanded
-                                    onExpandClick(backlog.id,expanded)
+                                    onExpandClick(backlog.id, expanded)
                                 }) {
                                     Icon(
                                         imageVector =
@@ -257,7 +250,7 @@ fun BacklogDetailCard(
                                 routineList.map { it ->
                                     BriefRoutineRow(
                                         modifier = Modifier
-                                            .clickable { onBacklogEditClick(it.id) },
+                                            .clickable { onBacklogEditClick(it.sortId) },
                                         routine = it,
                                         onFinishedChange = onFinishedChange,
                                     )
@@ -393,7 +386,7 @@ fun ThreeColorCircle(
     val angleOffset by transition.animateFloat(
         transitionSpec = {
             tween(
-                delayMillis = 500,
+//                delayMillis = 500,
                 durationMillis = 900,
                 easing = LinearOutSlowInEasing
             )
@@ -408,7 +401,7 @@ fun ThreeColorCircle(
     val shift by transition.animateFloat(
         transitionSpec = {
             tween(
-                delayMillis = 500,
+//                delayMillis = 500,
                 durationMillis = 900,
                 easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
             )
@@ -465,5 +458,5 @@ fun ThreeColorCircle(
 }
 private enum class ThreeCircleProgress { START, END }
 private const val DividerLengthInDegrees = 1.8f
-val RoutineColors= listOf(importColor, normalColor, faverColor)
+val RoutineColors= listOf(importColor, normalColor, faverColor, unfinishedColor)
 

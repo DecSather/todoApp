@@ -14,9 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -60,18 +57,93 @@ fun BacklogHomeScreen(
 //    State
     val backlogHomeUiState by viewModel.backlogHomeUiState.collectAsState()
     val routineHomeUiState by viewModel.routineHomeUiState.collectAsState()
-//    数据
-    val backlogList = backlogHomeUiState.backlogList
-    val finishedRoutineList= routineHomeUiState.routineList.filter { it.finished }
-    val unfinishedRoutineList= routineHomeUiState.routineList.filter { !it.finished }
     
 //    特殊属性-主页面
 //      -可优化
 //      -routineMap = remember { mutableStateMapOf<Int, Float>() }
     
-    var showEditDialog by remember { mutableStateOf(false) }
+
+//    界面
+    Box(modifier = Modifier.fillMaxSize()){
+        BacklogHomeBody(
+            sharedTransitionScope=sharedTransitionScope,
+            animatedContentScope=animatedContentScope,
+            susDeleteBacklogById ={
+                coroutineScope.launch {
+                    viewModel.deleteBacklogById(it)
+                }
+            },
+            
+            susUpdateBacklog={
+                coroutineScope.launch {
+                    viewModel.updateBacklog()
+                }
+            },
+            susAddBacklog ={ timeTitle ->
+                coroutineScope.launch {
+                    viewModel.addBacklog(timeTitle)
+                }
+            },
+            onExpandChange ={ id,isExpand ->
+                coroutineScope.launch {
+                    viewModel.onExpandChange(id,isExpand)
+                }
+            },
+            onFinishedChange={ id,finished ->
+                coroutineScope.launch {
+                    viewModel.onRoutineFinishedChange(id,finished)
+                }
+            },
+            onBacklogDetailClick = onBacklogDetailClick,
+            
+            backlogUiState = viewModel.backlogUiState,
+            updateBacklogUiState=viewModel::updatBacklogUiState,
+            
+            updateRoutine = { routine ->
+                coroutineScope.launch {
+                    viewModel.updateRoutine(routine)
+                }
+            },
+            insertRoutine = { routine ->
+                coroutineScope.launch {
+                    viewModel.insertRoutine(routine)
+                }
+            },
+            backlogList=backlogHomeUiState.backlogList,
+            finishedRoutineList = routineHomeUiState.routineList.filter { it.finished },
+            routineList = routineHomeUiState.routineList.filter { !it.finished },
+            )
+    }
+}
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun BacklogHomeBody(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     
+    backlogUiState: BacklogUiState,
+    onBacklogDetailClick:(Int)->Unit={},
+    onExpandChange:(Int,Boolean)->Unit,
+    onFinishedChange:(Int,Boolean)->Unit,
+    
+    updateBacklogUiState:(Backlog) -> Unit,
+    
+    susDeleteBacklogById:(Int)->Unit,
+    susUpdateBacklog:() -> Unit,
+    susAddBacklog:(String) ->Unit,
+    
+    updateRoutine:(Routine)->Unit,
+    insertRoutine:(Routine)->Unit,
+    
+    backlogList: List<Backlog>,
+    finishedRoutineList:List<Routine>,
+    routineList: List<Routine>,
+    ){
+    
+    var showEditDialog by remember { mutableStateOf(false) }
+    var showDatePickerModal by remember { mutableStateOf(false) }
     var clickPart by rememberSaveable { mutableIntStateOf(0) }
+    var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     val importTotal by rememberUpdatedState(
         finishedRoutineList.map { routine ->
             if(routine.rank==0)routine.credit else 0f
@@ -88,123 +160,6 @@ fun BacklogHomeScreen(
         }.sum()
     )
     val creditsTotal =importTotal+normalTotal+faverTotal
-//    界面
-    //    每日新日程
-    val currentDate = LocalDate.now()
-    var formattedDate = currentDate.format(formatter)
-    Box(modifier = Modifier.fillMaxSize()){
-        BacklogHomeBody(
-            sharedTransitionScope=sharedTransitionScope,
-            animatedContentScope=animatedContentScope,
-            onNewAndUpdateBackUi={
-                viewModel.updatBacklogUiState(
-                    Backlog(
-                        id=-1,
-                        timeTitle = formattedDate
-                    )
-                )
-                clickPart = -1
-                showEditDialog =!showEditDialog
-            } ,
-            susDeleteBacklogById ={
-                coroutineScope.launch {
-                    viewModel.deleteBacklogById(it)
-                }
-            },
-            
-            susUpdateBacklog={
-                coroutineScope.launch {
-                    viewModel.updateBacklog()
-                }
-            },
-            susAddBacklogAndUpdate ={ timeTitle ->
-                coroutineScope.launch {
-                    viewModel.updatBacklogUiState(
-                        Backlog(
-                            id =viewModel.addBacklog(timeTitle),
-                            timeTitle = timeTitle,
-                        )
-                    )
-                }
-            },
-            onExpandChange ={ id,isExpand ->
-                coroutineScope.launch {
-                    viewModel.onExpandChange(id,isExpand)
-                }
-            },
-            onFinishedChange={ id,finished ->
-                coroutineScope.launch {
-                    viewModel.onRoutineFinishedChange(id,finished)
-                }
-            },
-            clickPart=clickPart,
-            showEditDialog =showEditDialog,
-            onChangeEditStatus ={showEditDialog = !showEditDialog},
-            onChangeClickPart = {clickPart=it},
-            
-            formattedDate=formattedDate,
-            onBacklogDetailClick = onBacklogDetailClick,
-            
-            backlogUiState = viewModel.backlogUiState,
-            updateBacklogUiState=viewModel::updatBacklogUiState,
-            
-            updateRoutine = { routine ->
-                coroutineScope.launch {
-                    viewModel.updateRoutine(routine)
-                }
-            },
-            insertRoutine ={ routine ->
-                coroutineScope.launch {
-                    viewModel.insertRoutine(routine)
-                }
-            },
-            
-            creditsTotal=creditsTotal,
-            importTotal=importTotal,
-            normalTotal=normalTotal,
-            faverTotal=faverTotal,
-            backlogList=backlogList,
-            routineList = unfinishedRoutineList,
-            )
-    }
-}
-@OptIn(ExperimentalSharedTransitionApi::class)
-@Composable
-fun BacklogHomeBody(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    
-    formattedDate: String,
-    clickPart:Int,
-    showEditDialog :Boolean,
-    onChangeEditStatus:()->Unit,
-    onChangeClickPart:(Int)->Unit,
-    
-    onBacklogDetailClick:(Int)->Unit={},
-    onExpandChange:(Int,Boolean)->Unit,
-    onFinishedChange:(Int,Boolean)->Unit,
-    
-    backlogUiState: BacklogUiState,
-    
-    updateBacklogUiState:(Backlog) -> Unit,
-    onNewAndUpdateBackUi:() -> Unit,
-    
-    susDeleteBacklogById:(Int)->Unit,
-    susUpdateBacklog:() -> Unit,
-    susAddBacklogAndUpdate:(String) ->Unit,
-    
-    updateRoutine:(Routine)->Unit,
-    insertRoutine:(Routine)->Unit,
-    
-    creditsTotal:Float,
-    importTotal:Float,
-    normalTotal:Float,
-    faverTotal:Float,
-    backlogList: List<Backlog>,
-    routineList: List<Routine>,
-    ){
-    
-    
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
             modifier = Modifier
@@ -243,7 +198,7 @@ fun BacklogHomeBody(
                 BacklogDetailCard(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier,
                     
                     backlog = backlog,
                     routineList = routineList,
@@ -256,16 +211,20 @@ fun BacklogHomeBody(
                     onBacklogDetailClick = onBacklogDetailClick,
                     onBacklogEditClick = {
                         updateBacklogUiState(backlog)
-                        onChangeClickPart(it)
-                        onChangeEditStatus()
+                        clickPart = it
+                        selectedDate = LocalDate.parse(backlog.timeTitle, formatter)
+                        showEditDialog = !showEditDialog
                     }
                 )
                 Spacer(Modifier.height(12.dp))
             }
         }
+//        添加按钮
         FloatingActionButton(
             shape = CircleShape,
-            onClick = onNewAndUpdateBackUi,
+            onClick = {
+                showDatePickerModal = !showDatePickerModal
+                      },
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(16.dp),
@@ -281,21 +240,42 @@ fun BacklogHomeBody(
 //    编辑卡片
     if(showEditDialog){
         EditCardDialog(
-            onDismiss =onChangeEditStatus,
+            onDismiss = { tempRoutineList ->
+                showEditDialog = !showEditDialog
+                var index = 0
+                var sortId = 0
+                while (index < tempRoutineList.size) {
+                    val routine = tempRoutineList[index]
+                    if (routine.rank != 3) {
+                        if(routine.id >=0)
+                            updateRoutine(routine.copy(sortId = sortId))
+                        else
+                            insertRoutine(routine.copy(id = 0,sortId = sortId))
+                        if(routine.content.isNotEmpty())
+                            sortId++
+                    }
+                    index++
+                }
+            },
             clickPart = clickPart,
             
             backlogUiState=backlogUiState,
-            routineList = routineList.filter { it.backlogId == backlogUiState.backlog.id },
-            
-            addBacklog = susAddBacklogAndUpdate,
+            routineList = routineList.filter {it.backlogId == backlogUiState.backlog.id
+            },
             updateBacklogUiState = updateBacklogUiState,
             onUpdateBacklog=susUpdateBacklog,
             
-            updateRoutine = updateRoutine,
-            insertRoutine = insertRoutine,
-            
         )
     }
-    
+    if(showDatePickerModal){
+        DatePickerModal(
+            selectedDate = selectedDate,
+            onDateSelected = {
+                selectedDate = it
+                susAddBacklog(selectedDate.format(DateTimeFormatter.ISO_DATE))
+            },
+            onDismiss = {showDatePickerModal = !showDatePickerModal},
+        )
+    }
 }
 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
