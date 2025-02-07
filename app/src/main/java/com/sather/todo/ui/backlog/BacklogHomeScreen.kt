@@ -124,7 +124,7 @@ fun BacklogHomeBody(
     backlogUiState: BacklogUiState,
     onBacklogDetailClick:(Int)->Unit={},
     onExpandChange:(Int,Boolean)->Unit,
-    onFinishedChange:(Int,Boolean)->Unit,
+    onFinishedChange:(String,Boolean)->Unit,
     
     updateBacklogUiState:(Backlog) -> Unit,
     
@@ -247,10 +247,12 @@ fun BacklogHomeBody(
                 while (index < tempRoutineList.size) {
                     val routine = tempRoutineList[index]
                     if (routine.rank != 3) {
-                        if(routine.id >=0)
+                        if(routine.finished) {
+                            insertRoutine(routine.copy(sortId = sortId, finished = false, rank = 1))
+                        }
+                        else {
                             updateRoutine(routine.copy(sortId = sortId))
-                        else
-                            insertRoutine(routine.copy(id = 0,sortId = sortId))
+                        }
                         if(routine.content.isNotEmpty())
                             sortId++
                     }

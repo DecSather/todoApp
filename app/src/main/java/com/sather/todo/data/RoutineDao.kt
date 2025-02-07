@@ -16,7 +16,7 @@ interface RoutineDao {
     fun getRoutinesByBacklogId(backlogId:Int): Flow<List<Routine>>
 
     @Query("SELECT * from routines WHERE id = :id")
-    fun getRoutine(id: Int?): Flow<Routine>
+    fun getRoutine(id: String?): Flow<Routine>
 //    suspend关键词-单独线程运行-Room 不允许在主线程上访问数据库
     @Insert
     suspend fun insert(item: Routine):Long
@@ -26,10 +26,10 @@ interface RoutineDao {
     suspend fun update(item: Routine)
     
     @Query("UPDATE routines SET finished = :finished WHERE id = :id")
-    suspend fun undateFinished(id:Int,finished:Boolean)
+    suspend fun undateFinished(id:String,finished:Boolean)
     
     @Query("DELETE FROM routines WHERE id = :id")
-    suspend fun deleteRoutineById(id: Int)
+    suspend fun deleteRoutineById(id: String)
     @Query("DELETE FROM routines WHERE backlogId = :id")
     suspend fun deleteRoutineByBacklogId(id: Int)
 

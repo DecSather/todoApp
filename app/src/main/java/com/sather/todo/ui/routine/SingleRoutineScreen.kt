@@ -26,7 +26,7 @@ object SingleRoutineDestination : BaseDestination {
     const val routineIdArg = "routineId"
     val routeWithArgs = "$route/{$routineIdArg}"
     val arguments = listOf(
-        navArgument(routineIdArg) { type = NavType.IntType }
+        navArgument(routineIdArg) { type = NavType.StringType }
     )
 }
 

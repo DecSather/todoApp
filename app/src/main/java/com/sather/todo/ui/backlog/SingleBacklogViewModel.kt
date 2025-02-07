@@ -46,10 +46,10 @@ class SingleBacklogViewModel(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-    suspend fun onRoutineFinishedChange(routineId:Int,finished: Boolean){
+    suspend fun onRoutineFinishedChange(routineId:String,finished: Boolean){
         routinesRepository.updateFinished(routineId,finished)
     }
-    suspend fun deleteRoutineById(id:Int) {
+    suspend fun deleteRoutineById(id:String) {
         routinesRepository.deleteRoutineById(id)
     }
 }

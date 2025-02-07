@@ -49,7 +49,7 @@ fun SingleBacklogScreen(
     animatedContentScope: AnimatedContentScope,
     navigateBack: () -> Unit,
     navigateToNewRoutine:(Int)->Unit,
-    navigateToSingleRoutine: (Int) -> Unit={},
+    navigateToSingleRoutine: (String) -> Unit={},
     viewModel: SingleBacklogViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val backlogUiState = viewModel.backlogUiState.collectAsState()

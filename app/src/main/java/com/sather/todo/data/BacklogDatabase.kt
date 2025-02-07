@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Backlog::class, Routine::class], version =4, exportSchema = false)
+@Database(entities = [Backlog::class, Routine::class], version =5, exportSchema = false)
 abstract class BacklogDatabase : RoomDatabase()  {
     abstract fun backlogDao(): BacklogDao
     abstract fun routineDao(): RoutineDao

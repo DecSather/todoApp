@@ -58,7 +58,7 @@ class BacklogHomeViewModel(
                 initialValue = RoutineHomeUiState()
             )
     
-    suspend fun onRoutineFinishedChange(routineId:Int,finished: Boolean){
+    suspend fun onRoutineFinishedChange(routineId:String,finished: Boolean){
         routinesRepository.updateFinished(routineId,finished)
     }
     companion object {
@@ -91,7 +91,7 @@ class BacklogHomeViewModel(
     suspend fun insertRoutine(routine: Routine):Int {
         if(validateInput(routine)){
             println("insert routine: " + routine)
-            return routinesRepository.insertRoutine(routine.copy(id = 0,rank = 1)).toInt()
+            return routinesRepository.insertRoutine(routine).toInt()
         }else {
             println("insert routine failed: " + routine)
             return -1

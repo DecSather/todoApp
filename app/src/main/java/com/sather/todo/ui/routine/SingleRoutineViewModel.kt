@@ -19,7 +19,7 @@ class SingleRoutineViewModel(
     private val routinesRepository: RoutinesRepository
 ) : ViewModel() {
     
-    private val routineId: Int = checkNotNull(savedStateHandle[SingleRoutineDestination.routineIdArg])
+    private val routineId: String = checkNotNull(savedStateHandle[SingleRoutineDestination.routineIdArg])
     var routineUiState by mutableStateOf(RoutineUiState())
         private set
     init {

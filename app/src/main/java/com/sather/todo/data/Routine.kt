@@ -7,9 +7,9 @@ import java.util.*
 
 @Entity(tableName = "routines")
 data class Routine(
-    @PrimaryKey(autoGenerate = true)
-//    val id:String = UUID.randomUUID().toString(),
-    val id:Int = 0,
+    @PrimaryKey()
+    val id:String = UUID.randomUUID().toString(),
+//    val id:Int = 0,
 //    分类id由SingleBacklog页面上传
     val backlogId:Int,
 //    排序id

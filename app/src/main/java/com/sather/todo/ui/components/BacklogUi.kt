@@ -152,7 +152,7 @@ fun BacklogDetailCard(
     routineList:List<Routine>,
     
     onExpandClick:(Int,Boolean)->Unit,
-    onFinishedChange:(Int,Boolean)->Unit,
+    onFinishedChange:(String,Boolean)->Unit,
     
     onDelete:(Int)->Unit,
     onBacklogDetailClick: (Int) -> Unit,
@@ -247,11 +247,14 @@ fun BacklogDetailCard(
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             if (expanded) {
+                                var sortId = 0
                                 routineList.map { it ->
+                                    val routine = it.copy(sortId = sortId)
+                                    sortId++
                                     BriefRoutineRow(
                                         modifier = Modifier
-                                            .clickable { onBacklogEditClick(it.sortId) },
-                                        routine = it,
+                                            .clickable { onBacklogEditClick(routine.sortId) },
+                                        routine = routine,
                                         onFinishedChange = onFinishedChange,
                                     )
                                 }
@@ -386,7 +389,7 @@ fun ThreeColorCircle(
     val angleOffset by transition.animateFloat(
         transitionSpec = {
             tween(
-//                delayMillis = 500,
+                delayMillis = 500,
                 durationMillis = 900,
                 easing = LinearOutSlowInEasing
             )
@@ -401,7 +404,7 @@ fun ThreeColorCircle(
     val shift by transition.animateFloat(
         transitionSpec = {
             tween(
-//                delayMillis = 500,
+                delayMillis = 500,
                 durationMillis = 900,
                 easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
             )

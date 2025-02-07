@@ -16,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.*
@@ -44,6 +45,7 @@ import java.util.*
 import kotlin.math.absoluteValue
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun EditCardDialog(
@@ -64,55 +66,40 @@ fun EditCardDialog(
     ) {
     
     val backlog = backlogUiState.backlog
-    val initialDate =LocalDate.parse(backlog.timeTitle, formatter)
-    var selectedDate by remember { mutableStateOf(initialDate) }
+    var selectedDate by remember { mutableStateOf(LocalDate.parse(backlog.timeTitle, formatter)) }
     var showDatePickerModal by remember { mutableStateOf((clickPart == -1)) }
     
+    var targetIndex by remember { mutableStateOf(if(clickPart !=-2)clickPart else routineList.size) }
     val tempRoutineList = remember {
         mutableStateListOf<Routine>().apply {
             addAll(routineList)
             if(clickPart == -2) {
-                if(routineList.size == 0) {
-                    add(
-                        Routine(
-                            id = clickPart,
-                            backlogId = backlog.id,
-                            sortId = 0,
-                            rank = 3,
-                            content = "",
-                        )
+                add(
+                    Routine(
+                        backlogId = backlog.id,
+                        sortId = routineList.size,
+                        finished = true,
+                        rank = 3,
+                        content = "",
                     )
-                }else{
-                    add(
-                        Routine(
-                            id = -routineList.last().id-3,
-                            backlogId = backlog.id,
-                            sortId = routineList.size,
-                            rank = 3,
-                            content = "",
-                        )
-                    )
-                }
+                )
             }
         }
     }
-    
-    
     val listState = rememberLazyListState()
-    var targetIndex by remember { mutableStateOf(if(clickPart !=-2)clickPart else routineList.size) }
-    
-    val focusRequester = remember { FocusRequester() }
+    var focusRequester = remember { FocusRequester() }
     
     if(clickPart != -1) {
         LaunchedEffect(targetIndex) {
-            if(targetIndex>=0) {
+            if(targetIndex >=0) {
+//                列跳转+新增跳转
                 listState.animateScrollToItem(targetIndex)
                 delay(1)
-                focusRequester.requestFocus()
-            }else{
-                listState.animateScrollToItem(0)
+            }
+            focusRequester.requestFocus()
+            if(targetIndex == -3){
+//                保存键
                 delay(1)
-                focusRequester.requestFocus()
                 onDismiss(tempRoutineList)
             }
         }
@@ -123,72 +110,71 @@ fun EditCardDialog(
             
             modifier = Modifier
                 .padding(16.dp)
-                .heightIn(max = 480.dp)
                 .imePadding(),
             text = {
-                LazyColumn(
-                    Modifier
-                        .fillMaxWidth()
-                        .semantics { contentDescription = "Backlog Edit Card" }
-                        .heightIn(max =300.dp)
-                        .animateContentSize()
-                        .focusGroup(),
-                    state = listState,
-
+                Column {
+                    Row(
+//                        点击修改/失焦保存
+                        modifier = if (targetIndex == -1 || targetIndex == -3) Modifier.focusRequester(focusRequester) else Modifier,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                    item {
-                        Row(
-                            modifier =if(targetIndex == -1) Modifier.focusRequester(focusRequester) else Modifier,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
 //                        时间选择
-                            OutlinedTextField(
-                                value = selectedDate.format(DateTimeFormatter.ISO_DATE),
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text(stringResource(R.string.formatter)) },
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
-                                ),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(5.dp)
-                                    .pointerInput(selectedDate) {
-                                        awaitEachGesture {
-                                            awaitFirstDown(pass = PointerEventPass.Initial)
-                                            val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                                            if (upEvent != null) {
-                                                showDatePickerModal = true
-                                            }
+                        OutlinedTextField(
+                            value = selectedDate.format(DateTimeFormatter.ISO_DATE),
+                            onValueChange = {},
+                            readOnly = true,
+                            label = { Text(stringResource(R.string.formatter)) },
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .pointerInput(selectedDate) {
+                                    awaitEachGesture {
+                                        awaitFirstDown(pass = PointerEventPass.Initial)
+                                        val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+                                        if (upEvent != null) {
+                                            showDatePickerModal = true
                                         }
-                                    },
+                                    }
+                                },
+                        )
+                    }
+                    LazyColumn(
+                        Modifier
+                            .fillMaxWidth()
+                            .semantics { contentDescription = "Backlog Edit Card" }
+                            .heightIn(max = 250.dp)
+                            .animateContentSize()
+                            .focusGroup(),
+                        state = listState,
+                        ) {
+                        itemsIndexed(items = tempRoutineList, key = { _, item -> item.id }) { index, item ->
+                            BacklogEditRow(
+                                modifier = if (index == targetIndex) Modifier.focusRequester(focusRequester) else Modifier,
+                                routine = item.copy(sortId = index),
+                                updateRoutine = { routine ->
+                                    tempRoutineList[index] = routine
+                                },
+                                addRoutine = {
+                                    tempRoutineList.add(
+                                        index + 1,
+                                        Routine(
+                                            backlogId = backlog.id,
+                                            sortId = index + 1,
+                                            finished = true,
+                                            rank = 3,
+                                            content = "",
+                                        )
+                                    )
+                                },
+                                changeTarget = { newIndex ->
+                                    targetIndex = newIndex
+                                },
                             )
                         }
-                    }
-                    itemsIndexed(items = tempRoutineList, key = { _,item -> item.id}) {
-                        index,item ->
-                        BacklogEditRow(
-                            modifier =if(index == targetIndex) Modifier.focusRequester(focusRequester) else Modifier,
-                            routine = item.copy(sortId = index),
-                            updateRoutine = { routine ->
-                                tempRoutineList[index]=routine
-                                              },
-                            addRoutine = { newKey ->
-                                tempRoutineList.add(index+1,
-                                    Routine(
-                                        id = -newKey-3,
-                                        backlogId = backlog.id,
-                                        sortId = index+1,
-                                        rank = 3,
-                                        content = "",
-                                    )
-                                )
-                            },
-                            changeTarget = {newIndex ->
-                                targetIndex = newIndex
-                            },
-                        )
                     }
                 }
                 
@@ -201,7 +187,8 @@ fun EditCardDialog(
                         * 三个操作：
                         * * 更新Backlog标题
                         */
-                        targetIndex = -1
+                        println("should be clean focus")
+                        targetIndex = -3
                         onUpdateBacklog()
                     },
                 ) {
@@ -263,7 +250,7 @@ fun BacklogEditRow(
     modifier: Modifier,
     routine: Routine,
     updateRoutine: (Routine) -> Unit ={ },
-    addRoutine: (Int) -> Unit = {},
+    addRoutine: () -> Unit = {},
     changeTarget: (Int) -> Unit,
 ) {
     var textFieldValueState by remember {
@@ -297,7 +284,6 @@ fun BacklogEditRow(
                         wasFocused = true
                     }
                     if(!focusState.isFocused && wasFocused){
-                        println("update from focusState: "+routine.sortId)
                         if(textFieldValueState.text.isNotEmpty() && routine.rank == 3){
                             updateRoutine(routine.copy(content = textFieldValueState.text, rank = 1))
                         }else{
@@ -322,7 +308,7 @@ fun BacklogEditRow(
             ),
             keyboardActions = KeyboardActions(
                 onDone = {
-                    addRoutine(routine.id.absoluteValue)
+                    addRoutine()
                     changeTarget(routine.sortId+1)
                 }
             ),
