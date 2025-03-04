@@ -192,6 +192,7 @@ fun EditCardDialog(
                                 deleteRoutine = {
                                     val deleteRoutine = tempRoutineList[index]
                                     updateRoutine(deleteRoutine)
+//                                    if(tempRoutineList.size>1)
                                     tempRoutineList.removeAt(index)
                                  
                                 },
