@@ -374,12 +374,11 @@ fun DeleteConfirmationDialog(
 //三色圆圈动画
 @Composable
 fun ThreeColorCircle(
-    proportions:List<Float>,
-    colorIndexs:List<Int>,
-    modifier: Modifier = Modifier
-        .height(300.dp)
-        .fillMaxWidth()
+    amount:Float,
+    credits:List<Float>,
 ) {
+    val colorIndexs = listOf(0,1,2,3)
+    val properties = credits.map { it/amount }
     val currentState = remember {
         MutableTransitionState(ThreeCircleProgress.START)
             .apply { targetState = ThreeCircleProgress.END }
@@ -416,7 +415,11 @@ fun ThreeColorCircle(
             30f
         }
     }
-    Canvas(modifier) {
+    Canvas(
+        Modifier
+        .height(300.dp)
+        .fillMaxWidth()
+    ) {
         val innerRadius = (size.minDimension - stroke.width) / 2
         val halfSize = size / 2.0f
         val topLeft = Offset(
@@ -428,8 +431,8 @@ fun ThreeColorCircle(
         var sweep:Float
         var index=0
         colorIndexs.map { it ->
-            sweep = proportions[index] * angleOffset
-            if(proportions[index]>0f) {
+            sweep = properties[index] * angleOffset
+            if(properties[index]>0f) {
                 drawArc(
                     color = RoutineColors[it],
                     startAngle = startAngle + DividerLengthInDegrees / 2,
@@ -443,23 +446,9 @@ fun ThreeColorCircle(
             }
             index++
         }
-        
-        sweep = proportions[index] * angleOffset
-        if(proportions[index]>0f) {
-            drawArc(
-                color = unfinishedColor,
-                startAngle = startAngle + DividerLengthInDegrees / 2,
-                sweepAngle = sweep - DividerLengthInDegrees,
-                topLeft = topLeft,
-                size = size,
-                useCenter = false,
-                style = stroke
-            )
-            startAngle += sweep
-        }
     }
 }
 private enum class ThreeCircleProgress { START, END }
 private const val DividerLengthInDegrees = 1.8f
-val RoutineColors= listOf(importColor, normalColor, faverColor, unfinishedColor)
+val RoutineColors= listOf(unfinishedColor,importColor, normalColor, faverColor)
 

@@ -83,9 +83,11 @@ fun SingleBacklogScreen(
                     viewModel.onRoutineFinishedChange(id,finished)
                 }
             },
-            swipeToDelete ={ coroutineScope.launch {
-                viewModel.deleteRoutineById(routine.id)
-            } },
+            swipeToDelete ={
+                coroutineScope.launch {
+                    viewModel.deleteRoutineById(routine.id)
+                }
+                           },
         )
         
     }
@@ -104,21 +106,26 @@ fun  SingleBacklogBody(
     rows: @Composable (Routine) -> Unit,
 ) {
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    Box(modifier=Modifier.fillMaxSize())
-    {
-        val finishedAmount=finishedItems.map{ it -> it.credit}.sum()
-        val amount=finishedAmount+unfinishedItems.map { it.credit }.sum()
-        val creditRatios=
-           if(amount>0f) {
-               finishedItems.map { it -> it.credit / amount }+unfinishedItems.map{it -> it.credit}.sum()/amount
-           }
-            else listOf(1f)
+    var importCredit = 0f
+    var normalCredit = 0f
+    var faverCredit = 0f
+    finishedItems.map{it ->
+        when(it.rank){
+            1 -> importCredit += it.credit
+            2 -> normalCredit += it.credit
+            else -> faverCredit += it.credit
+        }
+    }
+    val finishedAmount=importCredit + normalCredit + faverCredit
+    val unfinishedAmount=unfinishedItems.map { it.credit }.sum()
+    val creditRatios= listOf(unfinishedAmount,importCredit,normalCredit,faverCredit)
+    Box(modifier=Modifier.fillMaxSize()){
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             Box(Modifier.padding(16.dp)) {
 //                三色圈
                 ThreeColorCircle(
-                    proportions = creditRatios,
-                    colorIndexs =finishedItems.map { it -> it.rank }
+                    amount = finishedAmount+unfinishedAmount,
+                    credits = creditRatios,
                 )
                 IconButton(onClick = navigateBack) {
                     Icon(
@@ -190,7 +197,7 @@ fun  SingleBacklogBody(
             shape = CircleShape,
             onClick = { deleteConfirmationRequired = true },
             modifier = Modifier
-                .align(Alignment.CenterEnd)
+                .align(Alignment.BottomEnd)
                 .padding(16.dp),
         ) {
             Icon(

@@ -18,10 +18,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.sather.todo.R
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.theme.unfinishedColor
 import kotlinx.coroutines.coroutineScope
@@ -62,13 +65,12 @@ fun BriefRoutineRow(
     val color= RoutineColors[routine.rank]
     val id=routine.id
     var finished by remember { mutableStateOf(routine.finished) }
-    val dollarSign ="$ "
     val customColors = CheckboxDefaults.colors(
         checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
     Row(
         modifier = modifier
-            .height(68.dp),
+            .height(MediumHeight),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val typography = MaterialTheme.typography
@@ -92,7 +94,7 @@ fun BriefRoutineRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = dollarSign,
+                text = stringResource(R.string.dollarSign),
                 style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -115,7 +117,7 @@ fun BriefEmptyRow(
     )
     Row(
         modifier = modifier
-            .height(68.dp),
+            .height(MediumHeight),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val typography = MaterialTheme.typography
@@ -156,13 +158,12 @@ fun DetailRoutineRow(
     val color= RoutineColors[routine.rank]
     val id=routine.id
     var finished by remember { mutableStateOf(routine.finished) }
-    val dollarSign ="$ "
     val customColors = CheckboxDefaults.colors(
         checkedColor =MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
     Row(
         modifier = modifier
-            .height(68.dp)
+            .height(LargeHeight)
             .swipeToDismiss(swipeToDelete)
             .clearAndSetSemantics {
                 contentDescription =
@@ -184,17 +185,24 @@ fun DetailRoutineRow(
             }
         )
         Column(Modifier) {
-            Text(text = content, style = typography.bodyMedium)
-//            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(text = subcontent, style = typography.titleLarge)
-//            }
+            if(finished){
+                Text(
+                    text = content,
+                    style = typography.bodyMedium,
+                    textDecoration = TextDecoration.LineThrough,
+                )
+            }else{
+                Text(text = content, style = typography.bodyMedium)
+                Text(text = subcontent, style = typography.titleLarge)
+                
+            }
         }
         Spacer(Modifier.weight(1f))
         Row(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = dollarSign,
+                text = stringResource(R.string.dollarSign),
                 style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -225,10 +233,9 @@ fun DetailEmptyRow(
     content: String,
     subcontent:String,
 ) {
-    val dollarSign ="$ "
     Row(
         modifier = modifier
-            .height(68.dp)
+            .height(LargeHeight)
             .clearAndSetSemantics {
                 contentDescription =
                     "Empty routine"
@@ -249,7 +256,7 @@ fun DetailEmptyRow(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = dollarSign,
+                text = stringResource(R.string.dollarSign),
                 style = typography.headlineMedium,
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
@@ -344,3 +351,5 @@ private fun Modifier.swipeToDismiss(
         // Apply the horizontal offset to the element.
         .offset { IntOffset(offsetX.value.roundToInt(), 0) }
 }
+private val MediumHeight = 54.dp
+private val LargeHeight = 68.dp

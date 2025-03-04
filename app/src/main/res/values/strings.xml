@@ -2,6 +2,7 @@
     <string name="app_name">ToDo</string>
     <string name="total">Total</string>
     <string name="attention">Attention</string>
+    <string name="dollarSign" translatable="false">$</string>
 <!--     Backlog -->
     <string name="credit">Credit</string>
     <string name="formatter">yyyy-MM-dd</string>
@@ -15,6 +16,7 @@
     <string name="rontine_credit_req">Credit*</string>
     <string name="rontine_subcontent_req">Remark</string>
     <string name="routine_empty_error">Can\'t be empty</string>
+    <string name="routine_credit_error">Float</string>
 <!--     Function -->
     <string name="see_all">DETAIL</string>
     <string name="back_button">Back</string>

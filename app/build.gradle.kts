@@ -49,6 +49,12 @@ android {
 }
 
 dependencies {
+//    微件
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:1.1.0")
+    
+    // For interop APIs with Material 3
+    implementation( "androidx.glance:glance-material3:1.1.0")
 //    动画效果
     implementation("androidx.compose.animation:animation:1.5.0")
     implementation("androidx.compose.foundation:foundation:1.7.5")

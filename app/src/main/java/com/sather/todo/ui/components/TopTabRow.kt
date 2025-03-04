@@ -46,7 +46,7 @@ fun TopTabRow(
                 .selectableGroup()
         ) {
             allScreens.forEach { screen ->
-                RallyTab(
+                ToDoAnimTab(
                     text = screen.route,
                     icon = screen.icon,
                     onSelected = { onTabSelected(screen) },
@@ -58,7 +58,7 @@ fun TopTabRow(
 }
 
 @Composable
-private fun RallyTab(
+private fun ToDoAnimTab(
     text: String,
     icon: ImageVector,
     onSelected: () -> Unit,

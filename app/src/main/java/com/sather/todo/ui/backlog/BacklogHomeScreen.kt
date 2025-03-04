@@ -144,22 +144,21 @@ fun BacklogHomeBody(
     var showDatePickerModal by remember { mutableStateOf(false) }
     var clickPart by rememberSaveable { mutableIntStateOf(0) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    val importTotal by rememberUpdatedState(
-        finishedRoutineList.map { routine ->
-            if(routine.rank==0)routine.credit else 0f
-        }.sum()
-    )
-    val normalTotal by rememberUpdatedState(
-        finishedRoutineList.map { routine ->
-            if(routine.rank==1)routine.credit else 0f
-        }.sum()
-    )
-    val faverTotal by rememberUpdatedState(
-        finishedRoutineList.map { routine ->
-            if(routine.rank==2)routine.credit else 0f
-        }.sum()
-    )
+    var importTotal = 0f
+    var normalTotal = 0f
+    var faverTotal = 0f
+    finishedRoutineList.map{it ->
+        when(it.rank){
+            1 -> importTotal += it.credit
+            2 -> normalTotal += it.credit
+            else -> faverTotal += it.credit
+        }
+    }
     val creditsTotal =importTotal+normalTotal+faverTotal
+    
+    var proportions :List<Float>
+    if(creditsTotal>0f) proportions = listOf(0f,importTotal,normalTotal,faverTotal)
+    else proportions = listOf(1f,0f,0f,0f)
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
             modifier = Modifier
@@ -167,14 +166,11 @@ fun BacklogHomeBody(
                 .semantics { contentDescription = "Backlogs Screen" }
         ) {
 //        三色转圈
-            var proportions =
-                if(creditsTotal>0f) listOf((importTotal/creditsTotal),(normalTotal/creditsTotal),(faverTotal/creditsTotal),0f)
-            else listOf(0f,0f,0f,1f)
             item {
                 Box(Modifier.padding(16.dp)) {
                     ThreeColorCircle(
-                        proportions =proportions,
-                        colorIndexs = listOf(0,1,2)
+                        amount = if(creditsTotal>0f)creditsTotal else 1f,
+                        credits =proportions,
                     )
                     Spacer(Modifier.height(12.dp))
                     Column(modifier = Modifier.align(Alignment.Center)) {
@@ -226,7 +222,7 @@ fun BacklogHomeBody(
                 showDatePickerModal = !showDatePickerModal
                       },
             modifier = Modifier
-                .align(Alignment.CenterEnd)
+                .align(Alignment.BottomEnd)
                 .padding(16.dp),
             
             ) {
@@ -246,15 +242,14 @@ fun BacklogHomeBody(
                 var sortId = 0
                 while (index < tempRoutineList.size) {
                     val routine = tempRoutineList[index]
-                    if (routine.rank != 3) {
-                        if(routine.finished) {
-                            insertRoutine(routine.copy(sortId = sortId, finished = false, rank = 1))
-                        }
-                        else {
-                            updateRoutine(routine.copy(sortId = sortId))
-                        }
-                        if(routine.content.isNotEmpty())
-                            sortId++
+                    if(routine.finished) {
+                        insertRoutine(routine.copy(sortId = sortId, finished = false))
+                    }
+                    else {
+                        updateRoutine(routine.copy(sortId = sortId))
+                    }
+                    if(routine.content.isNotEmpty()) {
+                        sortId++
                     }
                     index++
                 }
@@ -266,6 +261,7 @@ fun BacklogHomeBody(
             },
             updateBacklogUiState = updateBacklogUiState,
             onUpdateBacklog=susUpdateBacklog,
+            updateRoutine= updateRoutine,
             
         )
     }
