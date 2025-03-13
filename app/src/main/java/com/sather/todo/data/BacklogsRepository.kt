@@ -22,11 +22,12 @@ import kotlinx.coroutines.flow.Flow
  * Repository that provides insert, update, delete, and retrieve of [Backlog] from a given data source.
  */
 class BacklogsRepository(private val backlogDao: BacklogDao) {
-    
+     
      fun getAllBacklogsStream(): Flow<List<Backlog>> = backlogDao.getAllBacklogs()
+     fun getBacklogByString(timeTitle: String): Flow<List<Backlog>> = backlogDao.getBacklogByString(timeTitle)
     
      fun getBacklogStream(id: Int): Flow<Backlog?> = backlogDao.getBacklog(id)
-     fun getBacklogStreamByString(timeTitle: String): Flow<Backlog?>  = backlogDao.getBacklogByString(timeTitle)
+     
      
     
      suspend fun insertBacklog(backlog: Backlog) = backlogDao.insert(backlog)

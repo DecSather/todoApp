@@ -49,17 +49,20 @@ android {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
 //    微件
     // For AppWidgets support
     implementation("androidx.glance:glance-appwidget:1.1.0")
-    
+    implementation("androidx.glance:glance-preview:1.1.0")
+    implementation("androidx.glance:glance-appwidget-preview:1.1.0")
     // For interop APIs with Material 3
     implementation( "androidx.glance:glance-material3:1.1.0")
+    debugImplementation("androidx.glance:glance-preview:1.1.0")
+    debugImplementation("androidx.glance:glance-appwidget-preview:1.1.0")
+    
 //    动画效果
     implementation("androidx.compose.animation:animation:1.5.0")
     implementation("androidx.compose.foundation:foundation:1.7.5")
-    
-    implementation("com.google.code.gson:gson:2.8.6")
     implementation("androidx.navigation:navigation-compose:2.8.3")
     implementation( "androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
     implementation( "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
@@ -78,10 +81,11 @@ dependencies {
     implementation("androidx.compose.material3:material3-adaptive-navigation-suite-android:1.3.0")
     
 //    Room
-    implementation("androidx.room:room-common:2.6.1")
-    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.work:work-runtime-ktx:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("androidx.room:room-common:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
     // SQLite Testing
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -93,5 +97,5 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.4")
     debugImplementation("androidx.compose.ui:ui-tooling:1.7.4")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.6")
 }

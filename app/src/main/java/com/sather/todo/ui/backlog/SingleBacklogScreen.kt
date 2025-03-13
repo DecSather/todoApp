@@ -167,8 +167,8 @@ fun  SingleBacklogBody(
 //            routineList
             Card(
                 shape = RectangleShape,
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            )) {
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,)
+            ) {
                 Column(modifier = Modifier.padding(12.dp).fillMaxWidth()){
                     unfinishedItems.map {
                             item ->

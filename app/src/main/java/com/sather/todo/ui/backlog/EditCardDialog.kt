@@ -43,6 +43,7 @@ import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.components.RoutineColors
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -68,7 +69,7 @@ fun EditCardDialog(
     updateRoutine:(Routine)->Unit,
     ) {
     val backlog = backlogUiState.backlog
-    var selectedDate by remember { mutableStateOf(LocalDate.parse(backlog.timeTitle, formatter)) }
+    var selectedDate by remember { mutableStateOf(if(backlog.timeTitle.isNotEmpty())LocalDate.parse(backlog.timeTitle, formatter) else LocalDate.now()) }
     var showDatePickerModal by remember { mutableStateOf((clickPart == -1)) }
     
     val listState = rememberLazyListState()
@@ -76,7 +77,7 @@ fun EditCardDialog(
     *   初始化焦点-sortId或末尾-
     *   回收利用来保存数据组
     */
-    var saveFoucsIndex by remember { mutableIntStateOf(if(clickPart ==-2)routineList.size else clickPart) }
+    var saveFoucsIndex by remember { mutableIntStateOf(if(clickPart < 0)routineList.size else clickPart) }
     
     val focusRequester = remember { FocusRequester()}
     var focusIndex by remember { mutableIntStateOf(saveFoucsIndex) }
@@ -84,7 +85,7 @@ fun EditCardDialog(
     val tempRoutineList = remember {
         mutableStateListOf<Routine>().apply {
             addAll(routineList)
-            if(clickPart == -2) {
+            if(clickPart <= 0) {
                 add(
                     Routine(
                         backlogId = backlog.id,
@@ -97,18 +98,14 @@ fun EditCardDialog(
             }
         }
     }
-    
-    
-    
-    if(clickPart != -1) {
-        LaunchedEffect(focusIndex) {
+    LaunchedEffect(focusIndex) {
+        when(isItemVisible(focusIndex, listState)) {
+            -1 -> listState.animateScrollToItem(maxOf(0, focusIndex))
+            1 -> listState.animateScrollToItem(maxOf(0, focusIndex - 4))
             
-            when(isItemVisible(focusIndex, listState)) {
-                -1 -> listState.animateScrollToItem(maxOf(0, focusIndex))
-                1 -> listState.animateScrollToItem(maxOf(0, focusIndex - 4))
-                
-            }
         }
+    }
+    if(clickPart != -1) {
         AlertDialog(
             properties = DialogProperties(
                 usePlatformDefaultWidth = false,
@@ -118,8 +115,9 @@ fun EditCardDialog(
                 .padding(16.dp)
                 .imePadding(),
             text = {
+                println("enter AlertDialog")
                 Column {
-                    val titleFocusRequester  = remember { FocusRequester()}
+                    val titleFocusRequester = remember { FocusRequester() }
                     
                     Row(
 //                        点击修改/失焦保存
@@ -150,10 +148,13 @@ fun EditCardDialog(
                                 },
                         )
                     }
-                    LaunchedEffect(saveFoucsIndex){
-                        if(saveFoucsIndex == -1){
+                    LaunchedEffect(saveFoucsIndex) {
+                        if (saveFoucsIndex <= 0) {
                             titleFocusRequester.requestFocus()
-                            onDismiss(tempRoutineList)
+                            delay(1)
+                            if (saveFoucsIndex == -3) {
+                                onDismiss(tempRoutineList)
+                            }
                         }
                     }
                     
@@ -166,17 +167,17 @@ fun EditCardDialog(
                             .animateContentSize()
                             .focusGroup(),
                         state = listState,
-                        ) {
-                        println("current List: "+tempRoutineList)
+                    ) {
+                        println("current List: " + tempRoutineList)
                         itemsIndexed(items = tempRoutineList, key = { _, item -> item.id }) { index, item ->
                             
                             BacklogEditRow(
-                                modifier =if(index == focusIndex) Modifier.focusRequester(focusRequester) else Modifier,
+                                modifier = if (index == focusIndex) Modifier.focusRequester(focusRequester) else Modifier,
                                 routine = item.copy(sortId = index),
                                 updateRoutine = { routine ->
                                     tempRoutineList[index] = routine
                                 },
-                                addRoutine = {sortIndex,it ->
+                                addRoutine = { sortIndex, it ->
                                     tempRoutineList.add(
                                         index + sortIndex,
                                         Routine(
@@ -194,20 +195,30 @@ fun EditCardDialog(
                                     updateRoutine(deleteRoutine)
 //                                    if(tempRoutineList.size>1)
                                     tempRoutineList.removeAt(index)
-                                 
+                                    if (tempRoutineList.size == 0) tempRoutineList.add(
+                                        0,
+                                        Routine(
+                                            backlogId = backlog.id,
+                                            sortId = index + 1,
+                                            finished = true,
+                                            rank = 0,
+                                            content = "",
+                                        )
+                                    )
+                                    
                                 },
-                                focusClick = {newFocusIndex ->
-                                    if(focusIndex != newFocusIndex) {
+                                focusClick = { newFocusIndex ->
+                                    if (focusIndex != newFocusIndex) {
                                         focusIndex = newFocusIndex
                                     }
-                                             },
+                                },
                             )
-                            LaunchedEffect(focusIndex){
-                                if(index == focusIndex){
+                            LaunchedEffect(index == focusIndex) {
+                                if (index == focusIndex) {
                                     focusRequester.requestFocus()
                                 }
                             }
-
+                            
                         }
                     }
                 }
@@ -215,11 +226,11 @@ fun EditCardDialog(
             onDismissRequest = {
                 onDismiss(tempRoutineList.toList())
                 onUpdateBacklog()
-                               },
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        saveFoucsIndex = -1
+                        saveFoucsIndex = -3
                         onUpdateBacklog()
                     },
                 ) {
@@ -235,7 +246,7 @@ fun EditCardDialog(
                     onClick = {
                         onDismiss(tempRoutineList.toList())
                         onUpdateBacklog()
-                              },
+                    },
                 ) {
                     Text(
                         color = MaterialTheme.colorScheme.primary,
@@ -247,6 +258,7 @@ fun EditCardDialog(
             }
         )
     }
+    
     if (showDatePickerModal) {
         DatePickerModal(
             selectedDate = selectedDate,
@@ -262,7 +274,7 @@ fun EditCardDialog(
                 showDatePickerModal = false
                 if(clickPart == -1) {
                     onUpdateBacklog()
-                    onDismiss(listOf())
+                    saveFoucsIndex = -1
                 }
                         },
         )
@@ -378,7 +390,11 @@ fun BacklogEditRow(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        addRoutine(1, "")
+                        val oldText = contentFieldValueState.text.subSequence(0,contentFieldValueState.selection.end)
+                        val newText = contentFieldValueState.text.substring(contentFieldValueState.selection.end)
+                        println("cur text: ${oldText}\t new text: ${newText}")
+                        contentFieldValueState = TextFieldValue(text = oldText.toString())
+                        addRoutine(1, newText)
                     }
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium,
@@ -488,16 +504,6 @@ private val TabHeight = 42.dp
 private val TabSpacer = 10.dp
 private val BoxSize = 16.dp
 private val roundCornerShape = 2.dp
-
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("yyyy-MM-dd")
-    return formatter.format(Date(millis))
-}
-
-fun convertLocalDateToMillis(localDate: LocalDate): Long {
-    val zonedDateTime = localDate.atStartOfDay(ZoneOffset.UTC)
-    return zonedDateTime.toInstant().toEpochMilli()
-}
 
 private fun isItemVisible(index: Int, listState: LazyListState): Int {
     val visibleItemsInfo = listState.layoutInfo.visibleItemsInfo

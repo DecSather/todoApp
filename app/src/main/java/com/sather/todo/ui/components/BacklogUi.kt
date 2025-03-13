@@ -194,7 +194,9 @@ fun BacklogDetailCard(
                 }
             }
         ) {
-            Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)) {
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+            ) {
                 Column {
                     Column(
                         Modifier

@@ -26,7 +26,7 @@ val Typography = Typography(
 //    h2
     headlineLarge= TextStyle(
         fontWeight = FontWeight.SemiBold,
-        fontSize = 44.sp,
+        fontSize = 32.sp,
         fontFamily = EczarFontFamily,
         letterSpacing = 1.5.sp
     ),

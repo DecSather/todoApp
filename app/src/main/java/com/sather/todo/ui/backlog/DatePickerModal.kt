@@ -4,7 +4,11 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.sather.todo.R
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -13,17 +17,23 @@ fun DatePickerModal(
     onDateSelected: (LocalDate?) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val datePickerState = rememberDatePickerState(selectedDate?.let { convertLocalDateToMillis(it) })
+    
+    val datePickerState = rememberDatePickerState(
+        selectedDate?.let {
+            it.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+        }
+    )
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
                 onClick = {
                     onDateSelected(
-                        LocalDate.parse(
-                            datePickerState.selectedDateMillis?.let { convertMillisToDate(it) },
-                            formatter
-                        )
+                        datePickerState.selectedDateMillis?.let {
+                            Instant.ofEpochMilli(it)
+                                .atZone(ZoneId.systemDefault()) // 使用系统默认时区
+                                .toLocalDate()
+                        }
                     )
                     onDismiss()
                 }

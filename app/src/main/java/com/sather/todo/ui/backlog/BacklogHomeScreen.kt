@@ -29,7 +29,9 @@ import com.sather.todo.ui.components.BacklogDetailCard
 import com.sather.todo.ui.components.ThreeColorCircle
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 //日程-home页
@@ -81,7 +83,12 @@ fun BacklogHomeScreen(
             },
             susAddBacklog ={ timeTitle ->
                 coroutineScope.launch {
-                    viewModel.addBacklog(timeTitle)
+                    viewModel.updatBacklogUiState(
+                        Backlog(
+                            id= viewModel.addBacklog(timeTitle),
+                            timeTitle = timeTitle
+                        )
+                    )
                 }
             },
             onExpandChange ={ id,isExpand ->
@@ -130,7 +137,7 @@ fun BacklogHomeBody(
     
     susDeleteBacklogById:(Int)->Unit,
     susUpdateBacklog:() -> Unit,
-    susAddBacklog:(String) ->Unit,
+    susAddBacklog:(String) -> Unit,
     
     updateRoutine:(Routine)->Unit,
     insertRoutine:(Routine)->Unit,
@@ -141,8 +148,7 @@ fun BacklogHomeBody(
     ){
     
     var showEditDialog by remember { mutableStateOf(false) }
-    var showDatePickerModal by remember { mutableStateOf(false) }
-    var clickPart by rememberSaveable { mutableIntStateOf(0) }
+    var clickPart by rememberSaveable { mutableIntStateOf(-1) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
     var importTotal = 0f
     var normalTotal = 0f
@@ -219,12 +225,15 @@ fun BacklogHomeBody(
         FloatingActionButton(
             shape = CircleShape,
             onClick = {
-                showDatePickerModal = !showDatePickerModal
-                      },
+                clickPart = -2
+                val oldBacklog = backlogUiState.backlog.id
+                susAddBacklog(LocalDate.now().format(formatter))
+                showEditDialog = !showEditDialog
+                
+            },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            
             ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -236,6 +245,14 @@ fun BacklogHomeBody(
 //    编辑卡片
     if(showEditDialog){
         EditCardDialog(
+            clickPart = clickPart,
+            
+            backlogUiState=backlogUiState,
+            routineList = routineList.filter {it.backlogId == backlogUiState.backlog.id
+            },
+            updateBacklogUiState = updateBacklogUiState,
+            onUpdateBacklog=susUpdateBacklog,
+            updateRoutine= updateRoutine,
             onDismiss = { tempRoutineList ->
                 showEditDialog = !showEditDialog
                 var index = 0
@@ -254,25 +271,7 @@ fun BacklogHomeBody(
                     index++
                 }
             },
-            clickPart = clickPart,
             
-            backlogUiState=backlogUiState,
-            routineList = routineList.filter {it.backlogId == backlogUiState.backlog.id
-            },
-            updateBacklogUiState = updateBacklogUiState,
-            onUpdateBacklog=susUpdateBacklog,
-            updateRoutine= updateRoutine,
-            
-        )
-    }
-    if(showDatePickerModal){
-        DatePickerModal(
-            selectedDate = selectedDate,
-            onDateSelected = {
-                selectedDate = it
-                susAddBacklog(selectedDate.format(DateTimeFormatter.ISO_DATE))
-            },
-            onDismiss = {showDatePickerModal = !showDatePickerModal},
         )
     }
 }
