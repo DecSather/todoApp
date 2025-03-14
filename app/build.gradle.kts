@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    
     id("com.google.devtools.ksp") version "1.9.20-1.0.14"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
 }
 
 android {
@@ -49,7 +49,11 @@ android {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
+    
+    // DataStore
+    implementation ("androidx.datastore:datastore-preferences:1.1.0")
+    
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 //    微件
     // For AppWidgets support
     implementation("androidx.glance:glance-appwidget:1.1.0")

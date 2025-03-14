@@ -2,9 +2,10 @@ package com.sather.todo.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
 import java.util.*
 
-
+@Serializable
 @Entity(tableName = "routines")
 data class Routine(
     @PrimaryKey()

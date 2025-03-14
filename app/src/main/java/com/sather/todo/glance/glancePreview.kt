@@ -1,10 +1,9 @@
 package com.sather.todo.glance
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Card
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -16,8 +15,9 @@ import com.sather.todo.ui.theme.ToDoTheme
 @Composable
 fun glancePreview(){
     ToDoTheme {
-        Card(Modifier.fillMaxWidth().height(248.dp).padding(16.dp)) {
-            Text("hello")
+        Column {
+//            Row(Modifier.fillMaxWidth()) { Text("hello") }
+            Spacer(Modifier.height(100.dp).padding(8.dp).background(MaterialTheme.colorScheme.onPrimary))
         }
     }
 }

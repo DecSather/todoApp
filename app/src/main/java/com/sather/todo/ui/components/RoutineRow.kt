@@ -70,7 +70,8 @@ fun BriefRoutineRow(
     )
     Row(
         modifier = modifier
-            .height(MediumHeight),
+//            .height(MediumHeight)
+        ,
         verticalAlignment = Alignment.CenterVertically
     ) {
         val typography = MaterialTheme.typography
