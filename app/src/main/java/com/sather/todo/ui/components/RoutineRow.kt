@@ -58,7 +58,7 @@ fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 fun BriefRoutineRow(
     modifier: Modifier = Modifier,
     routine: Routine,
-    onFinishedChange:(String,Boolean)->Unit
+    onFinishedChange:(Long,Boolean)->Unit
 ) {
     val content=routine.content
     val credit=routine.credit
@@ -150,7 +150,7 @@ fun BriefEmptyRow(
 fun DetailRoutineRow(
     modifier: Modifier = Modifier,
     routine: Routine,
-    onFinishedChange:(String,Boolean)->Unit,
+    onFinishedChange:(Long,Boolean)->Unit,
     swipeToDelete:() ->Unit,
 ) {
     val content=routine.content

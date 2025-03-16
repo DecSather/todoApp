@@ -26,14 +26,14 @@ class BacklogsRepository(private val backlogDao: BacklogDao) {
      fun getAllBacklogsStream(): Flow<List<Backlog>> = backlogDao.getAllBacklogs()
      fun getBacklogByString(timeTitle: String): Flow<List<Backlog>> = backlogDao.getBacklogByString(timeTitle)
     
-     fun getBacklogStream(id: Int): Flow<Backlog?> = backlogDao.getBacklog(id)
+     fun getBacklogStream(id: Long): Flow<Backlog?> = backlogDao.getBacklog(id)
      
      
     
      suspend fun insertBacklog(backlog: Backlog) = backlogDao.insert(backlog)
     
-     suspend fun deleteBacklogById(id:Int) = backlogDao.deleteBacklogById(id)
+     suspend fun deleteBacklogById(id:Long) = backlogDao.deleteBacklogById(id)
     
      suspend fun updateBacklog(backlog: Backlog) = backlogDao.update(backlog)
-     suspend fun onExpandChange(id:Int,isExpand:Boolean) =backlogDao.onExpandChange(id,isExpand)
+     suspend fun onExpandChange(id:Long,isExpand:Boolean) =backlogDao.onExpandChange(id,isExpand)
 }

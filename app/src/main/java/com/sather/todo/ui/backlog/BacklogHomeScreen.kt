@@ -29,9 +29,7 @@ import com.sather.todo.ui.components.BacklogDetailCard
 import com.sather.todo.ui.components.ThreeColorCircle
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 //日程-home页
@@ -51,7 +49,7 @@ fun BacklogHomeScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
 //    导航
-    onBacklogDetailClick:(Int)->Unit={},
+    onBacklogDetailClick:(Long)->Unit={},
 //    数据管理
     viewModel: BacklogHomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
@@ -81,14 +79,9 @@ fun BacklogHomeScreen(
                     viewModel.updateBacklog()
                 }
             },
-            susAddBacklog ={ timeTitle ->
+            susAddBacklog ={ backlog ->
                 coroutineScope.launch {
-                    viewModel.updatBacklogUiState(
-                        Backlog(
-                            id= viewModel.addBacklog(timeTitle),
-                            timeTitle = timeTitle
-                        )
-                    )
+                    viewModel.addBacklog(backlog)
                 }
             },
             onExpandChange ={ id,isExpand ->
@@ -118,7 +111,7 @@ fun BacklogHomeScreen(
             },
             backlogList=backlogHomeUiState.backlogList,
             finishedRoutineList = routineHomeUiState.routineList.filter { it.finished },
-            routineList = routineHomeUiState.routineList.filter { !it.finished },
+            homeRoutineList = routineHomeUiState.routineList.filter { !it.finished },
             )
     }
 }
@@ -129,22 +122,22 @@ fun BacklogHomeBody(
     animatedContentScope: AnimatedContentScope,
     
     backlogUiState: BacklogUiState,
-    onBacklogDetailClick:(Int)->Unit={},
-    onExpandChange:(Int,Boolean)->Unit,
-    onFinishedChange:(String,Boolean)->Unit,
+    onBacklogDetailClick:(Long)->Unit={},
+    onExpandChange:(Long,Boolean)->Unit,
+    onFinishedChange:(Long,Boolean)->Unit,
     
     updateBacklogUiState:(Backlog) -> Unit,
     
-    susDeleteBacklogById:(Int)->Unit,
+    susDeleteBacklogById:(Long)->Unit,
     susUpdateBacklog:() -> Unit,
-    susAddBacklog:(String) -> Unit,
+    susAddBacklog:(Backlog) -> Unit,
     
     updateRoutine:(Routine)->Unit,
     insertRoutine:(Routine)->Unit,
     
     backlogList: List<Backlog>,
     finishedRoutineList:List<Routine>,
-    routineList: List<Routine>,
+    homeRoutineList: List<Routine>,
     ){
     
     var showEditDialog by remember { mutableStateOf(false) }
@@ -162,9 +155,7 @@ fun BacklogHomeBody(
     }
     val creditsTotal =importTotal+normalTotal+faverTotal
     
-    var proportions :List<Float>
-    if(creditsTotal>0f) proportions = listOf(0f,importTotal,normalTotal,faverTotal)
-    else proportions = listOf(1f,0f,0f,0f)
+    val proportions :List<Float> = if(creditsTotal>0f) listOf(0f,importTotal,normalTotal,faverTotal) else listOf(1f,0f,0f,0f)
     Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
             modifier = Modifier
@@ -196,7 +187,7 @@ fun BacklogHomeBody(
 //        日志卡
             items(items = backlogList,key = {it.id}) { backlog ->
                 val routineList =
-                    routineList.filter { it ->it.backlogId == backlog.id}
+                    homeRoutineList.filter { it ->it.backlogId == backlog.id}
                 BacklogDetailCard(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,
@@ -226,8 +217,12 @@ fun BacklogHomeBody(
             shape = CircleShape,
             onClick = {
                 clickPart = -2
-                val oldBacklog = backlogUiState.backlog.id
-                susAddBacklog(LocalDate.now().format(formatter))
+                val backlog = Backlog(
+                    timeTitle = LocalDate.now().format(formatter)
+                )
+                updateBacklogUiState(backlog)
+                selectedDate = LocalDate.now()
+                susAddBacklog(backlog)
                 showEditDialog = !showEditDialog
                 
             },
@@ -248,7 +243,7 @@ fun BacklogHomeBody(
             clickPart = clickPart,
             
             backlogUiState=backlogUiState,
-            routineList = routineList.filter {it.backlogId == backlogUiState.backlog.id
+            routineList = homeRoutineList.filter {it.backlogId == backlogUiState.backlog.id
             },
             updateBacklogUiState = updateBacklogUiState,
             onUpdateBacklog=susUpdateBacklog,
@@ -260,7 +255,7 @@ fun BacklogHomeBody(
                 while (index < tempRoutineList.size) {
                     val routine = tempRoutineList[index]
                     if(routine.finished) {
-                        insertRoutine(routine.copy(sortId = sortId, finished = false))
+                        insertRoutine(routine.copy(sortId = sortId, finished = false ))
                     }
                     else {
                         updateRoutine(routine.copy(sortId = sortId))
@@ -275,4 +270,4 @@ fun BacklogHomeBody(
         )
     }
 }
-val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")!!

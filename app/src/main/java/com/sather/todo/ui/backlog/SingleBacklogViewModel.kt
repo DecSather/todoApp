@@ -17,7 +17,7 @@ class SingleBacklogViewModel(
     private val backlogsRepository: BacklogsRepository,
     private val routinesRepository: RoutinesRepository
 ) : ViewModel() {
-    private val backlogId: Int = checkNotNull(savedStateHandle[SingleBacklogDestination.backlogIdArg])
+    private val backlogId: Long = checkNotNull(savedStateHandle[SingleBacklogDestination.backlogIdArg])
 //    backlog delete-热观察
     val backlogUiState: StateFlow<BacklogUiState> =
         backlogsRepository.getBacklogStream(id = backlogId)
@@ -27,7 +27,7 @@ class SingleBacklogViewModel(
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = BacklogUiState()
             )
-    suspend fun deleteBacklogById(id:Int) {
+    suspend fun deleteBacklogById(id:Long) {
         backlogsRepository.deleteBacklogById(id)
         routinesRepository.deleteRoutineByBacklogId(id)
     }
@@ -46,10 +46,10 @@ class SingleBacklogViewModel(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-    suspend fun onRoutineFinishedChange(routineId:String,finished: Boolean){
+    suspend fun onRoutineFinishedChange(routineId:Long,finished: Boolean){
         routinesRepository.updateFinished(routineId,finished)
     }
-    suspend fun deleteRoutineById(id:String) {
+    suspend fun deleteRoutineById(id:Long) {
         routinesRepository.deleteRoutineById(id)
     }
 }

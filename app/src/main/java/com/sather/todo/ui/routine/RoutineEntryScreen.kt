@@ -35,7 +35,7 @@ object RoutineEntryDestination : BaseDestination {
 
 @Composable
 fun RoutineEntryScreen(
-    backlogId: Int,
+    backlogId: Long,
     navigateBack: () -> Unit,
     viewModel: RoutineEntryViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {

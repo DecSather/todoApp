@@ -151,11 +151,11 @@ fun BacklogDetailCard(
     backlog: Backlog,
     routineList:List<Routine>,
     
-    onExpandClick:(Int,Boolean)->Unit,
-    onFinishedChange:(String,Boolean)->Unit,
+    onExpandClick:(Long,Boolean)->Unit,
+    onFinishedChange:(Long,Boolean)->Unit,
     
-    onDelete:(Int)->Unit,
-    onBacklogDetailClick: (Int) -> Unit,
+    onDelete:(Long)->Unit,
+    onBacklogDetailClick: (Long) -> Unit,
     onBacklogEditClick:(Int) -> Unit
     
 ) {

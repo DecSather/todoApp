@@ -115,7 +115,6 @@ fun EditCardDialog(
                 .padding(16.dp)
                 .imePadding(),
             text = {
-                println("enter AlertDialog")
                 Column {
                     val titleFocusRequester = remember { FocusRequester() }
                     
@@ -168,7 +167,6 @@ fun EditCardDialog(
                             .focusGroup(),
                         state = listState,
                     ) {
-                        println("current List: " + tempRoutineList)
                         itemsIndexed(items = tempRoutineList, key = { _, item -> item.id }) { index, item ->
                             
                             BacklogEditRow(
@@ -178,22 +176,21 @@ fun EditCardDialog(
                                     tempRoutineList[index] = routine
                                 },
                                 addRoutine = { sortIndex, it ->
-                                    tempRoutineList.add(
-                                        index + sortIndex,
-                                        Routine(
-                                            backlogId = backlog.id,
-                                            sortId = index + 1,
-                                            finished = true,
-                                            rank = 0,
-                                            content = it,
+                                        tempRoutineList.add(
+                                            index + sortIndex,
+                                            Routine(
+                                                backlogId = backlog.id,
+                                                sortId = index + 1,
+                                                finished = true,
+                                                rank =if(it.isEmpty()) 0 else 1 ,
+                                                content = it,
+                                            )
                                         )
-                                    )
                                     focusIndex = index + sortIndex
                                 },
                                 deleteRoutine = {
                                     val deleteRoutine = tempRoutineList[index]
                                     updateRoutine(deleteRoutine)
-//                                    if(tempRoutineList.size>1)
                                     tempRoutineList.removeAt(index)
                                     if (tempRoutineList.size == 0) tempRoutineList.add(
                                         0,
@@ -392,7 +389,6 @@ fun BacklogEditRow(
                     onDone = {
                         val oldText = contentFieldValueState.text.subSequence(0,contentFieldValueState.selection.end)
                         val newText = contentFieldValueState.text.substring(contentFieldValueState.selection.end)
-                        println("cur text: ${oldText}\t new text: ${newText}")
                         contentFieldValueState = TextFieldValue(text = oldText.toString())
                         addRoutine(1, newText)
                     }

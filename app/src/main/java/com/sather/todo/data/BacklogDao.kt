@@ -10,11 +10,11 @@ interface BacklogDao {
     // 将返回值类型设为 Flow 后，只要数据库中的数据发生更改，您就会收到通知。
     // 也就是说，您只需要显式获取一次数据。
     // 由于返回值类型为 Flow，Room 还会在后台线程上运行该查询，无需将其明确设为 suspend 函数并在协程作用域内调用它。
-    @Query("SELECT * from backlogs ORDER BY timeTitle DESC, id DESC")
+    @Query("SELECT * from backlogs ORDER BY timeTitle, id DESC")
     fun getAllBacklogs(): Flow<List<Backlog>>
     
     @Query("SELECT * from backlogs WHERE id = :id")
-    fun getBacklog(id: Int?): Flow<Backlog>
+    fun getBacklog(id: Long?): Flow<Backlog>
     
     @Query("SELECT * from backlogs WHERE timeTitle = :timeTitle")
     fun getBacklogByString(timeTitle: String?): Flow<List<Backlog>>
@@ -28,10 +28,10 @@ interface BacklogDao {
     @Update
     suspend fun update(item: Backlog)
     @Query("UPDATE backlogs SET isExpand = :isExpand WHERE id = :id")
-    suspend fun onExpandChange(id:Int,isExpand:Boolean)
+    suspend fun onExpandChange(id:Long,isExpand:Boolean)
     
     @Query("DELETE FROM backlogs WHERE id = :id")
-    suspend fun deleteBacklogById(id: Int)
+    suspend fun deleteBacklogById(id: Long)
     
     
 }

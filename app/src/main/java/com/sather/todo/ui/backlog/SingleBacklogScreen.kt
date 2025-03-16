@@ -38,7 +38,7 @@ object SingleBacklogDestination : BaseDestination {
     const val backlogIdArg = "backlogId"
     val routeWithArgs = "$route/{$backlogIdArg}"
     val arguments = listOf(navArgument(backlogIdArg) {
-        type = NavType.IntType
+        type = NavType.LongType
     })
 }
 //记得添加删除键
@@ -48,8 +48,8 @@ fun SingleBacklogScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     navigateBack: () -> Unit,
-    navigateToNewRoutine:(Int)->Unit,
-    navigateToSingleRoutine: (String) -> Unit={},
+    navigateToNewRoutine:(Long)->Unit,
+    navigateToSingleRoutine: (Long) -> Unit={},
     viewModel: SingleBacklogViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val backlogUiState = viewModel.backlogUiState.collectAsState()
@@ -98,7 +98,7 @@ fun  SingleBacklogBody(
     backlog: Backlog,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    newRoutineClick:(Int)->Unit,
+    newRoutineClick:(Long)->Unit,
     onDelete: () -> Unit={},
     navigateBack:()->Unit,
     finishedItems:List<Routine>,

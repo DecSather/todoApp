@@ -13,10 +13,10 @@ interface RoutineDao {
     @Query("SELECT * from routines ORDER BY sortId ASC, id ASC")
     fun getAllRoutines(): Flow<List<Routine>>
     @Query("SELECT * from routines WHERE backlogId = :backlogId ORDER BY sortId ASC, id ASC")
-    fun getRoutinesByBacklogId(backlogId:Int): Flow<List<Routine>>
+    fun getRoutinesByBacklogId(backlogId:Long): Flow<List<Routine>>
 
     @Query("SELECT * from routines WHERE id = :id")
-    fun getRoutine(id: String?): Flow<Routine>
+    fun getRoutine(id: Long?): Flow<Routine>
 //    suspend关键词-单独线程运行-Room 不允许在主线程上访问数据库
     @Insert
     suspend fun insert(item: Routine):Long
@@ -25,13 +25,13 @@ interface RoutineDao {
     @Update
     suspend fun update(item: Routine)
     
-    @Query("UPDATE routines SET finished = :finished WHERE id = :id")
-    suspend fun undateFinished(id:String,finished:Boolean)
+    @Query("UPDATE routines SET finished = :finished, sortId = 0 WHERE id = :id")
+    suspend fun undateFinished(id:Long,finished:Boolean)
     
     @Query("DELETE FROM routines WHERE id = :id")
-    suspend fun deleteRoutineById(id: String)
+    suspend fun deleteRoutineById(id: Long)
     @Query("DELETE FROM routines WHERE backlogId = :id")
-    suspend fun deleteRoutineByBacklogId(id: Int)
+    suspend fun deleteRoutineByBacklogId(id: Long)
 
 
 }

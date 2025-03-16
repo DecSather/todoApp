@@ -33,17 +33,13 @@ class BacklogHomeViewModel(
             initialValue = BacklogHomeUiState()
         )
     
-    suspend fun onExpandChange(id:Int,isExpand:Boolean) {
+    suspend fun onExpandChange(id:Long,isExpand:Boolean) {
         backlogsRepository.onExpandChange(id,isExpand)
     }
-    suspend fun addBacklog(timeTitle:String):Int{
-        return backlogsRepository.insertBacklog(
-            Backlog(
-                timeTitle =timeTitle
-            )
-        ).toInt()
+    suspend fun addBacklog(backlog: Backlog){
+        backlogsRepository.insertBacklog(backlog)
     }
-    suspend fun deleteBacklogById(id:Int) {
+    suspend fun deleteBacklogById(id:Long) {
         backlogsRepository.deleteBacklogById(id)
         routinesRepository.deleteRoutineByBacklogId(id)
     }
@@ -58,7 +54,7 @@ class BacklogHomeViewModel(
                 initialValue = RoutineHomeUiState()
             )
     
-    suspend fun onRoutineFinishedChange(routineId:String,finished: Boolean){
+    suspend fun onRoutineFinishedChange(routineId:Long,finished: Boolean){
         routinesRepository.updateFinished(routineId,finished)
     }
     companion object {
