@@ -36,4 +36,5 @@ class BacklogsRepository(private val backlogDao: BacklogDao) {
     
      suspend fun updateBacklog(backlog: Backlog) = backlogDao.update(backlog)
      suspend fun onExpandChange(id:Long,isExpand:Boolean) =backlogDao.onExpandChange(id,isExpand)
+     suspend fun onVisibleChange(id:Long,isVisible:Boolean) =backlogDao.onVisibleChange(id,isVisible)
 }

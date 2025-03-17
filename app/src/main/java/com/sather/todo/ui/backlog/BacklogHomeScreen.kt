@@ -89,6 +89,12 @@ fun BacklogHomeScreen(
                     viewModel.onExpandChange(id,isExpand)
                 }
             },
+            onVisibleChange = {id,finished ->
+                coroutineScope.launch {
+                    viewModel.onVisibleChange(id,finished)
+                }
+                
+            },
             onFinishedChange={ id,finished ->
                 coroutineScope.launch {
                     viewModel.onRoutineFinishedChange(id,finished)
@@ -124,6 +130,7 @@ fun BacklogHomeBody(
     backlogUiState: BacklogUiState,
     onBacklogDetailClick:(Long)->Unit={},
     onExpandChange:(Long,Boolean)->Unit,
+    onVisibleChange:(Long,Boolean)->Unit,
     onFinishedChange:(Long,Boolean)->Unit,
     
     updateBacklogUiState:(Backlog) -> Unit,
@@ -197,6 +204,7 @@ fun BacklogHomeBody(
                     routineList = routineList,
                     
                     onExpandClick = onExpandChange,
+                    onVisibleClick = onVisibleChange,
                     onFinishedChange = onFinishedChange,
                     
                     onDelete = susDeleteBacklogById,
@@ -228,7 +236,7 @@ fun BacklogHomeBody(
             },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 32.dp),
             ) {
             Icon(
                 imageVector = Icons.Default.Add,

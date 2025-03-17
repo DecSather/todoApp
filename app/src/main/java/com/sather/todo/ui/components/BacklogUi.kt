@@ -152,6 +152,7 @@ fun BacklogDetailCard(
     routineList:List<Routine>,
     
     onExpandClick:(Long,Boolean)->Unit,
+    onVisibleClick:(Long,Boolean)->Unit,
     onFinishedChange:(Long,Boolean)->Unit,
     
     onDelete:(Long)->Unit,
@@ -161,6 +162,7 @@ fun BacklogDetailCard(
 ) {
     val creditTotal:Float =routineList.map { it.credit }.sum()
     var expanded by rememberSaveable { mutableStateOf(backlog.isExpand) }
+    var isVisble by rememberSaveable{ mutableStateOf(backlog.isVisible) }
     
     val animVisibleState = remember {  MutableTransitionState(false).apply {  targetState = true  }  }
     
@@ -178,7 +180,7 @@ fun BacklogDetailCard(
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            actionWidth = 100.dp,
+            actionWidth = 200.dp,
             startAction = listOf {
                 FloatingActionButton(
                     shape = CircleShape,
@@ -209,6 +211,19 @@ fun BacklogDetailCard(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Checkbox(
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
+                                    ),
+                                    checked = !isVisble,
+                                    onCheckedChange = {
+                                        isVisble = !isVisble
+                                        expanded = isVisble
+                                        onVisibleClick(backlog.id,isVisble)
+                                        
+                                    
+                                    }
+                                )
                                 Text(
                                     text = backlog.timeTitle,
                                     style = MaterialTheme.typography.headlineLarge,
@@ -269,20 +284,22 @@ fun BacklogDetailCard(
                         }
                         
                     }
-
+                    
+                    if(isVisble) {
 //            进度横线
-                    BaseDivider(creditTotal, routineList.map { it.credit },
-                        routineList.map { RoutineColors[it.rank] })
-                    Column(
-                        Modifier
-                            .padding(start = 16.dp, top = 4.dp, end = 16.dp)
-                    ) {
+                        BaseDivider(creditTotal, routineList.map { it.credit },
+                            routineList.map { RoutineColors[it.rank] })
+                        Column(
+                            Modifier
+                                .padding(start = 16.dp, top = 4.dp, end = 16.dp)
+                        ) {
 //                展开所有
-                        SeeAllButton(
-                            modifier = Modifier.clearAndSetSemantics {
-                                contentDescription = "All ${backlog.timeTitle}'s Routines"
-                            }.clickable { onBacklogDetailClick(backlog.id) }
-                        )
+                            SeeAllButton(
+                                modifier = Modifier.clearAndSetSemantics {
+                                    contentDescription = "All ${backlog.timeTitle}'s Routines"
+                                }.clickable { onBacklogDetailClick(backlog.id) }
+                            )
+                        }
                     }
                 }
             }

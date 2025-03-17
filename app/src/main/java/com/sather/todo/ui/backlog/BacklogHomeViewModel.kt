@@ -10,7 +10,6 @@ import com.sather.todo.data.Backlog
 import com.sather.todo.data.BacklogsRepository
 import com.sather.todo.data.Routine
 import com.sather.todo.data.RoutinesRepository
-import com.sather.todo.ui.routine.RoutineUiState
 import kotlinx.coroutines.flow.*
 
 /**
@@ -35,6 +34,9 @@ class BacklogHomeViewModel(
     
     suspend fun onExpandChange(id:Long,isExpand:Boolean) {
         backlogsRepository.onExpandChange(id,isExpand)
+    }
+    suspend fun onVisibleChange(id:Long, isVisible:Boolean) {
+        backlogsRepository.onVisibleChange(id,isVisible)
     }
     suspend fun addBacklog(backlog: Backlog){
         backlogsRepository.insertBacklog(backlog)

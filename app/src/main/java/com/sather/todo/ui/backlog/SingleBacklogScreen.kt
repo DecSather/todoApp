@@ -198,7 +198,7 @@ fun  SingleBacklogBody(
             onClick = { deleteConfirmationRequired = true },
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 32.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.DeleteForever,

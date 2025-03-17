@@ -16,15 +16,15 @@ import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
+import androidx.work.*
 import com.sather.todo.R
+import com.sather.todo.data.BacklogDatabase
 import com.sather.todo.data.Routine
 import com.sather.todo.glance.workmanager.*
 import com.sather.todo.ui.backlog.formatter
 import com.sather.todo.ui.theme.MyAppWidgetGlanceColorScheme
 import java.time.LocalDate
+import java.util.concurrent.TimeUnit
 
 class MyAppWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = MyAppWidget()
@@ -140,6 +140,9 @@ class MyAppWidget : GlanceAppWidget() {
         val context = LocalContext.current
         LaunchedEffect(isFinished) {
             if(isFinished) {
+                println("LaunchedEffect(isFinished) ${routine.id} \t ${true}")
+//                val routineDao = BacklogDatabase.getDatabase(context).routineDao()
+//                routineDao.undateFinished(routine.id, true)
                 triggerUpdateRoutine(
                     context = context,
                     id = routine.id,
@@ -169,7 +172,7 @@ class MyAppWidget : GlanceAppWidget() {
     
     // routine完成更新：一次性workmanager存数据，
     fun triggerUpdateRoutine(context: Context, id: Long, finished: Boolean) {
-        println("triggerUpdateRoutine")
+        println("triggerUpdateRoutine ${id} \t ${finished}")
         val inputData = workDataOf(
             "id" to id,
             "finished" to finished
@@ -178,6 +181,8 @@ class MyAppWidget : GlanceAppWidget() {
         val updateRequest = OneTimeWorkRequestBuilder<UpdateRoutineWorker>()
             .setInputData(inputData)
             .build()
+        
+        // 并行执行多个任务
         WorkManager.getInstance(context).enqueue(updateRequest)
     }
     suspend fun triggerUpdateWidgetWorker(context: Context, timeTile: String  ) {

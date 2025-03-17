@@ -24,9 +24,8 @@ class UpdateRoutineWorker(
                 
                 // 2. 获取 RoutineRepository 实例
                 val routineDao = getDatabase(applicationContext).routineDao()
-                val repository = RoutinesRepository(routineDao)
                 
-                repository.updateFinished(id, finished)
+                routineDao.undateFinished(id, finished)
                 
                 // 4. 返回成功结果
                 Result.success()
