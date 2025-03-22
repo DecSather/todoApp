@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
+import com.sather.todo.ui.components.backlogs.TextDisplaysRow
 import com.sather.todo.ui.theme.faverColor
 import com.sather.todo.ui.theme.importColor
 import com.sather.todo.ui.theme.normalColor
@@ -57,10 +58,10 @@ import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun SwipeBox(
+fun SwipeToDeleteBox(
     modifier: Modifier = Modifier,
-    actionWidth: Dp,
-    startAction: List<@Composable BoxScope.() -> Unit> = listOf(),
+    actionWidth: Dp  = boxActionWidth,
+    startAction: List<@Composable BoxScope.() -> Unit>,
     content: @Composable BoxScope.() -> Unit
 ) {
     val density = LocalDensity.current
@@ -88,6 +89,8 @@ fun SwipeBox(
     }
         Box(
             modifier = modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
                 .anchoredDraggable(
                     state = state,
                     orientation = Orientation.Horizontal,
@@ -143,11 +146,11 @@ enum class DragAnchors {
 //backlog卡片-可改finished
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun BacklogDetailCard(
+fun BacklogSwipeCard(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     backlog: Backlog,
     routineList:List<Routine>,
     
@@ -161,6 +164,7 @@ fun BacklogDetailCard(
     
 ) {
     val creditTotal:Float =routineList.map { it.credit }.sum()
+    val amountText = "" + routineList.size + stringResource(R.string.unfinished)
     var expanded by rememberSaveable { mutableStateOf(backlog.isExpand) }
     var isVisble by rememberSaveable{ mutableStateOf(backlog.isVisible) }
     
@@ -176,11 +180,7 @@ fun BacklogDetailCard(
         visibleState = animVisibleState,
     ) {
         
-        SwipeBox(
-            modifier = modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            actionWidth = 200.dp,
+        SwipeToDeleteBox(
             startAction = listOf {
                 FloatingActionButton(
                     shape = CircleShape,
@@ -197,33 +197,36 @@ fun BacklogDetailCard(
             }
         ) {
             Card(
+                modifier = modifier,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Column {
                     Column(
                         Modifier
                             .fillMaxWidth()
-                            .padding(12.dp)
+                            .padding(basePadding)
                             .animateContentSize()
                     ) {
-                        with(sharedTransitionScope) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
-                                    ),
-                                    checked = !isVisble,
-                                    onCheckedChange = {
-                                        isVisble = !isVisble
-                                        expanded = isVisble
-                                        onVisibleClick(backlog.id,isVisble)
-                                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+//                            isVisible
+                            Checkbox(
+                                checked = !isVisble,
+                                colors = CheckboxDefaults.colors(
+                                    checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
+                                ),
+                                onCheckedChange = {
+                                    isVisble = !isVisble
+                                    expanded = isVisble
+                                    onVisibleClick(backlog.id,isVisble)
                                     
-                                    }
-                                )
+                                
+                                }
+                            )
+//                            标题
+                            with(sharedTransitionScope) {
                                 Text(
                                     text = backlog.timeTitle,
                                     style = MaterialTheme.typography.headlineLarge,
@@ -242,45 +245,57 @@ fun BacklogDetailCard(
                                             onBacklogEditClick(-1)
                                         }
                                 )
-                                IconButton(onClick = {
-                                    expanded = !expanded
-                                    onExpandClick(backlog.id, expanded)
-                                }) {
-                                    Icon(
-                                        imageVector =
-                                        if (expanded)
-                                            Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                                        contentDescription = if (expanded) {
-                                            stringResource(R.string.show_less)
-                                        } else {
-                                            stringResource(R.string.show_more)
-                                        }
-                                    )
-                                }
                             }
-                            val amountText = "" + routineList.size + stringResource(R.string.unfinished)
-                            Text(
-                                text = amountText,
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-                            if (expanded) {
-                                var sortId = 0
-                                routineList.map { it ->
-                                    val routine = it.copy(sortId = sortId)
-                                    sortId++
-                                    BriefRoutineRow(
-                                        modifier = Modifier
-                                            .clickable { onBacklogEditClick(routine.sortId) },
-                                        routine = routine,
-                                        onFinishedChange = onFinishedChange,
-                                    )
-                                }
-                                BriefEmptyRow(
-                                    modifier = Modifier
-                                        .clickable { onBacklogEditClick(-2) },
-                                    content = stringResource(R.string.click_to_add)
+//                            展开按钮
+                            IconButton(onClick = {
+                                expanded = !expanded
+                                onExpandClick(backlog.id, expanded)
+                            }) {
+                                Icon(
+                                    imageVector =
+                                    if (expanded)
+                                        Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                    contentDescription = if (expanded) {
+                                        stringResource(R.string.show_less)
+                                    } else {
+                                        stringResource(R.string.show_more)
+                                    }
                                 )
                             }
+                        }
+                        Text(
+                            text = amountText,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                        if (expanded) {
+                            Column{
+                                var sortId = 0
+                                routineList.map{it ->
+                                    key(it.id){
+                                        val routine = it.copy(sortId = sortId)
+                                        sortId++
+                                        TextDisplaysRow(
+                                            modifier = Modifier.clickable { onBacklogEditClick(routine.sortId) },
+                                            content = routine.content,
+                                            credit = routine.credit.toString(),
+                                            colorIndex = routine.rank,
+                                            finished = routine.finished,
+                                            onFinishedChange = { it ->
+                                                if(routineList.size == 1) {
+                                                    isVisble = false
+                                                    expanded = isVisble
+                                                    onVisibleClick(backlog.id, isVisble)
+                                                }
+                                                onFinishedChange(routine.id,it)
+                                                               },
+                                        )
+                                    }
+                                }
+                            }
+                            TextDisplaysRow(
+                                modifier = Modifier.clickable { onBacklogEditClick(-2) },
+                                content = stringResource(R.string.click_to_add)
+                            )
                         }
                         
                     }
@@ -291,12 +306,12 @@ fun BacklogDetailCard(
                             routineList.map { RoutineColors[it.rank] })
                         Column(
                             Modifier
-                                .padding(start = 16.dp, top = 4.dp, end = 16.dp)
+                                .padding(start = basePadding, top = spacePadding, end = basePadding)
                         ) {
 //                展开所有
                             SeeAllButton(
                                 modifier = Modifier.clearAndSetSemantics {
-                                    contentDescription = "All ${backlog.timeTitle}'s Routines"
+                                    contentDescription = "${backlog.timeTitle}'s Routines"
                                 }.clickable { onBacklogDetailClick(backlog.id) }
                             )
                         }
@@ -390,84 +405,5 @@ fun DeleteConfirmationDialog(
         })
 }
 
-//三色圆圈动画
-@Composable
-fun ThreeColorCircle(
-    amount:Float,
-    credits:List<Float>,
-) {
-    val colorIndexs = listOf(0,1,2,3)
-    val properties = credits.map { it/amount }
-    val currentState = remember {
-        MutableTransitionState(ThreeCircleProgress.START)
-            .apply { targetState = ThreeCircleProgress.END }
-    }
-    val stroke = with(LocalDensity.current) { Stroke(5.dp.toPx()) }
-    val transition = rememberTransition(currentState)
-    val angleOffset by transition.animateFloat(
-        transitionSpec = {
-            tween(
-                delayMillis = 500,
-                durationMillis = 900,
-                easing = LinearOutSlowInEasing
-            )
-        }
-    ) { progress ->
-        if (progress == ThreeCircleProgress.START) {
-            0f
-        } else {
-            360f
-        }
-    }
-    val shift by transition.animateFloat(
-        transitionSpec = {
-            tween(
-                delayMillis = 500,
-                durationMillis = 900,
-                easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
-            )
-        }
-    ) { progress ->
-        if (progress == ThreeCircleProgress.START) {
-            0f
-        } else {
-            30f
-        }
-    }
-    Canvas(
-        Modifier
-        .height(300.dp)
-        .fillMaxWidth()
-    ) {
-        val innerRadius = (size.minDimension - stroke.width) / 2
-        val halfSize = size / 2.0f
-        val topLeft = Offset(
-            halfSize.width - innerRadius,
-            halfSize.height - innerRadius
-        )
-        val size = Size(innerRadius * 2, innerRadius * 2)
-        var startAngle = shift - 90f
-        var sweep:Float
-        var index=0
-        colorIndexs.map { it ->
-            sweep = properties[index] * angleOffset
-            if(properties[index]>0f) {
-                drawArc(
-                    color = RoutineColors[it],
-                    startAngle = startAngle + DividerLengthInDegrees / 2,
-                    sweepAngle = sweep - DividerLengthInDegrees,
-                    topLeft = topLeft,
-                    size = size,
-                    useCenter = false,
-                    style = stroke
-                )
-                startAngle += sweep
-            }
-            index++
-        }
-    }
-}
-private enum class ThreeCircleProgress { START, END }
-private const val DividerLengthInDegrees = 1.8f
 val RoutineColors= listOf(unfinishedColor,importColor, normalColor, faverColor)
 

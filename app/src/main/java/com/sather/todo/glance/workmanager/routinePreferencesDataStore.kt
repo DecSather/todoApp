@@ -20,14 +20,12 @@ object DataStoreKeys {
 
 // 存储数据到 DataStore
 suspend fun saveRoutinesToDataStore(context: Context, data: List<Routine>) {
-    println("save routineList to Store")
     val jsonString = Json.encodeToString(data)
     context.dataStore.edit { preferences ->
         preferences[DataStoreKeys.ROUTINES_KEY] = jsonString
     }
 }
 suspend fun saveTimeTitleToDataStore(context: Context, data: String) {
-    println("save TimeTitle to Store")
     context.dataStore.edit { preferences ->
         preferences[DataStoreKeys.TIMETITLE] = data
     }

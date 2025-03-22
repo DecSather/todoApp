@@ -16,7 +16,7 @@ interface BacklogDao {
     @Query("SELECT * from backlogs WHERE id = :id")
     fun getBacklog(id: Long?): Flow<Backlog>
     
-    @Query("SELECT * from backlogs WHERE timeTitle = :timeTitle")
+    @Query("SELECT * from backlogs WHERE timeTitle = :timeTitle ORDER BY id DESC")
     fun getBacklogByString(timeTitle: String?): Flow<List<Backlog>>
     
     //    OnConflictStrategy.IGNORE-在 Inventory 应用中，仅从一处（即 Add Backlog 界面）插入实体

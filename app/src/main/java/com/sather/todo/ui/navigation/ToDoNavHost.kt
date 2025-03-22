@@ -61,7 +61,7 @@ fun ToDoNavHost(
                     )
                 },
             ){
-                val baklogId=it.arguments?.getInt("backlogId")
+                val baklogId=it.arguments?.getLong("backlogId")
                 SingleBacklogScreen(
                     this@SharedTransitionLayout,
                     this@composable,

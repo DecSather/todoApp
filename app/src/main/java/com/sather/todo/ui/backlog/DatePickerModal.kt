@@ -50,7 +50,7 @@ fun DatePickerModal(
                 Text(
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineMedium,
-                    text = stringResource(R.string.cancel_action),
+                    text = stringResource(R.string.copy_action),
                     
                     )
             }

@@ -23,6 +23,7 @@ import com.sather.todo.data.Routine
 import com.sather.todo.glance.workmanager.*
 import com.sather.todo.ui.backlog.formatter
 import com.sather.todo.ui.theme.MyAppWidgetGlanceColorScheme
+import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.util.concurrent.TimeUnit
 
@@ -47,24 +48,37 @@ class MyAppWidget : GlanceAppWidget() {
     fun MyWidgetContent() {
         val context = LocalContext.current
 
-//        结束应用又进入退出应用也会重新创建widget，不确定要不要改bug
+        
         var currentTime by remember { mutableStateOf(LocalDate.now()) }
         var timeTitle by remember { mutableStateOf(currentTime.format(formatter)) }
+//        刷新逻辑
+        var refresh by remember { mutableStateOf(false) }
+        LaunchedEffect(refresh) {
+            if(refresh) {
+                delay(300)
+                triggerUpdateWidgetWorker(context, timeTitle)
+                refresh = false
+            }
+        }
+        
         // 从 SharedPreferences 中读取数据
         var items = getRoutinesFromDataStore(context).collectAsState(initial = emptyList()).value
-        LaunchedEffect(timeTitle) {
-            triggerUpdateWidgetWorker(context, timeTitle)
-        }
+        
         Scaffold(
             titleBar = titleBar(
                 timeTitle,
+                refreshClick = {
+                    refresh = true
+                },
                 beforeClick = {
                     currentTime = currentTime.minusDays(1)
                     timeTitle = currentTime.format(formatter)
-                },
+                    refresh = true
+                              },
                 afterClick = {
                     currentTime = currentTime.plusDays(1)
                     timeTitle = currentTime.format(formatter)
+                    refresh = true
                 }
             )
         ) {
@@ -85,7 +99,10 @@ class MyAppWidget : GlanceAppWidget() {
                             items = items,
                             itemId = {item -> item.id},
                         ){item ->
-                            ListRow(item)
+                            ListRow(
+                                context,
+                                item
+                            )
                             
                         }
                     }
@@ -96,7 +113,8 @@ class MyAppWidget : GlanceAppWidget() {
     }
     fun titleBar(
         timeTile:String,
-        beforeClick:()->Unit,
+        refreshClick :() ->Unit,
+        beforeClick:() ->Unit,
         afterClick :()->Unit
     ): @Composable (() -> Unit) = {
         Row(
@@ -108,19 +126,28 @@ class MyAppWidget : GlanceAppWidget() {
             Text(
                 text = timeTile,
                 style = TextStyle(
-                    fontSize = 24.sp,
+                    color =GlanceTheme.colors.onSurface,
+                    fontSize = 20.sp,
                 ),
             )
             Row(
                 modifier = GlanceModifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.End
-            ) {CircleIconButton(
-                imageProvider = ImageProvider(R.drawable.sample_arrow_left_icon),
-                contentDescription = "圆按钮",
-                contentColor = GlanceTheme.colors.secondary,
-                backgroundColor = null, // transparent
-                onClick = beforeClick
-            )
+            ) {
+                CircleIconButton(
+                    imageProvider = ImageProvider(R.drawable.sample_refresh_icon),
+                    contentDescription = "圆按钮",
+                    contentColor = GlanceTheme.colors.secondary,
+                    backgroundColor = null, // transparent
+                    onClick = refreshClick
+                )
+                CircleIconButton(
+                    imageProvider = ImageProvider(R.drawable.sample_arrow_left_icon),
+                    contentDescription = "圆按钮",
+                    contentColor = GlanceTheme.colors.secondary,
+                    backgroundColor = null, // transparent
+                    onClick = beforeClick
+                )
                 CircleIconButton(
                     imageProvider = ImageProvider(R.drawable.sample_arrow_right_icon),
                     contentDescription = "圆按钮",
@@ -134,15 +161,14 @@ class MyAppWidget : GlanceAppWidget() {
     }
     @Composable
     fun ListRow(
+        context:Context,
         routine: Routine,
     ) {
+        
         var isFinished by remember { mutableStateOf(routine.finished) }
-        val context = LocalContext.current
+        
         LaunchedEffect(isFinished) {
             if(isFinished) {
-                println("LaunchedEffect(isFinished) ${routine.id} \t ${true}")
-//                val routineDao = BacklogDatabase.getDatabase(context).routineDao()
-//                routineDao.undateFinished(routine.id, true)
                 triggerUpdateRoutine(
                     context = context,
                     id = routine.id,
@@ -150,29 +176,34 @@ class MyAppWidget : GlanceAppWidget() {
                 )
             }
         }
-        if(!isFinished) {
             Column {
                 Row(
                     modifier = GlanceModifier.fillMaxWidth().wrapContentHeight(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    CheckBox(checked = isFinished,
-                        onCheckedChange = {
-                            isFinished = true
-                            
-                        }
-                    )
+                    if(!isFinished) {
+                        CheckBox(
+                            checked = false,
+                            onCheckedChange = {
+                                isFinished = true
+                            }
+                        )
+                    }
                     Spacer(modifier = GlanceModifier.width(8.dp))
-                    Text(text = routine.content)
+                    Text(
+                        text = routine.content,
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onSurface
+                        )
+                    )
                 }
                 Spacer(GlanceModifier.fillMaxWidth().height(1.dp).background(GlanceTheme.colors.secondaryContainer))
             }
-        }
+        
     }
     
     // routine完成更新：一次性workmanager存数据，
     fun triggerUpdateRoutine(context: Context, id: Long, finished: Boolean) {
-        println("triggerUpdateRoutine ${id} \t ${finished}")
         val inputData = workDataOf(
             "id" to id,
             "finished" to finished
@@ -183,9 +214,13 @@ class MyAppWidget : GlanceAppWidget() {
             .build()
         
         // 并行执行多个任务
-        WorkManager.getInstance(context).enqueue(updateRequest)
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "update_routine_${id}", // 唯一任务名称
+            ExistingWorkPolicy.REPLACE ,
+            updateRequest // 任务请求
+        )
     }
-    suspend fun triggerUpdateWidgetWorker(context: Context, timeTile: String  ) {
+    suspend fun triggerUpdateWidgetWorker(context: Context, timeTile: String) {
         // 存timeTitle
         saveTimeTitleToDataStore(context, timeTile)
         // 通过timeTitle存新routineList
@@ -193,6 +228,10 @@ class MyAppWidget : GlanceAppWidget() {
             .build()
         
         // 执行更新命令-一次性的
-        WorkManager.getInstance(context).enqueue(updateRequest)
+        WorkManager.getInstance(context).enqueueUniqueWork(
+            "update_time_title_${timeTile}", // 唯一任务名称
+            ExistingWorkPolicy.REPLACE, // 替换已有任务
+            updateRequest // 任务请求
+        )
     }
 }

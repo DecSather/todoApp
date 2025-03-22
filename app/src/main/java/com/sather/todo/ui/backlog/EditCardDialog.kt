@@ -1,6 +1,7 @@
 package com.sather.todo.ui.backlog
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.MutableTransitionState
@@ -29,10 +30,13 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,18 +47,18 @@ import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.components.RoutineColors
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import java.text.SimpleDateFormat
+import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun EditCardDialog(
-    onDismiss: (List<Routine>) -> Unit,
+    SortAndSave: (List<Routine>) -> Unit,
+    onDismiss:()->Unit,
 //    需要判断点击部位
 //      -2- empty routine
 //      -1- backlog
@@ -68,6 +72,10 @@ fun EditCardDialog(
     
     updateRoutine:(Routine)->Unit,
     ) {
+    
+    val clipboardManager = LocalClipboardManager.current
+    
+    
     val backlog = backlogUiState.backlog
     var selectedDate by remember { mutableStateOf(if(backlog.timeTitle.isNotEmpty())LocalDate.parse(backlog.timeTitle, formatter) else LocalDate.now()) }
     var showDatePickerModal by remember { mutableStateOf((clickPart == -1)) }
@@ -98,6 +106,8 @@ fun EditCardDialog(
             }
         }
     }
+    
+    var locationInEnd by remember { mutableStateOf(true) }
     LaunchedEffect(focusIndex) {
         when(isItemVisible(focusIndex, listState)) {
             -1 -> listState.animateScrollToItem(maxOf(0, focusIndex))
@@ -152,7 +162,8 @@ fun EditCardDialog(
                             titleFocusRequester.requestFocus()
                             delay(1)
                             if (saveFoucsIndex == -3) {
-                                onDismiss(tempRoutineList)
+                                SortAndSave(tempRoutineList)
+                                onDismiss()
                             }
                         }
                     }
@@ -172,10 +183,11 @@ fun EditCardDialog(
                             BacklogEditRow(
                                 modifier = if (index == focusIndex) Modifier.focusRequester(focusRequester) else Modifier,
                                 routine = item.copy(sortId = index),
+                                locationInEnd = locationInEnd,
                                 updateRoutine = { routine ->
                                     tempRoutineList[index] = routine
                                 },
-                                addRoutine = { sortIndex, it ->
+                                addRoutine = { sortIndex, it, location ->
                                         tempRoutineList.add(
                                             index + sortIndex,
                                             Routine(
@@ -187,6 +199,7 @@ fun EditCardDialog(
                                             )
                                         )
                                     focusIndex = index + sortIndex
+                                    locationInEnd = location
                                 },
                                 deleteRoutine = {
                                     val deleteRoutine = tempRoutineList[index]
@@ -207,6 +220,7 @@ fun EditCardDialog(
                                 focusClick = { newFocusIndex ->
                                     if (focusIndex != newFocusIndex) {
                                         focusIndex = newFocusIndex
+                                        if(!locationInEnd)locationInEnd = true
                                     }
                                 },
                             )
@@ -221,8 +235,7 @@ fun EditCardDialog(
                 }
             },
             onDismissRequest = {
-                onDismiss(tempRoutineList.toList())
-                onUpdateBacklog()
+                onDismiss()
             },
             confirmButton = {
                 TextButton(
@@ -239,19 +252,13 @@ fun EditCardDialog(
                 }
             },
             dismissButton = {
-                TextButton(
+                CopyToClipboardButton(
                     onClick = {
-                        onDismiss(tempRoutineList.toList())
-                        onUpdateBacklog()
-                    },
-                ) {
-                    Text(
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.headlineMedium,
-                        text = stringResource(R.string.cancel_action),
-                        
-                        )
-                }
+                        var textToCopy= ""
+                        tempRoutineList.filter { it.content.isNotEmpty() }.forEach { textToCopy += it.content+"\n" }
+                        clipboardManager.setText(AnnotatedString(textToCopy))
+                    }
+                )
             }
         )
     }
@@ -277,13 +284,43 @@ fun EditCardDialog(
         )
     }
 }
-
+@Composable
+fun CopyToClipboardButton(
+    onClick: () -> Unit
+) {
+    
+    // 按钮状态
+    var isButtonEnabled by remember { mutableStateOf(true) }
+    
+    LaunchedEffect(isButtonEnabled) {
+        if(!isButtonEnabled) {
+            delay(3000) // 3 秒延迟
+            isButtonEnabled = true
+        }
+    }
+    TextButton(
+        modifier = Modifier.animateContentSize(),
+        enabled = isButtonEnabled,
+        onClick = {
+            onClick()
+            isButtonEnabled = false
+            
+        },
+    ) {
+        Text(
+            color = if(isButtonEnabled)MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary,
+            style = MaterialTheme.typography.headlineMedium,
+            text = if(isButtonEnabled)stringResource(R.string.copy_action) else stringResource(R.string.copy_done_action)
+        )
+    }
+}
 @Composable
 fun BacklogEditRow(
     modifier: Modifier,
     routine: Routine,
+    locationInEnd:Boolean,
     updateRoutine: (Routine) -> Unit ={ },
-    addRoutine: (Int,String) -> Unit,
+    addRoutine: (Int,String,Boolean) -> Unit,
     deleteRoutine:() -> Unit,
     focusClick:(Int) -> Unit,
 ) {
@@ -303,7 +340,7 @@ fun BacklogEditRow(
         mutableStateOf(
             TextFieldValue(
                 text = routine.content,
-                selection = TextRange(routine.content.length),
+                selection = TextRange(if(locationInEnd)routine.content.length else 0),
             )
         )
     }
@@ -324,7 +361,7 @@ fun BacklogEditRow(
     ) {
         Row(
             modifier = Modifier
-                .height(TabHeight)
+                .wrapContentHeight()
                 .padding(start = TabSpacer),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -377,7 +414,8 @@ fun BacklogEditRow(
                             if (index == 0) contentFieldValueState = contentFieldValueState.copy(text = lineText)
                             else addRoutine(
                                 index,
-                                lineText
+                                lineText,
+                                true
                             )
                         }
                     }
@@ -390,7 +428,7 @@ fun BacklogEditRow(
                         val oldText = contentFieldValueState.text.subSequence(0,contentFieldValueState.selection.end)
                         val newText = contentFieldValueState.text.substring(contentFieldValueState.selection.end)
                         contentFieldValueState = TextFieldValue(text = oldText.toString())
-                        addRoutine(1, newText)
+                        addRoutine(1, newText,false)
                     }
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium,
@@ -426,7 +464,7 @@ fun BacklogEditRow(
                 ),
                 keyboardActions = KeyboardActions(
                     onDone = {
-                        addRoutine(1, "")
+                        addRoutine(1, "",true)
                     }
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium,

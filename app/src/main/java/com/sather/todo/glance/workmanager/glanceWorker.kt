@@ -12,7 +12,6 @@ import kotlinx.coroutines.withContext
 
 class UpdateWidgetWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
-        println("UpdateWidgetWorker doWork()")
         return withContext(Dispatchers.IO) {
             try {
 //                获得数据-转存数据-widget更新
@@ -23,7 +22,7 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Coroutine
                 notifyWidgetUpdate(applicationContext)
                 Result.success()
             } catch (e: Exception) {
-                Result.retry()
+                Result.failure()
             }
         }
     }
@@ -36,6 +35,7 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Coroutine
         if(backlogs.first().isEmpty()){
             return listOf(
                 Routine(
+                    id = -1,
                     backlogId = -1,
                     sortId = 0,
                     content = "nothing for today",
@@ -52,6 +52,7 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Coroutine
         if(flows.isEmpty()){
             return listOf(
                 Routine(
+                    id = -1,
                     backlogId = -1,
                     sortId = 0,
                     content = "nothing for today",

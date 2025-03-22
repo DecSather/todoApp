@@ -5,6 +5,8 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,8 +27,9 @@ import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
-import com.sather.todo.ui.components.BacklogDetailCard
-import com.sather.todo.ui.components.ThreeColorCircle
+import com.sather.todo.ui.components.BacklogSwipeCard
+import com.sather.todo.ui.components.backlogs.BaseScreenBody
+import com.sather.todo.ui.components.backlogs.ThreeColorCircle
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -73,7 +76,7 @@ fun BacklogHomeScreen(
                     viewModel.deleteBacklogById(it)
                 }
             },
-            
+
             susUpdateBacklog={
                 coroutineScope.launch {
                     viewModel.updateBacklog()
@@ -93,7 +96,7 @@ fun BacklogHomeScreen(
                 coroutineScope.launch {
                     viewModel.onVisibleChange(id,finished)
                 }
-                
+
             },
             onFinishedChange={ id,finished ->
                 coroutineScope.launch {
@@ -101,10 +104,10 @@ fun BacklogHomeScreen(
                 }
             },
             onBacklogDetailClick = onBacklogDetailClick,
-            
+
             backlogUiState = viewModel.backlogUiState,
             updateBacklogUiState=viewModel::updatBacklogUiState,
-            
+
             updateRoutine = { routine ->
                 coroutineScope.launch {
                     viewModel.updateRoutine(routine)
@@ -162,20 +165,94 @@ fun BacklogHomeBody(
     }
     val creditsTotal =importTotal+normalTotal+faverTotal
     
-    val proportions :List<Float> = if(creditsTotal>0f) listOf(0f,importTotal,normalTotal,faverTotal) else listOf(1f,0f,0f,0f)
-    Box(modifier = Modifier.fillMaxSize()){
+    val properties :List<Float> = if(creditsTotal>0f) listOf(0f,importTotal,normalTotal,faverTotal) else listOf(1f,0f,0f,0f)
+    
+    BaseScreenBody(
+        lazyColumnModifier = Modifier
+            .padding(horizontal = 16.dp)
+            .semantics { contentDescription = "Backlogs Screen" },
+        top = {
+            if(creditsTotal>0f)
+                ThreeColorCircle(
+                    properties = properties.map { it/creditsTotal },
+                )
+            else ThreeColorCircle()
+            Spacer(Modifier.height(12.dp))
+            Column(modifier = Modifier.align(Alignment.Center)) {
+                Text(
+                    text = stringResource(R.string.credit),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Text(
+                    text = formatedCredit( creditsTotal.toString()),
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+            }
+        },
+        rows = {
+            itemsIndexed(items = backlogList,key = {_,it -> it.id}) { index,backlog ->
+                val routineList =
+                    homeRoutineList.filter { it ->it.backlogId == backlog.id}
+                BacklogSwipeCard(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    
+                    backlog = backlog,
+                    routineList = routineList,
+                    
+                    onExpandClick = onExpandChange,
+                    onVisibleClick = onVisibleChange,
+                    onFinishedChange = onFinishedChange,
+                    
+                    onDelete = susDeleteBacklogById,
+                    
+                    onBacklogDetailClick = onBacklogDetailClick,
+                    onBacklogEditClick = {
+                        updateBacklogUiState(backlog)
+                        clickPart = it
+                        selectedDate = LocalDate.parse(backlog.timeTitle, formatter)
+                        showEditDialog = !showEditDialog
+                    }
+                )
+                Spacer(Modifier.height(12.dp))
+            }
+        },
+        floatButtonAction = {
+            clickPart = -2
+            val backlog = Backlog(
+                timeTitle = LocalDate.now().format(formatter)
+            )
+            updateBacklogUiState(backlog)
+            selectedDate = LocalDate.now()
+            susAddBacklog(backlog)
+            showEditDialog = !showEditDialog
+            
+        },
+        floatButtoncontent = {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Backlog"
+            )
+        }
+    )
+    
+    /*Box(modifier = Modifier.fillMaxSize()){
         LazyColumn(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .semantics { contentDescription = "Backlogs Screen" }
+                .semantics { contentDescription = "Backlogs Screen" },
         ) {
 //        三色转圈
-            item {
+            item(key = 0) {
                 Box(Modifier.padding(16.dp)) {
-                    ThreeColorCircle(
-                        amount = if(creditsTotal>0f)creditsTotal else 1f,
-                        credits =proportions,
-                    )
+                    
+                    if(creditsTotal>0f)
+                        ThreeColorCircle(
+                            properties = properties.map { it/creditsTotal },
+                        )
+                    else ThreeColorCircle()
                     Spacer(Modifier.height(12.dp))
                     Column(modifier = Modifier.align(Alignment.Center)) {
                         Text(
@@ -192,13 +269,12 @@ fun BacklogHomeBody(
                 }
             }
 //        日志卡
-            items(items = backlogList,key = {it.id}) { backlog ->
+            itemsIndexed(items = backlogList,key = {_,it -> it.id}) { index,backlog ->
                 val routineList =
                     homeRoutineList.filter { it ->it.backlogId == backlog.id}
-                BacklogDetailCard(
+                BacklogSwipeCard(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,
-                    modifier = Modifier,
                     
                     backlog = backlog,
                     routineList = routineList,
@@ -244,7 +320,7 @@ fun BacklogHomeBody(
             )
         }
         
-    }
+    }*/
 //    编辑卡片
     if(showEditDialog){
         EditCardDialog(
@@ -256,8 +332,10 @@ fun BacklogHomeBody(
             updateBacklogUiState = updateBacklogUiState,
             onUpdateBacklog=susUpdateBacklog,
             updateRoutine= updateRoutine,
-            onDismiss = { tempRoutineList ->
+            onDismiss = {
                 showEditDialog = !showEditDialog
+                        },
+            SortAndSave = { tempRoutineList ->
                 var index = 0
                 var sortId = 0
                 while (index < tempRoutineList.size) {

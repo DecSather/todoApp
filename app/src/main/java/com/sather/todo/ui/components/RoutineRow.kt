@@ -37,8 +37,7 @@ import kotlin.math.roundToInt
 @Composable
 fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
     Spacer(
-        modifier
-            .size(4.dp, 36.dp)
+        modifier.size(4.dp, 36.dp)
             .background(color = color)
     )
 }
@@ -47,99 +46,6 @@ fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 *   Backlog Edit Card用
 */
 
-
-
-
-/*
-* 简单信息展示的Routine
-*   主页用
-*/
-@Composable
-fun BriefRoutineRow(
-    modifier: Modifier = Modifier,
-    routine: Routine,
-    onFinishedChange:(Long,Boolean)->Unit
-) {
-    val content=routine.content
-    val credit=routine.credit
-    val color= RoutineColors[routine.rank]
-    val id=routine.id
-    var finished by remember { mutableStateOf(routine.finished) }
-    val customColors = CheckboxDefaults.colors(
-        checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
-    )
-    Row(
-        modifier = modifier
-//            .height(MediumHeight)
-        ,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val typography = MaterialTheme.typography
-        RowIndicator(
-            color = color,
-            modifier = Modifier
-        )
-        Spacer(Modifier.width(12.dp))
-        Checkbox(
-            colors = customColors,
-            checked = finished,
-            onCheckedChange = {
-                onFinishedChange(id,it)
-            }
-        )
-        Column{
-            Text(text = content, style = typography.bodyMedium)
-        }
-        Spacer(Modifier.weight(1f))
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = stringResource(R.string.dollarSign),
-                style = typography.headlineMedium,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Text(
-                text = credit.toString(),
-                style = typography.headlineMedium,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-        }
-        Spacer(Modifier.width(16.dp))
-    }
-}
-@Composable
-fun BriefEmptyRow(
-    modifier: Modifier = Modifier,
-    content: String,
-) {
-    val customColors = CheckboxDefaults.colors(
-        checkedColor = MaterialTheme.colorScheme.primary, // 选中时的颜色
-    )
-    Row(
-        modifier = modifier
-            .height(MediumHeight),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val typography = MaterialTheme.typography
-        RowIndicator(
-            color = unfinishedColor,
-            modifier = Modifier
-        )
-        Spacer(Modifier.width(12.dp))
-        Checkbox(
-            colors = customColors,
-            checked = false,
-            onCheckedChange = {}
-        )
-        Column{
-            Text(text = content, style = typography.bodyMedium)
-        }
-        Spacer(Modifier.weight(1f))
-        
-        Spacer(Modifier.width(16.dp))
-    }
-}
 
 /*
 * 全信息展示的Routine

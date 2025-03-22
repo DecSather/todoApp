@@ -79,7 +79,7 @@ private fun ToDoAnimTab(
     )
     Row(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(basePadding)
             .animateContentSize()
             .height(TabHeight)
             .selectable(
@@ -97,7 +97,7 @@ private fun ToDoAnimTab(
     ) {
         Icon(imageVector = icon, contentDescription = text, tint = tabTintColor)
         if (selected) {
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(basePadding))
             Text(text.uppercase(Locale.getDefault()), color = tabTintColor)
         }
     }

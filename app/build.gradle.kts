@@ -49,6 +49,8 @@ android {
 }
 
 dependencies {
+//    拖放库
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
     
     // DataStore
     implementation ("androidx.datastore:datastore-preferences:1.1.0")

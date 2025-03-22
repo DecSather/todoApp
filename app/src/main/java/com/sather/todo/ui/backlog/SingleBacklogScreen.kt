@@ -1,9 +1,11 @@
 package com.sather.todo.ui.backlog
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -25,9 +27,10 @@ import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
-import com.sather.todo.ui.components.*
 import com.sather.todo.ui.components.DeleteConfirmationDialog
-import com.sather.todo.ui.components.ThreeColorCircle
+import com.sather.todo.ui.components.DetailEmptyRow
+import com.sather.todo.ui.components.DetailRoutineRow
+import com.sather.todo.ui.components.backlogs.ThreeColorCircle
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.launch
@@ -120,12 +123,12 @@ fun  SingleBacklogBody(
     val unfinishedAmount=unfinishedItems.map { it.credit }.sum()
     val creditRatios= listOf(unfinishedAmount,importCredit,normalCredit,faverCredit)
     Box(modifier=Modifier.fillMaxSize()){
-        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+        Column {
             Box(Modifier.padding(16.dp)) {
+                val amount = finishedAmount+unfinishedAmount
 //                三色圈
                 ThreeColorCircle(
-                    amount = finishedAmount+unfinishedAmount,
-                    credits = creditRatios,
+                    properties = creditRatios.map { it/amount },
                 )
                 IconButton(onClick = navigateBack) {
                     Icon(
@@ -169,25 +172,26 @@ fun  SingleBacklogBody(
                 shape = RectangleShape,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer,)
             ) {
-                Column(modifier = Modifier.padding(12.dp).fillMaxWidth()){
-                    unfinishedItems.map {
-                            item ->
-                        key(item.id) {
-                            rows(item)
-                        }
+                LazyColumn(modifier = Modifier
+                    .padding(12.dp)
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                ){
+                    itemsIndexed(items = unfinishedItems, key = {_,routine -> routine.id}){index,routine ->
+                        rows(routine.copy(sortId = index))
                     }
 //                预加载空列
-                    DetailEmptyRow(
-                        modifier = Modifier.clickable{ newRoutineClick(backlog.id)},
-                        content = stringResource(R.string.todo_list),
-                        subcontent = stringResource(R.string.click_to_add),
-                    )
-                    finishedItems.map {
-                            item ->
-                        key(item.id) {
-                            rows(item)
-                        }
+                    item(key = -1){
+                        
+                        DetailEmptyRow(
+                            modifier = Modifier.clickable{ newRoutineClick(backlog.id)},
+                            content = stringResource(R.string.todo_list),
+                            subcontent = stringResource(R.string.click_to_add),
+                        )
                     }
+                    itemsIndexed(items = finishedItems, key = {_,routine -> routine.id}){index,routine ->
+                    rows(routine.copy(sortId = index))
+                }
                 }
                 Spacer(Modifier.height(16.dp))
             }

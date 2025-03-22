@@ -16,15 +16,11 @@ class UpdateRoutineWorker(
     override suspend fun doWork(): Result {
         return withContext(Dispatchers.IO) {
             try {
-                // 1. 从输入数据中获取参数
                 val id = inputData.getLong("id",(-1).toLong())
-                println("UpdateRoutineWorker doWork():${id}")
                 if(id == (-1).toLong())return@withContext Result.failure()
+                
                 val finished = inputData.getBoolean("finished", false)
-                
-                // 2. 获取 RoutineRepository 实例
                 val routineDao = getDatabase(applicationContext).routineDao()
-                
                 routineDao.undateFinished(id, finished)
                 
                 // 4. 返回成功结果
