@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.BacklogsRepository
+import com.sather.todo.data.Routine
 import com.sather.todo.data.RoutinesRepository
 import kotlinx.coroutines.flow.*
 /*
@@ -21,8 +22,9 @@ class SingleBacklogViewModel(
 //    backlog delete-热观察
     val backlogUiState: StateFlow<BacklogUiState> =
         backlogsRepository.getBacklogStream(id = backlogId)
-            .map { BacklogUiState(it?: Backlog()) }
-            .stateIn(
+            .map {
+                BacklogUiState(it?: Backlog())
+            }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = BacklogUiState()
@@ -35,8 +37,9 @@ class SingleBacklogViewModel(
     
     //    routine updateFinished deleteById-热观察
     val routineUiState: StateFlow<RoutineHomeUiState> =
-        routinesRepository.getRoutinesStreamByBacklogId(backlogId = backlogId).map { RoutineHomeUiState(it) }
-            .stateIn(
+        routinesRepository.getRoutinesStreamByBacklogId(backlogId = backlogId).map {
+            RoutineHomeUiState(it)
+        }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                 initialValue = RoutineHomeUiState()
@@ -46,7 +49,7 @@ class SingleBacklogViewModel(
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }
-    suspend fun onRoutineFinishedChange(routineId:Long,finished: Boolean){
+    suspend fun updateFinished(routineId:Long,finished:Boolean){
         routinesRepository.updateFinished(routineId,finished)
     }
     suspend fun deleteRoutineById(id:Long) {

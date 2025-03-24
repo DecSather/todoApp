@@ -197,7 +197,7 @@ fun BacklogSwipeCard(
             }
         ) {
             Card(
-                modifier = modifier,
+                modifier = modifier.padding(horizontal = 16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Column {

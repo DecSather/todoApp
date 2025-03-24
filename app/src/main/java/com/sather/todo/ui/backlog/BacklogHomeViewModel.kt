@@ -49,8 +49,7 @@ class BacklogHomeViewModel(
     val routineHomeUiState:StateFlow<RoutineHomeUiState> =
         routinesRepository.getAllRoutinesStream().map {
             RoutineHomeUiState(it)
-        }
-            .stateIn(
+        }.stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed((TIMEOUT_MILLIS)),
                 initialValue = RoutineHomeUiState()

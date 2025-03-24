@@ -1,5 +1,6 @@
 package com.sather.todo.ui.backlog
 
+import Screen2
 import android.annotation.SuppressLint
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
@@ -64,10 +65,10 @@ fun BacklogHomeScreen(
 //    特殊属性-主页面
 //      -可优化
 //      -routineMap = remember { mutableStateMapOf<Int, Float>() }
-    
+    Screen2()
 
 //    界面
-    Box(modifier = Modifier.fillMaxSize()){
+    /*Box(modifier = Modifier.fillMaxSize()){
         BacklogHomeBody(
             sharedTransitionScope=sharedTransitionScope,
             animatedContentScope=animatedContentScope,
@@ -122,7 +123,7 @@ fun BacklogHomeScreen(
             finishedRoutineList = routineHomeUiState.routineList.filter { it.finished },
             homeRoutineList = routineHomeUiState.routineList.filter { !it.finished },
             )
-    }
+    }*/
 }
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -169,14 +170,12 @@ fun BacklogHomeBody(
     
     BaseScreenBody(
         lazyColumnModifier = Modifier
-            .padding(horizontal = 16.dp)
             .semantics { contentDescription = "Backlogs Screen" },
         top = {
-            if(creditsTotal>0f)
-                ThreeColorCircle(
-                    properties = properties.map { it/creditsTotal },
-                )
-            else ThreeColorCircle()
+            ThreeColorCircle(
+                amount = creditsTotal,
+                credits = properties.map { it },
+            )
             Spacer(Modifier.height(12.dp))
             Column(modifier = Modifier.align(Alignment.Center)) {
                 Text(
@@ -237,90 +236,6 @@ fun BacklogHomeBody(
             )
         }
     )
-    
-    /*Box(modifier = Modifier.fillMaxSize()){
-        LazyColumn(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .semantics { contentDescription = "Backlogs Screen" },
-        ) {
-//        三色转圈
-            item(key = 0) {
-                Box(Modifier.padding(16.dp)) {
-                    
-                    if(creditsTotal>0f)
-                        ThreeColorCircle(
-                            properties = properties.map { it/creditsTotal },
-                        )
-                    else ThreeColorCircle()
-                    Spacer(Modifier.height(12.dp))
-                    Column(modifier = Modifier.align(Alignment.Center)) {
-                        Text(
-                            text = stringResource(R.string.credit),
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                        Text(
-                            text = formatedCredit( creditsTotal.toString()),
-                            style = MaterialTheme.typography.headlineLarge,
-                            modifier = Modifier.align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-            }
-//        日志卡
-            itemsIndexed(items = backlogList,key = {_,it -> it.id}) { index,backlog ->
-                val routineList =
-                    homeRoutineList.filter { it ->it.backlogId == backlog.id}
-                BacklogSwipeCard(
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope,
-                    
-                    backlog = backlog,
-                    routineList = routineList,
-                    
-                    onExpandClick = onExpandChange,
-                    onVisibleClick = onVisibleChange,
-                    onFinishedChange = onFinishedChange,
-                    
-                    onDelete = susDeleteBacklogById,
-                    
-                    onBacklogDetailClick = onBacklogDetailClick,
-                    onBacklogEditClick = {
-                        updateBacklogUiState(backlog)
-                        clickPart = it
-                        selectedDate = LocalDate.parse(backlog.timeTitle, formatter)
-                        showEditDialog = !showEditDialog
-                    }
-                )
-                Spacer(Modifier.height(12.dp))
-            }
-        }
-//        添加按钮
-        FloatingActionButton(
-            shape = CircleShape,
-            onClick = {
-                clickPart = -2
-                val backlog = Backlog(
-                    timeTitle = LocalDate.now().format(formatter)
-                )
-                updateBacklogUiState(backlog)
-                selectedDate = LocalDate.now()
-                susAddBacklog(backlog)
-                showEditDialog = !showEditDialog
-                
-            },
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(horizontal = 16.dp, vertical = 32.dp),
-            ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add Backlog"
-            )
-        }
-        
-    }*/
 //    编辑卡片
     if(showEditDialog){
         EditCardDialog(

@@ -18,8 +18,13 @@ import com.sather.todo.ui.components.RoutineColors
 //三色圆圈动画
 @Composable
 fun ThreeColorCircle(
-    properties:List<Float> = listOf(1f,0f,0f,0f)
+    amount:Float,
+    credits:List<Float> = listOf(1f,0f,0f,0f)
 ) {
+    val properties =
+        if(amount > 0f)credits.map { it/amount }
+        else credits
+        
     val colorIndexs = listOf(0,1,2,3)
     val currentState = remember {
         MutableTransitionState(ThreeCircleProgress.START)

@@ -32,12 +32,12 @@ class ToDoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppDataContainer(this)
-        // 获取 WorkManager 实例
-        val workManager = WorkManager.getInstance(this)
-        
-        // 注册生命周期观察者
-        ProcessLifecycleOwner.get().lifecycle.addObserver(
-            AppLifecycleObserver(workManager)
-        )
+//        // 获取 WorkManager 实例
+//        val workManager = WorkManager.getInstance(this)
+//
+//        // 注册生命周期观察者
+//        ProcessLifecycleOwner.get().lifecycle.addObserver(
+//            AppLifecycleObserver(workManager)
+//        )
     }
 }

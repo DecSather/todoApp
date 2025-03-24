@@ -81,7 +81,7 @@ fun ToDoNavHost(
                 route = RoutineEntryDestination.routeWithArgs,
                 arguments = RoutineEntryDestination.arguments
             ) {
-                val backlogId=it.arguments?.getLong("backlogId")?:0
+                val backlogId=it.arguments?.getLong("backlogId")?:-1
                 RoutineEntryScreen(
                     backlogId =backlogId,
                     navigateBack= { navController.popBackStack() }

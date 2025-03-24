@@ -55,27 +55,28 @@ fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun DetailRoutineRow(
     modifier: Modifier = Modifier,
-    routine: Routine,
-    onFinishedChange:(Long,Boolean)->Unit,
+    id:Long,
+    content:String,
+    subcontent:String,
+    isFinished:Boolean,
+    credit:Float,
+    colorIndex:Int,
+    onFinishedChange:(Long,Boolean)->Unit = {_,_ -> },
     swipeToDelete:() ->Unit,
-) {
-    val content=routine.content
-    val subcontent=routine.subcontent
-    val credit=routine.credit
-    val color= RoutineColors[routine.rank]
-    val id=routine.id
-    var finished by remember { mutableStateOf(routine.finished) }
+    
+    ) {
+    val color= RoutineColors[colorIndex]
+    var finished by remember { mutableStateOf(isFinished) }
     val customColors = CheckboxDefaults.colors(
         checkedColor =MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
     Row(
         modifier = modifier
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(horizontal = basePadding)
             .height(LargeHeight)
             .swipeToDismiss(swipeToDelete)
-            .clearAndSetSemantics {
-                contentDescription =
-                    "No.$id routine belong to No.${routine.backlogId}"
-            },
+        ,
         verticalAlignment = Alignment.CenterVertically
     ) {
         val typography = MaterialTheme.typography
@@ -100,7 +101,8 @@ fun DetailRoutineRow(
                 )
             }else{
                 Text(text = content, style = typography.bodyMedium)
-                Text(text = subcontent, style = typography.titleLarge)
+                if(subcontent.isNotEmpty())
+                    Text(text = subcontent, style = typography.titleLarge)
                 
             }
         }
@@ -120,8 +122,6 @@ fun DetailRoutineRow(
             )
         }
         Spacer(Modifier.width(16.dp))
-
-//        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Icon(
             imageVector = Icons.Filled.ChevronRight,
             contentDescription = null,
@@ -129,7 +129,6 @@ fun DetailRoutineRow(
                 .padding(end = 12.dp)
                 .size(24.dp)
         )
-//        }
     }
     BaseDivider()
 }
@@ -195,6 +194,8 @@ fun BaseDivider(
     HorizontalDivider(color = color, thickness = 1.dp, modifier = modifier)
 }
 
+
+
 /**
  * The modified element can be horizontally swiped away.
  *
@@ -258,5 +259,6 @@ private fun Modifier.swipeToDismiss(
         // Apply the horizontal offset to the element.
         .offset { IntOffset(offsetX.value.roundToInt(), 0) }
 }
-private val MediumHeight = 54.dp
-private val LargeHeight = 68.dp
+
+val LargeHeight = 68.dp
+

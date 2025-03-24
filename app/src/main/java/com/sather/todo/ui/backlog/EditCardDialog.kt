@@ -92,6 +92,7 @@ fun EditCardDialog(
     
     val tempRoutineList = remember {
         mutableStateListOf<Routine>().apply {
+            println("edit add all:${routineList}")
             addAll(routineList)
             if(clickPart <= 0) {
                 add(
@@ -115,6 +116,7 @@ fun EditCardDialog(
             
         }
     }
+    
     if(clickPart != -1) {
         AlertDialog(
             properties = DialogProperties(
@@ -178,8 +180,10 @@ fun EditCardDialog(
                             .focusGroup(),
                         state = listState,
                     ) {
-                        itemsIndexed(items = tempRoutineList, key = { _, item -> item.id }) { index, item ->
-                            
+                        itemsIndexed(
+                            items = tempRoutineList,
+                            key = { _, item -> item.id }
+                        ) { index, item ->
                             BacklogEditRow(
                                 modifier = if (index == focusIndex) Modifier.focusRequester(focusRequester) else Modifier,
                                 routine = item.copy(sortId = index),

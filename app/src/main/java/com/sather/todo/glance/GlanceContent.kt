@@ -62,12 +62,13 @@ class MyAppWidget : GlanceAppWidget() {
         }
         
         // 从 SharedPreferences 中读取数据
-        var items = getRoutinesFromDataStore(context).collectAsState(initial = emptyList()).value
+        val items by getRoutinesFromDataStore(context).collectAsState(initial = emptyList())
         
         Scaffold(
             titleBar = titleBar(
                 timeTitle,
                 refreshClick = {
+                    println("refresh")
                     refresh = true
                 },
                 beforeClick = {
