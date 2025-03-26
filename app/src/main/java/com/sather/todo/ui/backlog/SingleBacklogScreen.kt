@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -18,15 +20,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -39,7 +44,11 @@ import com.sather.todo.ui.components.backlogs.BaseScreenBody
 import com.sather.todo.ui.components.backlogs.ThreeColorCircle
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.util.*
 import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 
@@ -75,51 +84,39 @@ fun SingleBacklogScreen(
         sharedTransitionScope=sharedTransitionScope,
         animatedContentScope=animatedContentScope,
         newRoutineClick=navigateToNewRoutine,
+        navigateBack={
+            coroutineScope.launch {
+                navigateBack()
+            }
+            
+        },
+        navigateToSingleRoutine = navigateToSingleRoutine,
+        
         onDelete ={
             coroutineScope.launch {
                 viewModel.deleteBacklogById(backlog.id)
                 navigateBack()
             }
         },
-        navigateBack={routines ->
+        onUpdateSort = { sortList ->
             coroutineScope.launch {
-                navigateBack()
+                viewModel.updateSort(sortList)
             }
             
         },
+        onFinishedChange={ id,finished ->
+            coroutineScope.launch {
+                viewModel.updateFinished(id,finished)
+            }
+        },
+        swipeToDelete = { id->
+            coroutineScope.launch {
+                viewModel.deleteRoutineById( id)
+            }
+        },
         finishedRoutineList = finishedRoutines,
         unfinishedRoutineList=unfinishedRoutines,
-    ){ changeFinished,deleteTempRoutine,routine ->
-        DetailRoutineRow(
-            modifier = Modifier
-                .clickable {navigateToSingleRoutine(routine.id)}
-                .clearAndSetSemantics {
-                    contentDescription =
-                        "No.${routine.id} routine belong to No.${routine.backlogId}"
-                },
-            id = routine.id,
-            content = routine.content,
-            subcontent = routine.subcontent,
-            isFinished = routine.finished,
-            credit = routine.credit,
-            colorIndex = routine.rank,
-            onFinishedChange={ id,finished ->
-                coroutineScope.launch {
-                    viewModel.updateFinished(id,finished)
-                }
-                deleteTempRoutine()
-                changeFinished()
-            },
-            swipeToDelete = {
-                deleteTempRoutine()
-                coroutineScope.launch {
-                    viewModel.deleteRoutineById(routine.id)
-                }
-            },
-                
-                )
-        
-    }
+    )
 }
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -129,10 +126,13 @@ fun  SingleBacklogBody(
     animatedContentScope: AnimatedContentScope,
     newRoutineClick:(Long)->Unit,
     onDelete: () -> Unit={},
-    navigateBack:(List<Routine>)->Unit,
+    navigateBack:()->Unit,
+    navigateToSingleRoutine: (Long) -> Unit={},
+    onUpdateSort:(List<Routine>)->Unit,
+    onFinishedChange:(Long,Boolean) -> Unit,
+    swipeToDelete :(Long)->Unit,
     finishedRoutineList:List<Routine>,
     unfinishedRoutineList:List<Routine>,
-    rows: @Composable (() -> Unit,() -> Unit,Routine) -> Unit,
 ) {
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
     val tempUnfinishedList = remember {mutableStateListOf<Routine>()}
@@ -160,6 +160,30 @@ fun  SingleBacklogBody(
             tempfinishedList.addAll(finishedRoutineList)
         }
     }
+    // 自动提交更新的逻辑
+    LaunchedEffect(tempUnfinishedList) {
+        snapshotFlow { tempUnfinishedList.toList() } // 转换为不可变快照
+            .debounce(1000) // 防抖：500ms无操作后提交
+            .distinctUntilChanged() // 避免重复提交
+            .collectLatest { sortedList ->
+                onUpdateSort(sortedList)
+            }
+    }
+    LaunchedEffect(tempfinishedList) {
+        snapshotFlow { tempfinishedList.toList() } // 转换为不可变快照
+            .debounce(1000) // 防抖：500ms无操作后提交
+            .distinctUntilChanged() // 避免重复提交
+            .collectLatest { sortedList ->
+                onUpdateSort(sortedList)
+            }
+    }
+
+//    拖拽计算
+    val density = LocalDensity.current
+    
+    var draggedItemIndex by remember { mutableIntStateOf(-1) }
+    val heightDp = remember { LargeHeight }
+    val heightPx = remember { with(density) { heightDp.toPx() } }
     
     BaseScreenBody(
         lazyColumnModifier = Modifier
@@ -172,7 +196,7 @@ fun  SingleBacklogBody(
             )
             IconButton(
                 onClick = {
-                    navigateBack(tempfinishedList+tempUnfinishedList)
+                    navigateBack()
                 }
             ) {
                 Icon(
@@ -215,11 +239,75 @@ fun  SingleBacklogBody(
                 items = tempUnfinishedList,
                 key = { _, routine -> "unFinished"+routine.id}
             ){ index, routine ->
-                rows(
-                    {tempfinishedList.add(0,routine.copy(finished = true))},
-                    {tempUnfinishedList.remove(routine)},
-                    routine
-                )
+                var dragOffsetY by remember { mutableFloatStateOf(0F) }
+                var isDragged by remember { mutableStateOf(false) }
+                DetailRoutineRow(
+                    modifier = Modifier
+                        .graphicsLayer {
+                            translationY = dragOffsetY
+                            shadowElevation = if (isDragged) 8F else 0F
+                            alpha = if (isDragged) .9F else 1F
+                        }
+                        .zIndex(if (isDragged) 2F else 0F)
+                        .clickable {navigateToSingleRoutine(routine.id)}
+                        .clearAndSetSemantics {
+                            contentDescription =
+                                "No.${routine.id} routine belong to No.${routine.backlogId}"
+                        },
+                    id = routine.id,
+                    content = routine.content,
+                    subcontent = routine.subcontent,
+                    isFinished = routine.finished,
+                    credit = routine.credit,
+                    colorIndex = routine.rank,
+                    onFinishedChange={ id,finished ->
+//                        onFinishedChange(id,finished)
+                        tempUnfinishedList.remove(routine)
+                        tempfinishedList.add(0,routine.copy(finished = true))
+                    },
+                    swipeToDelete = {
+                        tempUnfinishedList.remove(routine)
+                        swipeToDelete(routine.id)
+                    },
+                ){
+                    IconButton(
+                        onClick = {},
+                        modifier = Modifier
+                            .pointerInput(Unit) {
+                                detectDragGestures(
+                                    onDragStart = { offset ->
+                                        draggedItemIndex = tempUnfinishedList.indexOf(routine)
+                                        isDragged = true
+                                    },
+                                    onDrag = { change, dragAmount ->
+                                        change.consume()
+                                        dragOffsetY += dragAmount.y
+                                        
+                                        val indexOffset = (dragOffsetY / heightPx).toInt()
+                                        val newIndex = indexOffset + draggedItemIndex
+                                        
+                                        if (newIndex in tempUnfinishedList.indices && newIndex != draggedItemIndex) {
+                                            Collections.swap(tempUnfinishedList, draggedItemIndex, newIndex)
+                                            draggedItemIndex = newIndex
+                                            dragOffsetY -= indexOffset * heightPx
+                                        }
+                                    },
+                                    onDragEnd = {
+                                        dragOffsetY = 0F
+                                        draggedItemIndex = -1
+                                        isDragged = false
+                                    },
+                                    onDragCancel = {
+                                        dragOffsetY = 0F
+                                        draggedItemIndex = -1
+                                        isDragged = false
+                                    }
+                                )
+                            }
+                    ) {
+                        Icon(Icons.Rounded.Menu, "Drag Handle")
+                    }
+                }
             }
 //                预加载空列
             item(key = "add_item"){
@@ -236,17 +324,31 @@ fun  SingleBacklogBody(
                     credit = 0f,
                     colorIndex = 0,
                     onFinishedChange={ _,_ -> },
-                    swipeToDelete = {}
+                    swipeToDelete = {},
+                    icon = {}
                 )
             }
             itemsIndexed(
                 items = tempfinishedList,
                 key = { _, routine -> "finished"+routine.id}
             ){ index, routine ->
-                rows(
-                    {tempUnfinishedList.add(0,routine.copy(finished = false))},
-                    {tempfinishedList.remove(routine)},
-                    routine
+                
+                DetailRoutineRow(
+                    id = routine.id,
+                    content = routine.content,
+                    subcontent = routine.subcontent,
+                    isFinished = routine.finished,
+                    credit = routine.credit,
+                    colorIndex = routine.rank,
+                    onFinishedChange={ id,finished ->
+//                        onFinishedChange(id,finished)
+                        tempfinishedList.remove(routine)
+                        tempUnfinishedList.add(0,routine.copy(finished = false))
+                    },
+                    swipeToDelete = {
+                        tempfinishedList.remove(routine)
+                        swipeToDelete(routine.id)
+                    },
                 )
             }
         },

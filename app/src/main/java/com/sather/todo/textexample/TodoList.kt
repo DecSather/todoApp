@@ -1,24 +1,22 @@
-//
-//给出省略代码：
-//itemsIndexed(items = tempRoutineList, key = { _, item -> item.id }) { index, item ->
-//
-//    val focusRequester = remember { FocusRequester() }
-//    BacklogEditRow(
-//        modifier = Modifier.focusRequester(focusRequester),
-//        addRoutine = {sortIndex,it ->
-//            tempRoutineList.add()
-//            focusManager.moveFocus(FocusDirection.Down)
-//        },
-//        deleteRoutine = {
-//            focusManager.moveFocus(FocusDirection.Up)
-//            tempRoutineList.removeAt(index)
-//
-//        },
-//    )
-//    if (index == initIndex ) {
-//        LaunchedEffect(Unit) {
-//            focusRequester.requestFocus()
-//            initIndex = -2
-//        }
-//    }
-//}，为什么focusManager.moveFocus(FocusDirection.Up),focusManager.moveFocus(FocusDirection.Up)不起效
+package com.sather.todo.textexample
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccessAlarm
+import androidx.compose.material.icons.rounded.DataSaverOn
+import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.glance.layout.Column
+
+@Preview
+@Composable
+fun greeting(){
+    Column {
+        Icon(Icons.Rounded.Image, "Drag Handle")
+        Icon(Icons.Rounded.AccessAlarm, "Drag Handle")
+        Icon(Icons.Rounded.DataSaverOn, "Drag Handle")
+    }
+    
+}

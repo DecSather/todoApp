@@ -65,10 +65,10 @@ fun BacklogHomeScreen(
 //    特殊属性-主页面
 //      -可优化
 //      -routineMap = remember { mutableStateMapOf<Int, Float>() }
-    Screen2()
+//    Screen2()
 
 //    界面
-    /*Box(modifier = Modifier.fillMaxSize()){
+    Box(modifier = Modifier.fillMaxSize()){
         BacklogHomeBody(
             sharedTransitionScope=sharedTransitionScope,
             animatedContentScope=animatedContentScope,
@@ -123,7 +123,7 @@ fun BacklogHomeScreen(
             finishedRoutineList = routineHomeUiState.routineList.filter { it.finished },
             homeRoutineList = routineHomeUiState.routineList.filter { !it.finished },
             )
-    }*/
+    }
 }
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

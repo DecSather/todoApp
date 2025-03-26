@@ -63,6 +63,15 @@ fun DetailRoutineRow(
     colorIndex:Int,
     onFinishedChange:(Long,Boolean)->Unit = {_,_ -> },
     swipeToDelete:() ->Unit,
+    icon: @Composable () ->Unit = {
+        Icon(
+            imageVector = Icons.Filled.ChevronRight,
+            contentDescription = null,
+            modifier = Modifier
+                .padding(end = 12.dp)
+                .size(24.dp)
+        )
+    },
     
     ) {
     val color= RoutineColors[colorIndex]
@@ -122,13 +131,7 @@ fun DetailRoutineRow(
             )
         }
         Spacer(Modifier.width(16.dp))
-        Icon(
-            imageVector = Icons.Filled.ChevronRight,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 12.dp)
-                .size(24.dp)
-        )
+        icon()
     }
     BaseDivider()
 }
