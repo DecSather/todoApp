@@ -92,7 +92,6 @@ fun EditCardDialog(
     
     val tempRoutineList = remember {
         mutableStateListOf<Routine>().apply {
-            println("edit add all:${routineList}")
             addAll(routineList)
             if(clickPart <= 0) {
                 add(

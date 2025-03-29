@@ -13,7 +13,6 @@ class AppLifecycleObserver(
     
     override fun onStop(owner: LifecycleOwner) {
         super.onStop(owner)
-        println("entry widget update for :onStop()")
         // 应用进入后台时触发 WorkManager 任务
         val updateRequest = OneTimeWorkRequestBuilder<UpdateWidgetWorker>()
             .build()

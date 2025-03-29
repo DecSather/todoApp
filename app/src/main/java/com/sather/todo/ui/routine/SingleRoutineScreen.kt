@@ -39,16 +39,16 @@ fun SingleRoutineScreen(
     routineViewModel: SingleRoutineViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
     val coroutineScope = rememberCoroutineScope()
+    
     SingleRoutineBody(
         routineUiState = routineViewModel.routineUiState,
         navigateBack=navigateBack,
         onRoutineValueChange= routineViewModel::updateRoutineUiState,
-        onSaveClick = {
+        onSave = {
             coroutineScope.launch {
                 routineViewModel.updateRoutine()
-                navigateBack()
             }
-        },
+        }
     )
 }
 
@@ -57,11 +57,11 @@ fun SingleRoutineBody(
     routineUiState: RoutineUiState,
     navigateBack:()->Unit,
     onRoutineValueChange:(Routine) -> Unit,
-    onSaveClick: () -> Unit,
+    onSave: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val routine = routineUiState.routine
-    var routineRank by remember { mutableIntStateOf(routine.rank) }
+    println("rank :${routine.rank}")
     var creditText by remember { mutableStateOf(routine.credit.toString()) }
     
     val rankIndexList = listOf(1,2,3)
@@ -69,6 +69,7 @@ fun SingleRoutineBody(
         modifier = modifier.padding(startPadding),
         verticalArrangement = Arrangement.spacedBy(startPadding)
     ) {
+        
         IconButton(onClick = navigateBack) {
             Icon(
                 imageVector = Icons.Filled.ArrowBackIosNew,
@@ -109,13 +110,13 @@ fun SingleRoutineBody(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
-                    rankIndexList.forEach { index->
+                    rankIndexList.forEach { rank->
                         rankSwitch(
-                            rank = index,
-                            checked = (routineRank == index),
+                            rank = rank,
+                            checked = (routine.rank == rank),
                             onCheckedChange = {
-                                routineRank = index
-                                onRoutineValueChange(routineUiState.routine.copy(rank = index))
+                                onRoutineValueChange(routineUiState.routine.copy(rank = rank))
+                                onSave()
                             }
                         )
                     }
@@ -128,10 +129,10 @@ fun SingleRoutineBody(
                 onValueChange = {
                     newText ->
                     creditText = newText
-                    if(newText.isEmpty()) {
+                    if(newText.toFloatOrNull()==null) {
                         onRoutineValueChange(routineUiState.routine.copy(credit = 0f))
                     }
-                    else if(newText.toFloatOrNull()!=null) {
+                    else{
                         onRoutineValueChange(routineUiState.routine.copy(credit = creditText.toFloat()))
                     }
                 },
@@ -140,8 +141,8 @@ fun SingleRoutineBody(
                     Text(
                         stringResource(R.string.rontine_credit_req),
                         fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.secondary,
-                        )
+                        color = MaterialTheme.colorScheme.secondary
+                    )
                         },
                 leadingIcon = { Text(stringResource(R.string.dollarSign)) },
                 modifier = Modifier.fillMaxWidth(),
@@ -171,7 +172,10 @@ fun SingleRoutineBody(
             }
         }
         Button(
-            onClick = onSaveClick,
+            onClick = {
+                onSave()
+                navigateBack()
+            },
             enabled = routineUiState.isEntryValid,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -181,7 +185,7 @@ fun SingleRoutineBody(
 }
 private val startPadding = 16.dp
 @Composable
-private fun rankSwitch(
+fun rankSwitch(
     rank:Int,
     checked:Boolean,
     onCheckedChange:(Boolean) -> Unit,
@@ -191,7 +195,6 @@ private fun rankSwitch(
         onCheckedChange = onCheckedChange,
         thumbContent = {
             if (checked) {
-                
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = null,

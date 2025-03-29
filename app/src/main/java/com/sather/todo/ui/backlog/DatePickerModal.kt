@@ -8,7 +8,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,9 +18,7 @@ fun DatePickerModal(
 ) {
     
     val datePickerState = rememberDatePickerState(
-        selectedDate?.let {
-            it.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
-        }
+        selectedDate.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli()
     )
     DatePickerDialog(
         onDismissRequest = onDismiss,

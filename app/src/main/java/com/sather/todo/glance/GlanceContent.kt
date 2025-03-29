@@ -5,27 +5,33 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.*
-import androidx.glance.appwidget.*
+import androidx.glance.appwidget.CheckBox
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.components.CircleIconButton
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.lazy.itemsIndexed
+import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.work.*
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.sather.todo.R
-import com.sather.todo.data.BacklogDatabase
 import com.sather.todo.data.Routine
-import com.sather.todo.glance.workmanager.*
+import com.sather.todo.glance.workmanager.UpdateRoutineWorker
+import com.sather.todo.glance.workmanager.UpdateWidgetWorker
+import com.sather.todo.glance.workmanager.getRoutinesFromDataStore
+import com.sather.todo.glance.workmanager.saveTimeTitleToDataStore
 import com.sather.todo.ui.backlog.formatter
 import com.sather.todo.ui.theme.MyAppWidgetGlanceColorScheme
 import kotlinx.coroutines.delay
 import java.time.LocalDate
-import java.util.concurrent.TimeUnit
 
 class MyAppWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = MyAppWidget()
@@ -37,11 +43,11 @@ class MyAppWidget : GlanceAppWidget() {
         provideContent{
             
             GlanceTheme(colors = MyAppWidgetGlanceColorScheme.colors) {
-                
                 MyWidgetContent()
             }
         }
     }
+    
     @OptIn(ExperimentalGlancePreviewApi::class)
     @Preview
     @Composable
@@ -63,7 +69,9 @@ class MyAppWidget : GlanceAppWidget() {
         
         // 从 SharedPreferences 中读取数据
         val items by getRoutinesFromDataStore(context).collectAsState(initial = emptyList())
+        LaunchedEffect(items){
         
+        }
         Scaffold(
             titleBar = titleBar(
                 timeTitle,
@@ -96,13 +104,15 @@ class MyAppWidget : GlanceAppWidget() {
                     }
                 }else {
                     LazyColumn(GlanceModifier.fillMaxWidth()) {
-                        items(
+                        itemsIndexed(
                             items = items,
-                            itemId = {item -> item.id},
-                        ){item ->
+                            itemId = {_,item -> item.id},
+                        ){index,item ->
                             ListRow(
                                 context,
-                                item
+                                item,
+                                onFinishedChange = {
+                                }
                             )
                             
                         }
@@ -164,6 +174,7 @@ class MyAppWidget : GlanceAppWidget() {
     fun ListRow(
         context:Context,
         routine: Routine,
+        onFinishedChange:() ->Unit,
     ) {
         
         var isFinished by remember { mutableStateOf(routine.finished) }
@@ -187,6 +198,7 @@ class MyAppWidget : GlanceAppWidget() {
                             checked = false,
                             onCheckedChange = {
                                 isFinished = true
+                                onFinishedChange()
                             }
                         )
                     }

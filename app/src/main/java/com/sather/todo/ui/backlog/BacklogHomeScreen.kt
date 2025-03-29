@@ -1,18 +1,17 @@
 package com.sather.todo.ui.backlog
 
-import Screen2
 import android.annotation.SuppressLint
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -23,14 +22,14 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sather.todo.R
-import com.sather.todo.ui.AppViewModelProvider
-import com.sather.todo.ui.navigation.BaseDestination
-import com.sather.todo.ui.routine.formatedCredit
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
+import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.components.BacklogSwipeCard
 import com.sather.todo.ui.components.backlogs.BaseScreenBody
 import com.sather.todo.ui.components.backlogs.ThreeColorCircle
+import com.sather.todo.ui.navigation.BaseDestination
+import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -157,7 +156,7 @@ fun BacklogHomeBody(
     var importTotal = 0f
     var normalTotal = 0f
     var faverTotal = 0f
-    finishedRoutineList.map{it ->
+    finishedRoutineList.map{ it ->
         when(it.rank){
             1 -> importTotal += it.credit
             2 -> normalTotal += it.credit
@@ -191,9 +190,9 @@ fun BacklogHomeBody(
             }
         },
         rows = {
-            itemsIndexed(items = backlogList,key = {_,it -> it.id}) { index,backlog ->
+            items(items = backlogList,key = {it.id}) { backlog ->
                 val routineList =
-                    homeRoutineList.filter { it ->it.backlogId == backlog.id}
+                    homeRoutineList.filter {it.backlogId == backlog.id}
                 BacklogSwipeCard(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,

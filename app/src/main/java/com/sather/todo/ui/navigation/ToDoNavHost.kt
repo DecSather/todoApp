@@ -15,8 +15,6 @@ import com.sather.todo.ui.backlog.SingleBacklogDestination
 import com.sather.todo.ui.backlog.SingleBacklogScreen
 import com.sather.todo.ui.comesoon.ComeSoon
 import com.sather.todo.ui.comesoon.ComeSoonScreen
-import com.sather.todo.ui.routine.RoutineEntryDestination
-import com.sather.todo.ui.routine.RoutineEntryScreen
 import com.sather.todo.ui.routine.SingleRoutineDestination
 import com.sather.todo.ui.routine.SingleRoutineScreen
 //waiting implement:页面转化的过渡
@@ -61,32 +59,19 @@ fun ToDoNavHost(
                     )
                 },
             ){
-                val baklogId=it.arguments?.getLong("backlogId")
                 SingleBacklogScreen(
                     this@SharedTransitionLayout,
                     this@composable,
                     navigateBack= { navController.popBackStack() },
-//                跳转新增待办
-                    navigateToNewRoutine = {navController.navigate("${RoutineEntryDestination.route}/${baklogId}")},
 //                跳转指定待办
-                    navigateToSingleRoutine ={navController.navigate("${SingleRoutineDestination.route}/${it}")}
+                    navigateToSingleRoutine ={it ->
+                        navController.navigate("${SingleRoutineDestination.route}/${it}")
+                    }
                 )
             }
             
             composable(route = ComeSoon.route) {
                 ComeSoonScreen()
-            }
-//            Entry new Routine
-            composable(
-                route = RoutineEntryDestination.routeWithArgs,
-                arguments = RoutineEntryDestination.arguments
-            ) {
-                val backlogId=it.arguments?.getLong("backlogId")?:-1
-                RoutineEntryScreen(
-                    backlogId =backlogId,
-                    navigateBack= { navController.popBackStack() }
-                )
-                
             }
 //        Single Routine
             composable(

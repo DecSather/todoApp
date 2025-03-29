@@ -61,8 +61,8 @@ fun DetailRoutineRow(
     isFinished:Boolean,
     credit:Float,
     colorIndex:Int,
-    onFinishedChange:(Long,Boolean)->Unit = {_,_ -> },
-    swipeToDelete:() ->Unit,
+    onFinishedChange:()->Unit = {},
+    swipeToDelete:() ->Unit = {},
     icon: @Composable () ->Unit = {
         Icon(
             imageVector = Icons.Filled.ChevronRight,
@@ -98,7 +98,7 @@ fun DetailRoutineRow(
             colors = customColors,
             checked = finished,
             onCheckedChange = {
-                onFinishedChange(id,it)
+                onFinishedChange()
             }
         )
         Column(Modifier) {
@@ -109,9 +109,12 @@ fun DetailRoutineRow(
                     textDecoration = TextDecoration.LineThrough,
                 )
             }else{
-                Text(text = content, style = typography.bodyMedium)
+                if(content.isNotBlank())
+                    Text(text = content, style = typography.bodyMedium)
+                else
+                    Text(text = "Not be EMPTY", style = typography.bodyMedium)
                 if(subcontent.isNotEmpty())
-                    Text(text = subcontent, style = typography.titleLarge)
+                    Text(text = subcontent, style = typography.bodySmall)
                 
             }
         }

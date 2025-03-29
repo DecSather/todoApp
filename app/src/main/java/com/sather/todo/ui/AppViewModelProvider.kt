@@ -8,7 +8,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.sather.todo.ToDoApplication
 import com.sather.todo.ui.backlog.BacklogHomeViewModel
 import com.sather.todo.ui.backlog.SingleBacklogViewModel
-import com.sather.todo.ui.routine.RoutineEntryViewModel
 import com.sather.todo.ui.routine.SingleRoutineViewModel
 
 
@@ -19,12 +18,6 @@ object AppViewModelProvider {
         initializer {
             SingleRoutineViewModel(
                 this.createSavedStateHandle(),
-                inventoryApplication().container.routinesRepository
-            )
-        }
-//            RoutineEntry
-        initializer {
-            RoutineEntryViewModel(
                 inventoryApplication().container.routinesRepository
             )
         }

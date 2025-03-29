@@ -54,12 +54,14 @@ class SingleBacklogViewModel(
     }
     suspend fun updateSort(sortedList: List<Routine>) {
         sortedList.forEachIndexed{ index,it ->
-            routinesRepository.updateRoutine(it.copy(sortId = index))
-            println("update Sort:${it.copy(sortId = index)}")
+                routinesRepository.updateRoutine(it.copy(sortId = index))
         }
     }
     suspend fun deleteRoutineById(id:Long) {
         routinesRepository.deleteRoutineById(id)
+    }
+    suspend fun addRoutine(routine:Routine) {
+        routinesRepository.insertRoutine(routine)
     }
 }
 data class BacklogUiState(

@@ -1,12 +1,10 @@
 package com.sather.todo.ui.backlog
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
@@ -18,18 +16,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
-import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,19 +31,19 @@ import androidx.navigation.navArgument
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
+import com.sather.todo.data.generateSimpleId
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.components.*
 import com.sather.todo.ui.components.backlogs.BaseScreenBody
 import com.sather.todo.ui.components.backlogs.ThreeColorCircle
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.math.absoluteValue
-import kotlin.math.roundToInt
 
 object SingleBacklogDestination : BaseDestination {
     override val route = "single_backlog"
@@ -68,7 +61,6 @@ fun SingleBacklogScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
     navigateBack: () -> Unit,
-    navigateToNewRoutine:(Long)->Unit,
     navigateToSingleRoutine: (Long) -> Unit={},
     viewModel: SingleBacklogViewModel = viewModel(factory = AppViewModelProvider.Factory),
 ) {
@@ -83,7 +75,6 @@ fun SingleBacklogScreen(
         backlog =backlog,
         sharedTransitionScope=sharedTransitionScope,
         animatedContentScope=animatedContentScope,
-        newRoutineClick=navigateToNewRoutine,
         navigateBack={
             coroutineScope.launch {
                 navigateBack()
@@ -91,7 +82,12 @@ fun SingleBacklogScreen(
             
         },
         navigateToSingleRoutine = navigateToSingleRoutine,
-        
+        onAddRoutine = {routine ->
+            
+            coroutineScope.launch {
+                viewModel.addRoutine(routine)
+            }
+        },
         onDelete ={
             coroutineScope.launch {
                 viewModel.deleteBacklogById(backlog.id)
@@ -104,12 +100,7 @@ fun SingleBacklogScreen(
             }
             
         },
-        onFinishedChange={ id,finished ->
-            coroutineScope.launch {
-                viewModel.updateFinished(id,finished)
-            }
-        },
-        swipeToDelete = { id->
+        swipeToDeleteRoutine = { id->
             coroutineScope.launch {
                 viewModel.deleteRoutineById( id)
             }
@@ -118,19 +109,18 @@ fun SingleBacklogScreen(
         unfinishedRoutineList=unfinishedRoutines,
     )
 }
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, FlowPreview::class)
 @Composable
 fun  SingleBacklogBody(
     backlog: Backlog,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
-    newRoutineClick:(Long)->Unit,
+    onAddRoutine:(Routine)->Unit,
     onDelete: () -> Unit={},
     navigateBack:()->Unit,
     navigateToSingleRoutine: (Long) -> Unit={},
     onUpdateSort:(List<Routine>)->Unit,
-    onFinishedChange:(Long,Boolean) -> Unit,
-    swipeToDelete :(Long)->Unit,
+    swipeToDeleteRoutine :(Long)->Unit,
     finishedRoutineList:List<Routine>,
     unfinishedRoutineList:List<Routine>,
 ) {
@@ -235,10 +225,11 @@ fun  SingleBacklogBody(
             }
         },
         rows = {
-            itemsIndexed(
+//            未完成列
+            items(
                 items = tempUnfinishedList,
-                key = { _, routine -> "unFinished"+routine.id}
-            ){ index, routine ->
+                key = {routine -> routine.id + generateSimpleId()}
+            ){ routine ->
                 var dragOffsetY by remember { mutableFloatStateOf(0F) }
                 var isDragged by remember { mutableStateOf(false) }
                 DetailRoutineRow(
@@ -260,14 +251,13 @@ fun  SingleBacklogBody(
                     isFinished = routine.finished,
                     credit = routine.credit,
                     colorIndex = routine.rank,
-                    onFinishedChange={ id,finished ->
-//                        onFinishedChange(id,finished)
+                    onFinishedChange={
                         tempUnfinishedList.remove(routine)
                         tempfinishedList.add(0,routine.copy(finished = true))
                     },
                     swipeToDelete = {
                         tempUnfinishedList.remove(routine)
-                        swipeToDelete(routine.id)
+                        swipeToDeleteRoutine(routine.id)
                     },
                 ){
                     IconButton(
@@ -309,11 +299,19 @@ fun  SingleBacklogBody(
                     }
                 }
             }
-//                预加载空列
+//           预加载空列
             item(key = "add_item"){
                 DetailRoutineRow(
                     modifier = Modifier
-                        .clickable{ newRoutineClick(backlog.id)}
+                        .clickable{
+                            val routine = Routine(
+                                content = "",
+                                sortId = tempUnfinishedList.size,
+                                backlogId = backlog.id
+                            )
+                            onAddRoutine(routine)
+                            navigateToSingleRoutine(routine.id)
+                        }
                         .clearAndSetSemantics {
                             contentDescription = "Empty routine"
                         },
@@ -323,16 +321,13 @@ fun  SingleBacklogBody(
                     isFinished = false,
                     credit = 0f,
                     colorIndex = 0,
-                    onFinishedChange={ _,_ -> },
-                    swipeToDelete = {},
-                    icon = {}
                 )
             }
-            itemsIndexed(
+//            完成列
+            items(
                 items = tempfinishedList,
-                key = { _, routine -> "finished"+routine.id}
-            ){ index, routine ->
-                
+                key = {routine -> routine.id + generateSimpleId()}
+            ){ routine ->
                 DetailRoutineRow(
                     id = routine.id,
                     content = routine.content,
@@ -340,14 +335,13 @@ fun  SingleBacklogBody(
                     isFinished = routine.finished,
                     credit = routine.credit,
                     colorIndex = routine.rank,
-                    onFinishedChange={ id,finished ->
-//                        onFinishedChange(id,finished)
+                    onFinishedChange={
                         tempfinishedList.remove(routine)
                         tempUnfinishedList.add(0,routine.copy(finished = false))
                     },
                     swipeToDelete = {
                         tempfinishedList.remove(routine)
-                        swipeToDelete(routine.id)
+                        swipeToDeleteRoutine(routine.id)
                     },
                 )
             }
