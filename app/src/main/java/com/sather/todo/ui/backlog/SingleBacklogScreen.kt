@@ -5,13 +5,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.rounded.Menu
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -33,9 +35,11 @@ import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.data.generateSimpleId
 import com.sather.todo.ui.AppViewModelProvider
-import com.sather.todo.ui.components.*
-import com.sather.todo.ui.components.backlogs.BaseScreenBody
-import com.sather.todo.ui.components.backlogs.ThreeColorCircle
+import com.sather.todo.ui.backlog.components.BaseScreenBody
+import com.sather.todo.ui.backlog.components.DeleteConfirmationDialog
+import com.sather.todo.ui.backlog.components.ThreeColorCircle
+import com.sather.todo.ui.components.DetailRoutineRow
+import com.sather.todo.ui.components.LargeHeight
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.FlowPreview
@@ -83,7 +87,6 @@ fun SingleBacklogScreen(
         },
         navigateToSingleRoutine = navigateToSingleRoutine,
         onAddRoutine = {routine ->
-            
             coroutineScope.launch {
                 viewModel.addRoutine(routine)
             }
@@ -142,11 +145,13 @@ fun  SingleBacklogBody(
     
     LaunchedEffect(unfinishedRoutineList.isNotEmpty()){
         if(unfinishedRoutineList.isNotEmpty()) {
+            tempUnfinishedList.clear()
             tempUnfinishedList.addAll(unfinishedRoutineList)
         }
     }
     LaunchedEffect(finishedRoutineList.isNotEmpty()){
         if(finishedRoutineList.isNotEmpty()) {
+            tempfinishedList.clear()
             tempfinishedList.addAll(finishedRoutineList)
         }
     }
@@ -347,7 +352,7 @@ fun  SingleBacklogBody(
             }
         },
         floatButtonAction = {
-             deleteConfirmationRequired = true
+            deleteConfirmationRequired = true
         },
         floatButtoncontent = {
             Icon(

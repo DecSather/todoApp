@@ -1,4 +1,4 @@
-package com.sather.todo.ui.components.backlogs
+package com.sather.todo.ui.backlog.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -13,7 +13,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.sather.todo.ui.components.RoutineColors
 
 //三色圆圈动画
 @Composable

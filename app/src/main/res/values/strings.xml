@@ -15,7 +15,7 @@
     <string name="rontine_rank_req">Rank*</string>
     <string name="rontine_credit_req">Credit*</string>
     <string name="rontine_subcontent_req">Remark</string>
-    <string name="routine_empty_error">Can\'t be empty</string>
+    <string name="routine_empty_error">Not be EMPTY</string>
     <string name="routine_credit_error">Float</string>
 <!--     Function -->
     <string name="see_all">DETAIL</string>

@@ -25,9 +25,9 @@ import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
-import com.sather.todo.ui.components.BacklogSwipeCard
-import com.sather.todo.ui.components.backlogs.BaseScreenBody
-import com.sather.todo.ui.components.backlogs.ThreeColorCircle
+import com.sather.todo.ui.backlog.components.BacklogSwipeCard
+import com.sather.todo.ui.backlog.components.BaseScreenBody
+import com.sather.todo.ui.backlog.components.ThreeColorCircle
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.launch

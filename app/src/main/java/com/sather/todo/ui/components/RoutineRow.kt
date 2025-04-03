@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.sather.todo.R
-import com.sather.todo.data.Routine
-import com.sather.todo.ui.theme.unfinishedColor
+import com.sather.todo.ui.backlog.components.RoutineColors
+import com.sather.todo.ui.backlog.components.basePadding
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -84,7 +84,7 @@ fun DetailRoutineRow(
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(horizontal = basePadding)
             .height(LargeHeight)
-            .swipeToDismiss(swipeToDelete)
+//            .swipeToDismiss(swipeToDelete)
         ,
         verticalAlignment = Alignment.CenterVertically
     ) {

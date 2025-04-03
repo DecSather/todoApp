@@ -8,74 +8,64 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.ImageProvider
-import androidx.glance.LocalContext
 import androidx.glance.LocalSize
-import androidx.glance.action.Action
 import androidx.glance.appwidget.components.CircleIconButton
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.components.TitleBar
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
-import androidx.glance.preview.ExperimentalGlancePreviewApi
-import androidx.glance.preview.Preview
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import com.example.platform.ui.appwidgets.R
-import com.example.platform.ui.appwidgets.glance.layout.collections.data.FakeCheckListDataRepository.Companion.demoData
-import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutDimensions.checkListRowStartPadding
 import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutDimensions.checkListRowEndPadding
+import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutDimensions.checkListRowStartPadding
 import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutDimensions.scaffoldHorizontalPadding
 import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutDimensions.verticalItemSpacing
 import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutDimensions.widgetPadding
-import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutSize.Companion.isWiderThan
 import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutSize.Companion.showTitleBar
 import com.example.platform.ui.appwidgets.glance.layout.collections.layout.CheckListLayoutSize.Small
-import com.example.platform.ui.appwidgets.glance.layout.utils.ActionUtils.actionStartDemoActivity
-import com.example.platform.ui.appwidgets.glance.layout.utils.LargeWidgetPreview
-import com.example.platform.ui.appwidgets.glance.layout.utils.MediumWidgetPreview
-import com.example.platform.ui.appwidgets.glance.layout.utils.SmallWidgetPreview
+import com.sather.todo.data.Routine
 
 /**
- * A layout focused on presenting list of items in a check list. Content is displayed in a
- * [Scaffold] below an app-specific title bar.
+ *一种布局，侧重于在检查列表中显示项目列表。内容以
+ * [Scaffold] 位于特定于应用程序的标题栏下方。
  *
- * The layout is a variation of [ActionListLayout], where on-check, item is removed from list once
- * updated in the backend. The layout assumes checklist items follow a certain order, so, in
- * larger sizes, instead of displaying items in a grid, the layout shows additional trailing
- * actions per item. However, if grid works for your use case, you can switch over to it to
- * support large sizes.
+ * 布局是 [ActionListLayout] 的变体，其中 on-check，项从列表中删除一次
+ * 在后端更新。布局假定清单项遵循特定顺序，因此，在
+ * 较大的大小，布局显示额外的尾随，而不是在网格中显示项目
+ * 每个项目的作。但是，如果网格适用于您的使用案例，您可以切换到它以
+ * 支持大尺寸。
  *
- * In this sample, user sees the checked state until the item is removed from the list in the
- * backing database. By showing the checked state, it is clear to the user that tapping did
- * something. Specifically, for similar looking texts, it may not be immediately obvious to the
- * user that item was removed; the intermediate checked state gives that clarity.
+ * 在此示例中，用户会看到 checked 状态，直到该项目从
+ * 后备数据库。通过显示选中状态，用户可以清楚地知道点按
+ *东西。具体来说，对于外观相似的文本，它可能不会立即对
+ * 用户，该项目已被删除;中间 checked 状态提供了这种清晰度。
  *
- * @param title the text to be displayed as title of the widget, e.g. name of your widget or app.
- * @param titleIconRes a tintable icon that represents your app or brand, that can be displayed
- *                     with the provided [title]. In this sample, we use icon from a drawable
- *                     resource, but you should use an appropriate icon source for your use case.
- * @param titleBarActionIconRes resource id of a tintable icon that can be displayed as
- *                              an icon button within the title bar area of the widget. For
- *                              example, a search icon to launch search for finding specific
- *                              items.
- * @param titleBarActionIconContentDescription description of the [titleBarActionIconRes] button
- *                                             to be used by the accessibility services.
- * @param titleBarAction action to be performed on click of the [titleBarActionIconRes] button.
- * @param items list of items to be included in the list; typically includes a short title and a
- *              supporting text.
- * @param checkedItems list of keys of items that are in checked state.
- * @param checkedIconRes tintable icon to be pressed to uncheck an item.
- * @param unCheckedIconRes tintable icon to be pressed to check an item.
- * @param checkButtonContentDescription description of the unchecked button to be used by the
- *                                     accessibility services; in checked state, button is
- *                                     not clickable.
- * @param onCheck handler to perform the specific action on click of icon; in
- *                          a to-do list this can be the handler removing the item from the list.
+ * @param要显示为 widget 标题的文本命名，例如您的 widget 或 app 的名称。
+ * @param titleIconRes，一个代表您的应用或品牌的可着色图标，可以显示该图标
+ * 使用提供的 [title]。在此示例中，我们使用 drawable 中的 icon
+ * 资源，但您应该为您的用例使用适当的图标源。
+ * @param可着色图标的 titleBarActionIconRes 资源 ID，该图标可显示为
+ * 小部件标题栏区域中的图标按钮。为
+ * 示例，用于启动搜索以查找特定
+ *项目。
+ * @param [titleBarActionIconRes] 按钮的 titleBarActionIconContentDescription 说明
+ * 供辅助功能服务使用。
+ * @param 单击[titleBarActionIconRes]按钮时执行的titleBarAction动作。
+ * @param要包含在列表中的项目列表;通常包括一个简短的标题和一个
+ * 支持文本。
+ * @param checkedItems 处于选中状态的项的键列表。
+ * @param按下 checkedIconRes 着色图标以取消选中项目。
+ * @param按下 unCheckedIconRes 着色图标来检查项目。
+ * @param checkButtonContentDescription 要使用的未选中按钮的描述
+ * 无障碍服务;在选中状态下，Button 为
+ * 不可点击。
+ * @param onCheck 处理程序在点击图标时执行特定动作;在
+ * 待办事项列表 这可以是从列表中删除项目的处理程序。
 
- *
- * @see [CheckListItem] for accepted inputs.
+*
+ * @see [CheckListItem] 表示接受的输入。
  * @see [com.example.platform.ui.appwidgets.glance.layout.collections.CheckListAppWidgetReceiver]
  */
 @Composable
@@ -84,13 +74,12 @@ fun CheckListLayout(
   @DrawableRes titleIconRes: Int,
   @DrawableRes titleBarActionIconRes: Int,
   titleBarActionIconContentDescription: String,
-  titleBarAction: Action,
-  items: List<CheckListItem>,
-  checkedItems: List<String>,
+  items: List<Routine>,
+  checkedItems: List<Long>,
   @DrawableRes checkedIconRes: Int,
   @DrawableRes unCheckedIconRes: Int,
   checkButtonContentDescription: String,
-  onCheck: (String) -> Unit,
+  onCheck: (Long) -> Unit,
 ) {
   val checkListLayoutSize = CheckListLayoutSize.fromLocalSize()
 
@@ -107,7 +96,7 @@ fun CheckListLayout(
           contentDescription = titleBarActionIconContentDescription,
           contentColor = GlanceTheme.colors.secondary,
           backgroundColor = null, // transparent
-          onClick = titleBarAction
+          onClick = {}
         )
       }
     )
@@ -133,7 +122,7 @@ fun CheckListLayout(
     }
   ) {
     if (items.isEmpty()) {
-      EmptyListContent()
+      Text("items.isEmpty")
     } else {
       Content(
         items = items,
@@ -149,9 +138,9 @@ fun CheckListLayout(
 
 @Composable
 private fun Content(
-  items: List<CheckListItem>,
-  checkedItems: List<String>,
-  onCheck: (String) -> Unit,
+  items: List<Routine>,
+  checkedItems: List<Long>,
+  onCheck: (Long) -> Unit,
   @DrawableRes checkedIconRes: Int,
   @DrawableRes unCheckedIconRes: Int,
   checkButtonContentDescription: String,
@@ -163,7 +152,7 @@ private fun Content(
     itemContentProvider = { item ->
       CheckListItem(
         item = item,
-        isChecked = checkedItems.contains(item.key),
+        isChecked = checkedItems.contains(item.id),
         onCheck = onCheck,
         checkedIconRes = checkedIconRes,
         unCheckedIconRes = unCheckedIconRes,
@@ -181,19 +170,16 @@ private fun Content(
  */
 @Composable
 private fun CheckListItem(
-  item: CheckListItem,
+  item: Routine,
   @DrawableRes checkedIconRes: Int,
   @DrawableRes unCheckedIconRes: Int,
   checkButtonContentDescription: String,
-  onCheck: (String) -> Unit,
+  onCheck: (Long) -> Unit,
   modifier: GlanceModifier = GlanceModifier,
   isChecked: Boolean,
 ) {
-    val listItemEndPadding = if (item.hasTrailingIcons) {
-        0.dp
-    } else {
-        checkListRowEndPadding
-    }
+    val listItemEndPadding = checkListRowEndPadding
+    
 
   @Composable
   fun CheckButton() {
@@ -207,15 +193,15 @@ private fun CheckListItem(
       contentColor = GlanceTheme.colors.secondary,
       contentDescription = checkButtonContentDescription,
       enabled = !isChecked,
-      onClick = { onCheck(item.key) },
-      key = "${LocalSize.current} ${item.key}"
+      onClick = { onCheck(item.id) },
+      key = "${LocalSize.current} ${item.id}"
     )
   }
 
   @Composable
   fun Title() {
     Text(
-      text = item.title,
+      text = item.content,
       style = CheckListLayoutTextStyles.titleText,
       maxLines = 2,
     )
@@ -224,24 +210,9 @@ private fun CheckListItem(
   @Composable
   fun SupportingText() {
     Text(
-      text = item.supportingText,
+      text = item.subcontent,
       style = CheckListLayoutTextStyles.supportingText,
       maxLines = 2,
-    )
-  }
-
-  @Composable
-  fun TrailingActions() {
-    TrailingIconButtonSet(
-      leadingButtonRes = R.drawable.sample_edit_icon,
-      leadingButtonContentDescription = "Edit",
-      leadingButtonOnClick = actionStartDemoActivity(message = "Edit click on item: ${item.key}"),
-      middleButtonRes = R.drawable.sample_snooze_icon,
-      middleButtonContentDescription = "Snooze",
-      middleButtonOnClick = actionStartDemoActivity(message = "Snooze click on item: ${item.key}"),
-      trailingButtonRes = R.drawable.sample_delete_icon,
-      trailingButtonContentDescription = "Delete",
-      trailingButtonOnClick = actionStartDemoActivity(message = "Delete click on item: ${item.key}"),
     )
   }
 
@@ -253,64 +224,9 @@ private fun CheckListItem(
     leadingContent = { CheckButton() },
     headlineContent = { Title() },
     supportingContent = { SupportingText() },
-    trailingContent = takeComposableIf(item.hasTrailingIcons)
-    { TrailingActions() },
   )
 }
 
-@Composable
-private fun TrailingIconButtonSet(
-  @DrawableRes leadingButtonRes: Int,
-  leadingButtonContentDescription: String,
-  leadingButtonOnClick: Action,
-  @DrawableRes middleButtonRes: Int,
-  middleButtonContentDescription: String,
-  middleButtonOnClick: Action,
-  @DrawableRes trailingButtonRes: Int,
-  trailingButtonContentDescription: String,
-  trailingButtonOnClick: Action,
-) {
-  val checkListLayoutSize = CheckListLayoutSize.fromLocalSize()
-
-  if (checkListLayoutSize.isWiderThan(CheckListLayoutSize.Medium)) {
-    CircleIconButton(
-      imageProvider = ImageProvider(leadingButtonRes),
-      backgroundColor = null, // to show transparent background
-      contentColor = GlanceTheme.colors.secondary,
-      contentDescription = leadingButtonContentDescription,
-      onClick = leadingButtonOnClick,
-    )
-    if (checkListLayoutSize.isWiderThan(CheckListLayoutSize.Large)) {
-      CircleIconButton(
-        imageProvider = ImageProvider(middleButtonRes),
-        backgroundColor = null, // to show transparent background
-        contentColor = GlanceTheme.colors.secondary,
-        contentDescription = middleButtonContentDescription,
-        onClick = middleButtonOnClick,
-      )
-    }
-    if (checkListLayoutSize.isWiderThan(CheckListLayoutSize.XLarge)) {
-      CircleIconButton(
-        imageProvider = ImageProvider(trailingButtonRes),
-        backgroundColor = null, // to show transparent background
-        contentColor = GlanceTheme.colors.secondary,
-        contentDescription = trailingButtonContentDescription,
-        onClick = trailingButtonOnClick,
-      )
-    }
-  }
-}
-
-/** Returns the provided [block] composable if [predicate] is true, else returns null */
-@Composable
-private inline fun takeComposableIf(
-  predicate: Boolean,
-  crossinline block: @Composable () -> Unit,
-): (@Composable () -> Unit)? {
-  return if (predicate) {
-    { block() }
-  } else null
-}
 
 /**
  * Holds data corresponding to each item in a
@@ -367,10 +283,6 @@ private enum class CheckListLayoutSize(val maxWidth: Dp) {
       throw IllegalStateException("No mapped size ")
     }
 
-    fun CheckListLayoutSize.isWiderThan(checkListLayoutSize: CheckListLayoutSize): Boolean {
-      return this.maxWidth > checkListLayoutSize.maxWidth
-    }
-
     @Composable
     fun showTitleBar(): Boolean {
       return LocalSize.current.height >= 180.dp
@@ -422,12 +334,6 @@ private object CheckListLayoutDimensions {
 /**
  * Preview sizes of layout at the configured width breakpoints.
  */
-@OptIn(ExperimentalGlancePreviewApi::class)
-@Preview(widthDp = 259, heightDp = 200)
-@Preview(widthDp = 303, heightDp = 200)
-@Preview(widthDp = 350, heightDp = 200)
-private annotation class CheckListBreakpointPreviews
-
 /**
  * Previews for the check list layout.
  *
@@ -435,28 +341,3 @@ private annotation class CheckListBreakpointPreviews
  * the previews at standard sizes allows us to quickly verify updates across min / max and common
  * widget sizes without needing to run the app or manually place the widget.
  */
-@CheckListBreakpointPreviews
-@SmallWidgetPreview
-@MediumWidgetPreview
-@LargeWidgetPreview
-@Composable
-private fun CheckListLayoutPreview() {
-  val context = LocalContext.current
-  CheckListLayout(
-    title = context.getString(R.string.sample_check_list_app_widget_name),
-    titleIconRes = R.drawable.sample_pin_icon,
-    titleBarActionIconRes = R.drawable.sample_add_icon,
-    titleBarActionIconContentDescription = context.getString(
-      R.string.sample_add_button_text,
-    ),
-    titleBarAction = actionStartDemoActivity("Add icon in title bar"),
-    items = demoData,
-    checkedItems = listOf("1"),
-    checkButtonContentDescription = context.getString(
-      R.string.sample_mark_done_button_content_description,
-    ),
-    checkedIconRes = R.drawable.sample_checked_circle_icon,
-    unCheckedIconRes = R.drawable.sample_circle_icon,
-    onCheck = {},
-  )
-}

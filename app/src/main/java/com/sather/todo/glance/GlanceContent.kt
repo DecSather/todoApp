@@ -11,26 +11,22 @@ import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.components.CircleIconButton
 import androidx.glance.appwidget.components.Scaffold
 import androidx.glance.appwidget.lazy.LazyColumn
-import androidx.glance.appwidget.lazy.itemsIndexed
+import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.layout.*
 import androidx.glance.preview.ExperimentalGlancePreviewApi
 import androidx.glance.preview.Preview
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.workDataOf
 import com.sather.todo.R
 import com.sather.todo.data.Routine
-import com.sather.todo.glance.workmanager.UpdateRoutineWorker
-import com.sather.todo.glance.workmanager.UpdateWidgetWorker
-import com.sather.todo.glance.workmanager.getRoutinesFromDataStore
-import com.sather.todo.glance.workmanager.saveTimeTitleToDataStore
+import com.sather.todo.glance.data.BacklogWidgetRepository.Companion.getBacklogRepo
+import com.sather.todo.glance.data.RoutineWidgetRepository.Companion.getRoutineRepo
 import com.sather.todo.ui.backlog.formatter
 import com.sather.todo.ui.theme.MyAppWidgetGlanceColorScheme
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class MyAppWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -38,12 +34,48 @@ class MyAppWidgetReceiver : GlanceAppWidgetReceiver() {
 }
 class MyAppWidget : GlanceAppWidget() {
     
-    
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
+    override suspend fun provideGlance(context: Context, glanceId: GlanceId) {
+        val backlogRepo = getBacklogRepo(context,glanceId)
+        val routineRepo = getRoutineRepo(context,glanceId)
+        val initTimeTitle = LocalDate.now().format(formatter)
+        
+        val initRoutines = withContext(Dispatchers.Default) {
+            routineRepo.load(backlogRepo.load(initTimeTitle))
+        }
         provideContent{
+            val coroutineScope = rememberCoroutineScope()
             
+            val routines by routineRepo.routines().collectAsState(initial = initRoutines)
+            val finishedIds by routineRepo.finishedIds().collectAsState(initial = emptySet())
+            var timeTitle by remember { mutableStateOf(initTimeTitle) }
+            var currentTime by remember { mutableStateOf(LocalDate.now()) }
             GlanceTheme(colors = MyAppWidgetGlanceColorScheme.colors) {
-                MyWidgetContent()
+                MyWidgetContent(
+                    timeTitle = timeTitle+"-${routines.size-finishedIds.size}",
+                    items = routines,
+                    refreshClick = {
+                        coroutineScope.launch {
+                            routineRepo.load(backlogRepo.load(timeTitle))
+                        }
+                    },
+                    beforeClick = {
+                        currentTime = currentTime.minusDays(1)
+                        timeTitle = currentTime.format(formatter)
+                    },
+                    afterClick = {
+                        currentTime = currentTime.plusDays(1)
+                        timeTitle = currentTime.format(formatter)
+//                    refresh = true
+                    },
+                    isFinished = {
+                        finishedIds.contains(it)
+                                 },
+                    onFinishedChange = { id->
+                        coroutineScope.launch {
+                            routineRepo.toggleFinished(id)
+                        }
+                    }
+                )
             }
         }
     }
@@ -51,46 +83,29 @@ class MyAppWidget : GlanceAppWidget() {
     @OptIn(ExperimentalGlancePreviewApi::class)
     @Preview
     @Composable
-    fun MyWidgetContent() {
-        val context = LocalContext.current
-
-        
-        var currentTime by remember { mutableStateOf(LocalDate.now()) }
-        var timeTitle by remember { mutableStateOf(currentTime.format(formatter)) }
-//        刷新逻辑
-        var refresh by remember { mutableStateOf(false) }
-        LaunchedEffect(refresh) {
-            if(refresh) {
-                delay(300)
-                triggerUpdateWidgetWorker(context, timeTitle)
-                refresh = false
-            }
-        }
-        
-        // 从 SharedPreferences 中读取数据
-        val items by getRoutinesFromDataStore(context).collectAsState(initial = emptyList())
-        LaunchedEffect(items){
-        
-        }
+    fun MyWidgetContent(
+        timeTitle: String,
+        items:List<Routine>,
+        refreshClick :() ->Unit,
+        beforeClick:() ->Unit,
+        afterClick :()->Unit,
+        isFinished:(Long)->Boolean,
+        onFinishedChange:(Long) ->Unit,
+    ) {
         Scaffold(
             titleBar = titleBar(
                 timeTitle,
-                refreshClick = {
-                    println("refresh")
-                    refresh = true
-                },
+                refreshClick = refreshClick,
                 beforeClick = {
-                    currentTime = currentTime.minusDays(1)
-                    timeTitle = currentTime.format(formatter)
-                    refresh = true
-                              },
+                    beforeClick()
+                    refreshClick()
+                },
                 afterClick = {
-                    currentTime = currentTime.plusDays(1)
-                    timeTitle = currentTime.format(formatter)
-                    refresh = true
+                    afterClick()
+                    refreshClick()
                 }
             )
-        ) {
+        ){
             Column(
                 modifier = GlanceModifier.fillMaxSize().padding(8.dp)
             ) {
@@ -100,19 +115,18 @@ class MyAppWidget : GlanceAppWidget() {
                         modifier = GlanceModifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("Loading...")
+                        Text("nothing for today")
                     }
                 }else {
                     LazyColumn(GlanceModifier.fillMaxWidth()) {
-                        itemsIndexed(
+                        items(
                             items = items,
-                            itemId = {_,item -> item.id},
-                        ){index,item ->
+                            itemId = { item -> item.id},
+                        ){item ->
                             ListRow(
-                                context,
                                 item,
-                                onFinishedChange = {
-                                }
+                                isFinished = isFinished(item.id),
+                                onFinishedChange = {onFinishedChange(item.id)}
                             )
                             
                         }
@@ -120,9 +134,8 @@ class MyAppWidget : GlanceAppWidget() {
                 }
             }
         }
-        
     }
-    fun titleBar(
+    private fun titleBar(
         timeTile:String,
         refreshClick :() ->Unit,
         beforeClick:() ->Unit,
@@ -130,10 +143,8 @@ class MyAppWidget : GlanceAppWidget() {
     ): @Composable (() -> Unit) = {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            
             ) {
             Spacer(modifier = GlanceModifier.width(16.dp))
-            
             Text(
                 text = timeTile,
                 style = TextStyle(
@@ -172,79 +183,30 @@ class MyAppWidget : GlanceAppWidget() {
     }
     @Composable
     fun ListRow(
-        context:Context,
         routine: Routine,
+        isFinished:Boolean,
         onFinishedChange:() ->Unit,
     ) {
-        
-        var isFinished by remember { mutableStateOf(routine.finished) }
-        
-        LaunchedEffect(isFinished) {
-            if(isFinished) {
-                triggerUpdateRoutine(
-                    context = context,
-                    id = routine.id,
-                    finished = true
-                )
-            }
-        }
-            Column {
-                Row(
-                    modifier = GlanceModifier.fillMaxWidth().wrapContentHeight(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    if(!isFinished) {
-                        CheckBox(
-                            checked = false,
-                            onCheckedChange = {
-                                isFinished = true
-                                onFinishedChange()
-                            }
-                        )
-                    }
-                    Spacer(modifier = GlanceModifier.width(8.dp))
-                    Text(
-                        text = routine.content,
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onSurface
-                        )
+        Column {
+            Row(
+                modifier = GlanceModifier.fillMaxWidth().wrapContentHeight(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                if(!isFinished) {
+                    CheckBox(
+                        checked = isFinished,
+                        onCheckedChange = onFinishedChange
                     )
                 }
-                Spacer(GlanceModifier.fillMaxWidth().height(1.dp).background(GlanceTheme.colors.secondaryContainer))
+                Spacer(modifier = GlanceModifier.width(8.dp))
+                Text(
+                    text = routine.content,
+                    style = TextStyle(
+                        color = GlanceTheme.colors.onSurface
+                    )
+                )
             }
-        
-    }
-    
-    // routine完成更新：一次性workmanager存数据，
-    fun triggerUpdateRoutine(context: Context, id: Long, finished: Boolean) {
-        val inputData = workDataOf(
-            "id" to id,
-            "finished" to finished
-            
-        )
-        val updateRequest = OneTimeWorkRequestBuilder<UpdateRoutineWorker>()
-            .setInputData(inputData)
-            .build()
-        
-        // 并行执行多个任务
-        WorkManager.getInstance(context).enqueueUniqueWork(
-            "update_routine_${id}", // 唯一任务名称
-            ExistingWorkPolicy.REPLACE ,
-            updateRequest // 任务请求
-        )
-    }
-    suspend fun triggerUpdateWidgetWorker(context: Context, timeTile: String) {
-        // 存timeTitle
-        saveTimeTitleToDataStore(context, timeTile)
-        // 通过timeTitle存新routineList
-        val updateRequest = OneTimeWorkRequestBuilder<UpdateWidgetWorker>()
-            .build()
-        
-        // 执行更新命令-一次性的
-        WorkManager.getInstance(context).enqueueUniqueWork(
-            "update_time_title_${timeTile}", // 唯一任务名称
-            ExistingWorkPolicy.REPLACE, // 替换已有任务
-            updateRequest // 任务请求
-        )
+            Spacer(GlanceModifier.fillMaxWidth().height(1.dp).background(GlanceTheme.colors.secondaryContainer))
+        }
     }
 }

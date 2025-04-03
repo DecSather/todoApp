@@ -8,7 +8,11 @@ import com.sather.todo.data.Backlog
 import com.sather.todo.data.BacklogsRepository
 import com.sather.todo.data.Routine
 import com.sather.todo.data.RoutinesRepository
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+
 /*
 * SingleBacklog
 *   数据展示-或可考虑将删除键移到主页以简化交互逻辑
@@ -30,8 +34,8 @@ class SingleBacklogViewModel(
                 initialValue = BacklogUiState()
             )
     suspend fun deleteBacklogById(id:Long) {
-        backlogsRepository.deleteBacklogById(id)
         routinesRepository.deleteRoutineByBacklogId(id)
+        backlogsRepository.deleteBacklogById(id)
     }
     
     

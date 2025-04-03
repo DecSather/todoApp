@@ -50,7 +50,7 @@ android {
 
 dependencies {
 //    拖放库
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
     
     // DataStore
     implementation ("androidx.datastore:datastore-preferences:1.1.0")

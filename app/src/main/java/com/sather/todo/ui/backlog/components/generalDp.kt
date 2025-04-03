@@ -1,4 +1,4 @@
-package com.sather.todo.ui.components
+package com.sather.todo.ui.backlog.components
 
 import androidx.compose.ui.unit.dp
 

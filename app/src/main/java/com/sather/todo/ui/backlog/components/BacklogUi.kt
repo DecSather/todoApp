@@ -1,8 +1,12 @@
-package com.sather.todo.ui.components
+package com.sather.todo.ui.backlog.components
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.*
-import androidx.compose.foundation.*
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -19,10 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -35,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
-import com.sather.todo.ui.components.backlogs.TextDisplaysRow
 import com.sather.todo.ui.theme.faverColor
 import com.sather.todo.ui.theme.importColor
 import com.sather.todo.ui.theme.normalColor
