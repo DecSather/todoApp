@@ -50,7 +50,7 @@ android {
 
 dependencies {
 //    拖放库
-    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+    implementation("sh.calvin.reorderable:reorderable:2.4.3")
     
     // DataStore
     implementation ("androidx.datastore:datastore-preferences:1.1.0")

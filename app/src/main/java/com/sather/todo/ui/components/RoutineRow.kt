@@ -72,71 +72,71 @@ fun DetailRoutineRow(
                 .size(24.dp)
         )
     },
-    
     ) {
     val color= RoutineColors[colorIndex]
     var finished by remember { mutableStateOf(isFinished) }
     val customColors = CheckboxDefaults.colors(
         checkedColor =MaterialTheme.colorScheme.primary, // 选中时的颜色
     )
-    Row(
-        modifier = modifier
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .padding(horizontal = basePadding)
-            .height(LargeHeight)
-//            .swipeToDismiss(swipeToDelete)
-        ,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val typography = MaterialTheme.typography
-        RowIndicator(
-            color = color,
-            modifier = Modifier
-        )
-        Spacer(Modifier.width(12.dp))
-        Checkbox(
-            colors = customColors,
-            checked = finished,
-            onCheckedChange = {
-                onFinishedChange()
-            }
-        )
-        Column(Modifier) {
-            if(finished){
-                Text(
-                    text = content,
-                    style = typography.bodyMedium,
-                    textDecoration = TextDecoration.LineThrough,
-                )
-            }else{
-                if(content.isNotBlank())
-                    Text(text = content, style = typography.bodyMedium)
-                else
-                    Text(text = "Not be EMPTY", style = typography.bodyMedium)
-                if(subcontent.isNotEmpty())
-                    Text(text = subcontent, style = typography.bodySmall)
-                
-            }
-        }
-        Spacer(Modifier.weight(1f))
+    Column {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = modifier
+                .background(MaterialTheme.colorScheme.secondaryContainer)
+                .padding(horizontal = basePadding)
+                .height(LargeHeight),
+//                .swipeToDismiss(swipeToDelete),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.dollarSign),
-                style = typography.headlineMedium,
-                modifier = Modifier.align(Alignment.CenterVertically)
+            val typography = MaterialTheme.typography
+            RowIndicator(
+                color = color,
+                modifier = Modifier
             )
-            Text(
-                text = credit.toString(),
-                style = typography.headlineMedium,
-                modifier = Modifier.align(Alignment.CenterVertically)
+            Spacer(Modifier.width(12.dp))
+            Checkbox(
+                colors = customColors,
+                checked = finished,
+                onCheckedChange = {
+                    onFinishedChange()
+                }
             )
+            Column(Modifier) {
+                if (finished) {
+                    Text(
+                        text = content,
+                        style = typography.bodyMedium,
+                        textDecoration = TextDecoration.LineThrough,
+                    )
+                } else {
+                    if (content.isNotBlank())
+                        Text(text = content, style = typography.bodyMedium)
+                    else
+                        Text(text = "Not be EMPTY", style = typography.bodyMedium)
+                    if (subcontent.isNotEmpty())
+                        Text(text = subcontent, style = typography.bodySmall)
+                    
+                }
+            }
+            Spacer(Modifier.weight(1f))
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.dollarSign),
+                    style = typography.headlineMedium,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = credit.toString(),
+                    style = typography.headlineMedium,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            }
+            Spacer(Modifier.width(16.dp))
+            icon()
         }
-        Spacer(Modifier.width(16.dp))
-        icon()
+        BaseDivider()
     }
-    BaseDivider()
 }
 //Routine列-新增
 @Composable
@@ -207,7 +207,7 @@ fun BaseDivider(
  *
  * @param onDismissed Called when the element is swiped to the edge of the screen.
  */
-private fun Modifier.swipeToDismiss(
+fun Modifier.swipeToDismiss(
     onDismissed: () -> Unit
 ): Modifier = composed {
     // This `Animatable` stores the horizontal offset for the element.

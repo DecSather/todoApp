@@ -1,49 +1,86 @@
 package com.sather.todo.textexample
 
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
-import com.sather.todo.ui.components.LargeHeight
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
+import androidx.core.view.HapticFeedbackConstantsCompat
+import androidx.core.view.ViewCompat
+import com.sather.todo.data.Routine
+import com.sather.todo.ui.components.DetailRoutineRow
+import com.sather.todo.ui.components.swipeToDismiss
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
-fun VerticalReorderList() {
-    val data = remember { mutableStateOf(List(100) { "Item $it" }) }
-    val state = rememberReorderableLazyListState(onMove = { from, to ->
-        data.value = data.value.toMutableList().apply {
+fun VerticalReorderList(routineList:List<Routine>) {
+    val view = LocalView.current
+    
+    var list = remember { mutableStateListOf<Routine>().apply {
+        addAll(routineList)
+    } }
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        list.apply {
             add(to.index, removeAt(from.index))
         }
-    })
+        ViewCompat.performHapticFeedback(
+            view,
+            HapticFeedbackConstantsCompat.SEGMENT_FREQUENT_TICK
+        )
+    }
+    
     LazyColumn(
-        state = state.listState,
-        modifier = Modifier
-            .reorderable(state)
-            .detectReorderAfterLongPress(state)
+        modifier = Modifier.fillMaxSize(),
+        state = lazyListState,
     ) {
-        items(items = data.value, key = { it }) { item ->
-            ReorderableItem(state, key = item) { isDragging ->
-                val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
-                Column(
-                    modifier = Modifier
-                        .height(LargeHeight)
-                        .shadow(elevation.value)
-                        .background(MaterialTheme.colorScheme.secondaryContainer)
-                ) {
-                    Text(item)
+        items(
+            items = list,
+            key = { it.id }
+        ) {routine ->
+            ReorderableItem(
+                state = reorderableLazyListState,
+                key =  routine.id
+            ) { isDragging ->
+                val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
+                
+                Surface(shadowElevation = elevation) {
+                    DetailRoutineRow(
+                        modifier = Modifier
+                            .clickable{
+                                println("click")
+                            }
+                        .swipeToDismiss { println("swipe") },
+                        id = routine.id,
+                        content = routine.content,
+                        subcontent = routine.subcontent,
+                        isFinished = routine.finished,
+                        credit = routine.credit,
+                        colorIndex = routine.rank,
+                    ) {
+                        IconButton(
+                            onClick = {},
+                            modifier = Modifier.fillMaxHeight()
+                                .draggableHandle()
+                        ) {
+                            Icon(Icons.Rounded.Menu, "Drag Handle")
+                        }
+                    }
                 }
             }
         }
