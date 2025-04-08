@@ -3,7 +3,12 @@
     <string name="total">Total</string>
     <string name="attention">Attention</string>
     <string name="dollarSign" translatable="false">$</string>
+    <!-- come sooon -->
+    <string name="come_soon">Comesoon</string>
+    <string name="coming_soon">Coming soon</string>
+    <string name="waiting_implement">waiting implement</string>
 <!--     Backlog -->
+    <string name="home_route">Backlogs</string>
     <string name="credit">Credit</string>
     <string name="formatter">yyyy-MM-dd</string>
     <string name="unfinished"> unfinished</string>

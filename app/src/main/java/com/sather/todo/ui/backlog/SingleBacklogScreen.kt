@@ -246,19 +246,15 @@ fun  SingleBacklogBody(
                 
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
-                        println("swipe box value：$it")
                         if (it == SwipeToDismissBoxValue.StartToEnd) { // 仅在完全滑动时触发
                                 tempUnfinishedList.remove(routine)
                                 swipeToDeleteRoutine(routine.id)
                                  true
-                            
                         } else {
                             false // 未达阈值时回弹
                         }
                     },
-                    positionalThreshold = {
-                        it
-                    }
+                    positionalThreshold = {it / 2}
                     
                 )
                 

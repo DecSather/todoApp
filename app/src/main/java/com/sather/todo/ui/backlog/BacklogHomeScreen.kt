@@ -38,7 +38,7 @@ import java.time.format.DateTimeFormatter
 //日程-home页
 data object BacklogHome : BaseDestination {
     override val icon =Icons.Filled.Timer
-    override val route ="backlogs"
+    override val route = "Backlogs"
 }
 //    三次接入-标题展开，进入页面，数据渲染
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -153,20 +153,32 @@ fun BacklogHomeBody(
     var showEditDialog by remember { mutableStateOf(false) }
     var clickPart by rememberSaveable { mutableIntStateOf(-1) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var importTotal = 0f
-    var normalTotal = 0f
-    var faverTotal = 0f
-    finishedRoutineList.map{ it ->
-        when(it.rank){
-            1 -> importTotal += it.credit
-            2 -> normalTotal += it.credit
-            else -> faverTotal += it.credit
+    val (importTotal, normalTotal, faverTotal) = remember(finishedRoutineList) {
+        var import = 0f
+        var normal = 0f
+        var faver = 0f
+        finishedRoutineList.forEach { routine ->
+            when (routine.rank) {
+                1 -> import += routine.credit
+                2 -> normal += routine.credit
+                else -> faver += routine.credit
+            }
         }
+        Triple(import, normal, faver)
     }
-    val creditsTotal =importTotal+normalTotal+faverTotal
     
-    val properties :List<Float> = if(creditsTotal>0f) listOf(0f,importTotal,normalTotal,faverTotal) else listOf(1f,0f,0f,0f)
+    val creditsTotal = remember(importTotal, normalTotal, faverTotal) {
+        importTotal + normalTotal + faverTotal
+    }
     
+    val properties = remember(creditsTotal, importTotal, normalTotal, faverTotal) {
+        if (creditsTotal > 0f) listOf(0f, importTotal, normalTotal, faverTotal)
+        else listOf(1f, 0f, 0f, 0f)
+    }
+    
+    val filteredBacklogList by remember(backlogList) {
+        derivedStateOf { backlogList.sortedByDescending { it.id } }
+    }
     BaseScreenBody(
         lazyColumnModifier = Modifier
             .semantics { contentDescription = "Backlogs Screen" },
@@ -190,9 +202,14 @@ fun BacklogHomeBody(
             }
         },
         rows = {
-            items(items = backlogList,key = {it.id}) { backlog ->
-                val routineList =
-                    homeRoutineList.filter {it.backlogId == backlog.id}
+            items(
+                items = filteredBacklogList,
+                key = {it.id},
+                contentType = { "backlogItem" }
+            ) { backlog ->
+                val routineList by remember(backlog.id, homeRoutineList) {
+                    derivedStateOf { homeRoutineList.filter { it.backlogId == backlog.id } }
+                }
                 BacklogSwipeCard(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,

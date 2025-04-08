@@ -111,7 +111,7 @@ fun DetailRoutineRow(
                     if (content.isNotBlank())
                         Text(text = content, style = typography.bodyMedium)
                     else
-                        Text(text = "Not be EMPTY", style = typography.bodyMedium)
+                        Text(text = stringResource(R.string.routine_empty_error), style = typography.bodyMedium)
                     if (subcontent.isNotEmpty())
                         Text(text = subcontent, style = typography.bodySmall)
                     

@@ -4,9 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.exponentialDecay
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.AnchoredDraggableState
 import androidx.compose.foundation.gestures.DraggableAnchors
 import androidx.compose.foundation.gestures.Orientation
@@ -147,10 +145,10 @@ enum class DragAnchors {
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BacklogSwipeCard(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     
     modifier: Modifier = Modifier,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     backlog: Backlog,
     routineList:List<Routine>,
     
@@ -197,7 +195,7 @@ fun BacklogSwipeCard(
             }
         ) {
             Card(
-                modifier = modifier.padding(horizontal = 16.dp),
+                modifier = modifier.padding(horizontal = 16.dp) ,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Column {
@@ -268,7 +266,12 @@ fun BacklogSwipeCard(
                             style = MaterialTheme.typography.titleMedium,
                         )
                         if (expanded) {
-                            Column{
+                            Column(
+                                Modifier.heightIn( max = 240.dp)
+                                    .verticalScroll(
+                                        rememberScrollState()
+                                    )
+                            ){
                                 var sortId = 0
                                 routineList.map{it ->
                                     key(it.id){

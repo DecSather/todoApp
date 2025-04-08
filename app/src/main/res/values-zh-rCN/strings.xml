@@ -3,6 +3,8 @@
     <string name="app_name">待办速记</string>
     <string name="total">共计</string>
     <string name="attention">注意</string>
+    <string name="come_soon">开发中</string>
+    <string name="home_route">日程</string>
     <string name="credit">总分</string>
     <string name="rontine_content_req">标题*</string>
     <string name="rontine_rank_req">分级*</string>
@@ -26,4 +28,6 @@
     <string name="todo_list">待办清单</string>
     <string name="routine_credit_error">纯数字</string>
     <string name="copy_done_action">已复制</string>
+    <string name="coming_soon">正在开发</string>
+    <string name="waiting_implement">等待实现</string>
 </resources>
