@@ -1,29 +1,24 @@
 package com.sather.todo.ui.navigation
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.sather.todo.ui.backlog.BacklogHome
 import com.sather.todo.ui.backlog.BacklogHomeScreen
-import com.sather.todo.ui.backlog.SingleBacklogDestination
 import com.sather.todo.ui.backlog.SingleBacklogScreen
-import com.sather.todo.ui.comesoon.ComeSoon
 import com.sather.todo.ui.comesoon.ComeSoonScreen
-import com.sather.todo.ui.routine.SingleRoutineDestination
 import com.sather.todo.ui.routine.SingleRoutineScreen
+
 //waiting implement:页面转化的过渡
 
 
-interface BaseDestination {
-    val icon: ImageVector
-    val route: String
-}
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

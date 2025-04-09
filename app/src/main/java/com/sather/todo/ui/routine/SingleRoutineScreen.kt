@@ -11,27 +11,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.sather.todo.R
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.RoutineColors
-import com.sather.todo.ui.navigation.BaseDestination
+import com.sather.todo.ui.components.TextLimitedWidth
+import com.sather.todo.ui.components.basePadding
 import kotlinx.coroutines.launch
+
 //new Routine Entry-预添加类设计，非数据
-object SingleRoutineDestination : BaseDestination {
-    override val route = "single_routine"
-    override val icon = Icons.Filled.Check
-    const val routineIdArg = "routineId"
-    val routeWithArgs = "$route/{$routineIdArg}"
-    val arguments = listOf(
-        navArgument(routineIdArg) { type = NavType.LongType }
-    )
-}
+
 
 @Composable
 fun SingleRoutineScreen(
@@ -66,8 +56,8 @@ fun SingleRoutineBody(
     
     val rankIndexList = listOf(1,2,3)
     Column(
-        modifier = modifier.padding(startPadding),
-        verticalArrangement = Arrangement.spacedBy(startPadding)
+        modifier = modifier.padding(basePadding),
+        verticalArrangement = Arrangement.spacedBy(basePadding)
     ) {
         
         IconButton(onClick = navigateBack) {
@@ -78,7 +68,7 @@ fun SingleRoutineBody(
         }
         Column(
             modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(startPadding)
+            verticalArrangement = Arrangement.spacedBy(basePadding)
         ) {
 //        content
             OutlinedTextField(
@@ -89,7 +79,7 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_content_req),
-                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary,
                     )
                         },
@@ -101,12 +91,12 @@ fun SingleRoutineBody(
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = stringResource(R.string.rontine_rank_req),
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(horizontal = startPadding),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(horizontal = basePadding),
                     color = MaterialTheme.colorScheme.secondary,
                 )
                 Row(
-                    modifier = Modifier.width(248.dp),
+                    modifier = Modifier.width(TextLimitedWidth),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
@@ -140,7 +130,7 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_credit_req),
-                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
                         },
@@ -157,7 +147,7 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_subcontent_req),
-                        fontSize = 15.sp,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.secondary,
                     )
                         },
@@ -166,7 +156,7 @@ fun SingleRoutineBody(
             if (!routineUiState.isEntryValid) {
                 Text(
                     text = stringResource(R.string.required_fields),
-                    modifier = Modifier.padding(start = startPadding),
+                    modifier = Modifier.padding(start = basePadding),
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
@@ -183,7 +173,6 @@ fun SingleRoutineBody(
         }
     }
 }
-private val startPadding = 16.dp
 @Composable
 fun rankSwitch(
     rank:Int,

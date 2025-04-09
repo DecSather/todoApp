@@ -43,12 +43,12 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.backlog.components.RoutineColors
+import com.sather.todo.ui.components.*
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -123,7 +123,7 @@ fun EditCardDialog(
             ),
             
             modifier = Modifier
-                .padding(16.dp)
+                .padding(basePadding)
                 .imePadding(),
             text = {
                 Column {
@@ -146,7 +146,7 @@ fun EditCardDialog(
                             ),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(5.dp)
+                                .padding(TabSpacer / 2)
                                 .pointerInput(selectedDate) {
                                     awaitEachGesture {
                                         awaitFirstDown(pass = PointerEventPass.Initial)
@@ -174,7 +174,7 @@ fun EditCardDialog(
                         Modifier
                             .fillMaxWidth()
                             .semantics { contentDescription = "Backlog Edit Card" }
-                            .heightIn(max = 250.dp)
+                            .heightIn(max = cardMaxHeight)
                             .animateContentSize()
                             .focusGroup(),
                         state = listState,
@@ -443,7 +443,7 @@ fun BacklogEditRow(
                 modifier = Modifier.align(Alignment.CenterVertically)
             )
             BasicTextField(
-                modifier = Modifier.width(68.dp)
+                modifier = Modifier.width(LargeWidth)
                     .padding(start = TabSpacer)
                     .onFocusEvent { focusState ->
                         if (focusState.isFocused) {
@@ -520,7 +520,7 @@ private fun RankColorBox(
 ){
     Row(
         modifier = Modifier
-            .height(BoxSize+ TabSpacer*2 )
+            .height(BoxSize+ TabSpacer * 2 )
             .clip(RoundedCornerShape(percent = 50))
             .clickable{ onClicked() },
         verticalAlignment = Alignment.CenterVertically
@@ -537,10 +537,6 @@ private fun RankColorBox(
         Spacer(modifier = Modifier.width(TabSpacer))
     }
 }
-private val TabHeight = 42.dp
-private val TabSpacer = 10.dp
-private val BoxSize = 16.dp
-private val roundCornerShape = 2.dp
 
 private fun isItemVisible(index: Int, listState: LazyListState): Int {
     val visibleItemsInfo = listState.layoutInfo.visibleItemsInfo

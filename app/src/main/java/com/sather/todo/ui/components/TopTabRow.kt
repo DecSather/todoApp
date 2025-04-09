@@ -21,10 +21,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.sather.todo.R
-import com.sather.todo.ui.backlog.BacklogHome
-import com.sather.todo.ui.backlog.components.basePadding
+import com.sather.todo.ui.navigation.BacklogHome
 import com.sather.todo.ui.navigation.BaseDestination
 import java.util.*
 
@@ -77,7 +75,7 @@ private fun ToDoAnimTab(
     }
     val tabTintColor by animateColorAsState(
         targetValue = if (selected) color else color.copy(alpha = InactiveTabOpacity),
-        animationSpec = animSpec
+        animationSpec = animSpec, label = "tab tint color"
     )
     Row(
         modifier = Modifier
@@ -105,7 +103,6 @@ private fun ToDoAnimTab(
     }
 }
 
-private val TabHeight = 56.dp
 private const val InactiveTabOpacity = 0.60f
 
 private const val TabFadeInAnimationDuration = 150

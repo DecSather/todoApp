@@ -9,12 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.sather.todo.ui.backlog.BacklogHome
-import com.sather.todo.ui.backlog.SingleBacklogDestination
 import com.sather.todo.ui.components.TopTabRow
-import com.sather.todo.ui.comesoon.ComeSoon
-import com.sather.todo.ui.navigation.ToDoNavHost
-import com.sather.todo.ui.navigation.navigateSingleTopTo
+import com.sather.todo.ui.navigation.*
 import com.sather.todo.ui.theme.ToDoTheme
 // Screens to be displayed in the top RallyTabRow
 val rallyTabRowScreens = listOf(BacklogHome, ComeSoon)

@@ -10,7 +10,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.sather.todo.ui.components.basePadding
 
 @Composable
 fun  BaseScreenBody(
@@ -43,7 +43,7 @@ fun  BaseScreenBody(
                 onClick = floatButtonAction,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(horizontal = 16.dp, vertical = 32.dp),
+                    .padding(horizontal = basePadding, vertical = basePadding * 2),
                 content =floatButtoncontent
             )
         }

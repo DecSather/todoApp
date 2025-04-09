@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
@@ -28,18 +26,13 @@ import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.BacklogSwipeCard
 import com.sather.todo.ui.backlog.components.BaseScreenBody
 import com.sather.todo.ui.backlog.components.ThreeColorCircle
-import com.sather.todo.ui.navigation.BaseDestination
+import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
-//日程-home页
-data object BacklogHome : BaseDestination {
-    override val icon =Icons.Filled.Timer
-    override val route = "Backlogs"
-}
 //    三次接入-标题展开，进入页面，数据渲染
 @OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -187,7 +180,7 @@ fun BacklogHomeBody(
                 amount = creditsTotal,
                 credits = properties.map { it },
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(basePadding))
             Column(modifier = Modifier.align(Alignment.Center)) {
                 Text(
                     text = stringResource(R.string.credit),
@@ -231,7 +224,7 @@ fun BacklogHomeBody(
                         showEditDialog = !showEditDialog
                     }
                 )
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(basePadding))
             }
         },
         floatButtonAction = {

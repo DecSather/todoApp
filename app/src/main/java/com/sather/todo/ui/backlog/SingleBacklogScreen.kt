@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,12 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
-import androidx.navigation.navArgument
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
@@ -35,9 +32,11 @@ import com.sather.todo.data.generateSimpleId
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.BaseScreenBody
 import com.sather.todo.ui.backlog.components.DeleteConfirmationDialog
+import com.sather.todo.ui.backlog.components.DetailRoutineRow
 import com.sather.todo.ui.backlog.components.ThreeColorCircle
-import com.sather.todo.ui.components.DetailRoutineRow
-import com.sather.todo.ui.navigation.BaseDestination
+import com.sather.todo.ui.components.basePadding
+import com.sather.todo.ui.components.elevation
+import com.sather.todo.ui.components.zeroDp
 import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.collectLatest
@@ -47,16 +46,6 @@ import kotlinx.coroutines.launch
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-object SingleBacklogDestination : BaseDestination {
-    override val route = "single_backlog"
-    override val icon = Icons.Filled.Timer
-    const val backlogIdArg = "backlogId"
-    val routeWithArgs = "$route/{$backlogIdArg}"
-    val arguments = listOf(navArgument(backlogIdArg) {
-        type = NavType.LongType
-    })
-}
-//记得添加删除键
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SingleBacklogScreen(
@@ -131,7 +120,7 @@ fun  SingleBacklogBody(
     
 //    临时数据
     val tempfinishedList = remember {mutableStateListOf<Routine>()}
-    var tempUnfinishedList = remember { mutableStateListOf<Routine>()}
+    val tempUnfinishedList = remember { mutableStateListOf<Routine>()}
     
     val lazyListState = rememberLazyListState()
     val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
@@ -206,7 +195,7 @@ fun  SingleBacklogBody(
                     contentDescription = stringResource(R.string.back_button)
                 )
             }
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(basePadding))
             Column(modifier = Modifier.align(Alignment.Center)) {
                 with(sharedTransitionScope){
                     Text(
@@ -268,8 +257,12 @@ fun  SingleBacklogBody(
                             state = reorderableLazyListState,
                             key = routine.id
                         ) { isDragging ->
-                            val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-                            Surface(shadowElevation = elevation) {
+                            val elevation by animateDpAsState(if (isDragging) elevation else zeroDp, label = "routine No.${routine.id} elevation in single backlog No.${backlog.id}")
+                            Surface(
+                                modifier = Modifier
+                                    .zIndex(if (isDragging) 2F else 0F),
+                                shadowElevation = elevation
+                            ) {
                                 DetailRoutineRow(
                                     modifier = Modifier
                                         .clickable { navigateToSingleRoutine(routine.id) }
@@ -372,7 +365,7 @@ fun  SingleBacklogBody(
                 onDelete()
             },
             onDeleteCancel = { deleteConfirmationRequired = false },
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(basePadding)
         )
     }
     
