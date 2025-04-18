@@ -1,6 +1,9 @@
 package com.sather.todo.ui.backlog.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
@@ -11,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sather.todo.R
 import com.sather.todo.ui.components.RowIndicator
+import com.sather.todo.ui.components.basePadding
 
 @Composable
 fun TextDisplaysRow(
@@ -44,9 +48,10 @@ fun TextDisplaysRow(
                 onFinishedChange(it)
             }
         )
-        Column{
-            Text(text = content, style = typography.bodyMedium)
-        }
+        Text(text = if(content.isNotBlank())content
+                    else stringResource(R.string.routine_empty_error),
+            style = typography.bodyMedium
+        )
         Spacer(Modifier.weight(1f))
         if(credit.isNotEmpty()) {
             Row(

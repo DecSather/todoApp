@@ -11,8 +11,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -20,8 +18,11 @@ import com.sather.todo.R
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.RoutineColors
+import com.sather.todo.ui.components.cardSize
+import com.sather.todo.ui.components.startPadding
 import com.sather.todo.ui.navigation.BaseDestination
 import kotlinx.coroutines.launch
+
 //new Routine Entry-预添加类设计，非数据
 object SingleRoutineDestination : BaseDestination {
     override val route = "single_routine"
@@ -89,8 +90,8 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_content_req),
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodyLarge
+                    
                     )
                         },
                 modifier = Modifier.fillMaxWidth(),
@@ -100,13 +101,13 @@ fun SingleRoutineBody(
            
             Row(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = stringResource(R.string.rontine_rank_req),
-                    fontSize = 15.sp,
                     modifier = Modifier.padding(horizontal = startPadding),
-                    color = MaterialTheme.colorScheme.secondary,
+                    text = stringResource(R.string.rontine_rank_req),
+                    style = MaterialTheme.typography.bodyLarge
+                
                 )
                 Row(
-                    modifier = Modifier.width(248.dp),
+                    modifier = Modifier.width(cardSize),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
@@ -140,8 +141,8 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_credit_req),
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.secondary
+                        style = MaterialTheme.typography.bodyLarge
+                    
                     )
                         },
                 leadingIcon = { Text(stringResource(R.string.dollarSign)) },
@@ -157,16 +158,15 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_subcontent_req),
-                        fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                         },
                 modifier = Modifier.fillMaxWidth(),
             )
             if (!routineUiState.isEntryValid) {
                 Text(
-                    text = stringResource(R.string.required_fields),
                     modifier = Modifier.padding(start = startPadding),
+                    text = stringResource(R.string.required_fields),
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
@@ -183,7 +183,6 @@ fun SingleRoutineBody(
         }
     }
 }
-private val startPadding = 16.dp
 @Composable
 fun rankSwitch(
     rank:Int,

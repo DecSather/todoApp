@@ -5,11 +5,15 @@ import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.AddTask
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -27,9 +31,10 @@ import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.BacklogSwipeCard
 import com.sather.todo.ui.backlog.components.BaseScreenBody
-import com.sather.todo.ui.backlog.components.ThreeColorCircle
+import com.sather.todo.ui.backlog.components.EditCardDialog
+import com.sather.todo.ui.backlog.components.SystemTimeTitle
+import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.navigation.BaseDestination
-import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -37,7 +42,7 @@ import java.time.format.DateTimeFormatter
 
 //日程-home页
 data object BacklogHome : BaseDestination {
-    override val icon =Icons.Filled.Timer
+    override val icon =Icons.Filled.AddTask
     override val route ="backlogs"
 }
 //    三次接入-标题展开，进入页面，数据渲染
@@ -60,69 +65,60 @@ fun BacklogHomeScreen(
 //    State
     val backlogHomeUiState by viewModel.backlogHomeUiState.collectAsState()
     val routineHomeUiState by viewModel.routineHomeUiState.collectAsState()
-    
-//    特殊属性-主页面
-//      -可优化
-//      -routineMap = remember { mutableStateMapOf<Int, Float>() }
-//    Screen2()
-
 //    界面
-    Box(modifier = Modifier.fillMaxSize()){
-        BacklogHomeBody(
-            sharedTransitionScope=sharedTransitionScope,
-            animatedContentScope=animatedContentScope,
-            susDeleteBacklogById ={
-                coroutineScope.launch {
-                    viewModel.deleteBacklogById(it)
-                }
-            },
+    BacklogHomeBody(
+        sharedTransitionScope=sharedTransitionScope,
+        animatedContentScope=animatedContentScope,
+        susDeleteBacklogById ={
+            coroutineScope.launch {
+                viewModel.deleteBacklogById(it)
+            }
+        },
 
-            susUpdateBacklog={
-                coroutineScope.launch {
-                    viewModel.updateBacklog()
-                }
-            },
-            susAddBacklog ={ backlog ->
-                coroutineScope.launch {
-                    viewModel.addBacklog(backlog)
-                }
-            },
-            onExpandChange ={ id,isExpand ->
-                coroutineScope.launch {
-                    viewModel.onExpandChange(id,isExpand)
-                }
-            },
-            onVisibleChange = {id,finished ->
-                coroutineScope.launch {
-                    viewModel.onVisibleChange(id,finished)
-                }
+        susUpdateBacklog={
+            coroutineScope.launch {
+                viewModel.updateBacklog()
+            }
+        },
+        susAddBacklog ={ backlog ->
+            coroutineScope.launch {
+                viewModel.addBacklog(backlog)
+            }
+        },
+        onExpandChange ={ id,isExpand ->
+            coroutineScope.launch {
+                viewModel.onExpandChange(id,isExpand)
+            }
+        },
+        onVisibleChange = {id,finished ->
+            coroutineScope.launch {
+                viewModel.onVisibleChange(id,finished)
+            }
 
-            },
-            onFinishedChange={ id,finished ->
-                coroutineScope.launch {
-                    viewModel.onRoutineFinishedChange(id,finished)
-                }
-            },
-            onBacklogDetailClick = onBacklogDetailClick,
+        },
+        onFinishedChange={ id,finished ->
+            coroutineScope.launch {
+                viewModel.onRoutineFinishedChange(id,finished)
+            }
+        },
+        onBacklogDetailClick = onBacklogDetailClick,
 
-            backlogUiState = viewModel.backlogUiState,
-            updateBacklogUiState=viewModel::updatBacklogUiState,
+        backlogUiState = viewModel.backlogUiState,
+        updateBacklogUiState=viewModel::updatBacklogUiState,
 
-            updateRoutine = { routine ->
-                coroutineScope.launch {
-                    viewModel.updateRoutine(routine)
-                }
-            },
-            insertRoutine = { routine ->
-                coroutineScope.launch {
-                    viewModel.insertRoutine(routine)
-                }
-            },
-            backlogList=backlogHomeUiState.backlogList,
-            finishedRoutineList = routineHomeUiState.routineList.filter { it.finished },
-            homeRoutineList = routineHomeUiState.routineList.filter { !it.finished },
-            )
-    }
+        updateRoutine = { routine ->
+            coroutineScope.launch {
+                viewModel.updateRoutine(routine)
+            }
+        },
+        insertRoutine = { routine ->
+            coroutineScope.launch {
+                viewModel.insertRoutine(routine)
+            }
+        },
+        backlogList=backlogHomeUiState.backlogList,
+        homeRoutineList = routineHomeUiState.routineList.filter { !it.finished },
+        )
 }
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -146,51 +142,25 @@ fun BacklogHomeBody(
     insertRoutine:(Routine)->Unit,
     
     backlogList: List<Backlog>,
-    finishedRoutineList:List<Routine>,
     homeRoutineList: List<Routine>,
     ){
     
     var showEditDialog by remember { mutableStateOf(false) }
     var clickPart by rememberSaveable { mutableIntStateOf(-1) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var importTotal = 0f
-    var normalTotal = 0f
-    var faverTotal = 0f
-    finishedRoutineList.map{ it ->
-        when(it.rank){
-            1 -> importTotal += it.credit
-            2 -> normalTotal += it.credit
-            else -> faverTotal += it.credit
-        }
-    }
-    val creditsTotal =importTotal+normalTotal+faverTotal
+    var expanded by rememberSaveable { mutableStateOf(false) }
     
-    val properties :List<Float> = if(creditsTotal>0f) listOf(0f,importTotal,normalTotal,faverTotal) else listOf(1f,0f,0f,0f)
+    val listState = rememberLazyListState()
     
     BaseScreenBody(
+        state = listState,
         lazyColumnModifier = Modifier
             .semantics { contentDescription = "Backlogs Screen" },
         top = {
-            ThreeColorCircle(
-                amount = creditsTotal,
-                credits = properties.map { it },
-            )
-            Spacer(Modifier.height(12.dp))
-            Column(modifier = Modifier.align(Alignment.Center)) {
-                Text(
-                    text = stringResource(R.string.credit),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Text(
-                    text = formatedCredit( creditsTotal.toString()),
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
+            SystemTimeTitle()
         },
         rows = {
-            items(items = backlogList,key = {it.id}) { backlog ->
+            itemsIndexed(items = backlogList.filter { it.isVisible },key = {_,it -> it.id}) { index,backlog ->
                 val routineList =
                     homeRoutineList.filter {it.backlogId == backlog.id}
                 BacklogSwipeCard(
@@ -215,6 +185,59 @@ fun BacklogHomeBody(
                     }
                 )
                 Spacer(Modifier.height(12.dp))
+            }
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(Modifier.width(basePadding))
+                    IconButton(
+                        modifier = Modifier.size(24.dp),
+                        onClick = {
+                        expanded = !expanded
+                    }
+                    ) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.secondary,
+                            imageVector =
+                            if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                            contentDescription = if (expanded) {
+                                stringResource(R.string.show_less)
+                            } else {
+                                stringResource(R.string.show_more)
+                            }
+                        )
+                    }
+                    Text(
+                        color = MaterialTheme.colorScheme.secondary,
+                        text = stringResource(R.string.finished_string),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+                Spacer(Modifier.height(basePadding))
+            }
+            
+            if(expanded)
+            itemsIndexed(items = backlogList.filter { !it.isVisible },key = {_,it -> it.id}) { index,backlog ->
+                BacklogSwipeCard(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
+                    
+                    backlog = backlog,
+                    
+                    onExpandClick = onExpandChange,
+                    onVisibleClick = onVisibleChange,
+                    
+                    onDelete = susDeleteBacklogById,
+                    onBacklogDetailClick = onBacklogDetailClick,
+                    onTitleEditClick = {
+                        updateBacklogUiState(backlog)
+                        clickPart = it
+                        selectedDate = LocalDate.parse(backlog.timeTitle, formatter)
+                        showEditDialog = !showEditDialog
+                    }
+                )
+                Spacer(Modifier.height(basePadding))
             }
         },
         floatButtonAction = {

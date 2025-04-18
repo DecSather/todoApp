@@ -1,4 +1,4 @@
-package com.sather.todo.ui.backlog
+package com.sather.todo.ui.backlog.components
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
@@ -48,7 +48,8 @@ import androidx.compose.ui.window.DialogProperties
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
-import com.sather.todo.ui.backlog.components.RoutineColors
+import com.sather.todo.ui.backlog.BacklogUiState
+import com.sather.todo.ui.backlog.formatter
 import kotlinx.coroutines.delay
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -520,7 +521,7 @@ private fun RankColorBox(
 ){
     Row(
         modifier = Modifier
-            .height(BoxSize+ TabSpacer*2 )
+            .height(BoxSize + TabSpacer *2 )
             .clip(RoundedCornerShape(percent = 50))
             .clickable{ onClicked() },
         verticalAlignment = Alignment.CenterVertically

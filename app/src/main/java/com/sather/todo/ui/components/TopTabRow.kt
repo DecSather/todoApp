@@ -6,12 +6,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.*
@@ -21,14 +16,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.sather.todo.ui.backlog.components.basePadding
+import com.sather.todo.R
+import com.sather.todo.ui.backlog.BacklogHome
 import com.sather.todo.ui.navigation.BaseDestination
-import java.util.Locale
+import java.util.*
+
 //            导航栏样式
 @Composable
 fun TopTabRow(
@@ -48,8 +45,12 @@ fun TopTabRow(
         ) {
             allScreens.forEach { screen ->
                 ToDoAnimTab(
-                    text = screen.route,
-                    icon = screen.icon,
+                    text =
+                        if(screen  == BacklogHome) stringResource(R.string.backlog_route)
+                        else stringResource(R.string.come_soon_route)
+                    ,
+                    
+                    icon =  screen.icon,
                     onSelected = { onTabSelected(screen) },
                     selected = currentScreen == screen
                 )
@@ -96,7 +97,8 @@ private fun ToDoAnimTab(
             )
             .clearAndSetSemantics { contentDescription = text }
     ) {
-        Icon(imageVector = icon, contentDescription = text, tint = tabTintColor)
+        
+        Icon(imageVector = icon , contentDescription = text, tint = tabTintColor)
         if (selected) {
             Spacer(Modifier.width(basePadding))
             Text(text.uppercase(Locale.getDefault()), color = tabTintColor)
@@ -104,7 +106,6 @@ private fun ToDoAnimTab(
     }
 }
 
-private val TabHeight = 56.dp
 private const val InactiveTabOpacity = 0.60f
 
 private const val TabFadeInAnimationDuration = 150

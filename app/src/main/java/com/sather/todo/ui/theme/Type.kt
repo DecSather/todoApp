@@ -12,11 +12,6 @@ private val EczarFontFamily = FontFamily(
     Font(R.font.eczar_regular),
     Font(R.font.eczar_semibold, FontWeight.SemiBold)
 )
-private val RobotoCondensed = FontFamily(
-    Font(R.font.robotocondensed_regular),
-    Font(R.font.robotocondensed_light, FontWeight.Light),
-    Font(R.font.robotocondensed_bold, FontWeight.Bold)
-)
 
 val Typography = Typography(
 //    h1 = TextStyle(
@@ -77,6 +72,9 @@ val Typography = Typography(
         lineHeight = 20.sp,
 //        letterSpacing = 0.1.em
     ),
+    bodyLarge = TextStyle(
+        fontSize = 15.sp,
+    )
 
 //    button = TextStyle(
 //        fontWeight = FontWeight.Bold,

@@ -2,6 +2,7 @@ package com.sather.todo.ui.backlog
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -246,7 +248,6 @@ fun  SingleBacklogBody(
                 
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
-                        println("swipe box value：$it")
                         if (it == SwipeToDismissBoxValue.StartToEnd) { // 仅在完全滑动时触发
                                 tempUnfinishedList.remove(routine)
                                 swipeToDeleteRoutine(routine.id)
@@ -273,7 +274,11 @@ fun  SingleBacklogBody(
                             key = routine.id
                         ) { isDragging ->
                             val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-                            Surface(shadowElevation = elevation) {
+                            val zIndex by animateFloatAsState(if (isDragging) 2f else 0f)
+                            Surface(
+                                Modifier.zIndex(zIndex),
+                                shadowElevation = elevation,
+                            ) {
                                 DetailRoutineRow(
                                     modifier = Modifier
                                         .clickable { navigateToSingleRoutine(routine.id) }
@@ -281,7 +286,6 @@ fun  SingleBacklogBody(
                                             contentDescription =
                                                 "No.${routine.id} routine belong to No.${routine.backlogId}"
                                         },
-                                    id = routine.id,
                                     content = routine.content,
                                     subcontent = routine.subcontent,
                                     isFinished = routine.finished,
@@ -290,10 +294,6 @@ fun  SingleBacklogBody(
                                     onFinishedChange = {
                                         tempUnfinishedList.remove(routine)
                                         tempfinishedList.add(0, routine.copy(finished = true))
-                                    },
-                                    swipeToDelete = {
-                                        tempUnfinishedList.remove(routine)
-                                        swipeToDeleteRoutine(routine.id)
                                     },
                                 ) {
 //                    拖拽Icon
@@ -328,7 +328,6 @@ fun  SingleBacklogBody(
                         .clearAndSetSemantics {
                             contentDescription = "Empty routine"
                         },
-                    id = -1,
                     content = stringResource(R.string.todo_list),
                     subcontent = stringResource(R.string.click_to_add),
                     isFinished = false,
@@ -342,7 +341,12 @@ fun  SingleBacklogBody(
                 key = {routine -> routine.id + generateSimpleId()}
             ){ routine ->
                 DetailRoutineRow(
-                    id = routine.id,
+                    modifier = Modifier
+                        .clickable { navigateToSingleRoutine(routine.id) }
+                        .clearAndSetSemantics {
+                            contentDescription =
+                                "No.${routine.id} routine belong to No.${routine.backlogId}"
+                        },
                     content = routine.content,
                     subcontent = routine.subcontent,
                     isFinished = routine.finished,
@@ -351,10 +355,6 @@ fun  SingleBacklogBody(
                     onFinishedChange={
                         tempfinishedList.remove(routine)
                         tempUnfinishedList.add(0,routine.copy(finished = false))
-                    },
-                    swipeToDelete = {
-                        tempfinishedList.remove(routine)
-                        swipeToDeleteRoutine(routine.id)
                     },
                 )
             }

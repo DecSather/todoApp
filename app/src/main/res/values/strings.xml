@@ -3,7 +3,12 @@
     <string name="total">Total</string>
     <string name="attention">Attention</string>
     <string name="dollarSign" translatable="false">$</string>
+<!--     come soon -->
+    <string name="come_soon_route">ComeSoon</string>
+    <string name="coming_soon">Coming soon</string>
+    <string name="waiting_implement">waiting implement</string>
 <!--     Backlog -->
+    <string name="backlog_route">Backlogs</string>
     <string name="credit">Credit</string>
     <string name="formatter">yyyy-MM-dd</string>
     <string name="unfinished"> unfinished</string>
@@ -18,6 +23,7 @@
     <string name="routine_empty_error">Not be EMPTY</string>
     <string name="routine_credit_error">Float</string>
 <!--     Function -->
+    <string name="finished_string">finished</string>
     <string name="see_all">DETAIL</string>
     <string name="back_button">Back</string>
     <string name="save_action">Save</string>

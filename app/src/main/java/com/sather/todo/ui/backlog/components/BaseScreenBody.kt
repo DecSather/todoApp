@@ -1,6 +1,9 @@
 package com.sather.todo.ui.backlog.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,11 +14,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.sather.todo.ui.components.basePadding
 
 @Composable
 fun  BaseScreenBody(
     state:LazyListState = rememberLazyListState(),
-    verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     lazyColumnModifier: Modifier = Modifier,
     top:@Composable BoxScope.() ->Unit,
     rows: LazyListScope.() -> Unit,
@@ -27,8 +30,6 @@ fun  BaseScreenBody(
             LazyColumn(
                 state = state,
                 modifier = lazyColumnModifier,
-                verticalArrangement = verticalArrangement
-                
             ) {
                 item(key = "tricolor_circle") {
                     Box(Modifier.padding(basePadding)) {
@@ -36,7 +37,6 @@ fun  BaseScreenBody(
                     }
                 }
                 rows()
-                
             }
             FloatingActionButton(
                 shape = CircleShape,

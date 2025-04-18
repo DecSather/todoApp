@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.sather.todo.R
 import com.sather.todo.ui.backlog.components.RoutineColors
-import com.sather.todo.ui.backlog.components.basePadding
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -55,14 +54,12 @@ fun RowIndicator(color: Color, modifier: Modifier = Modifier) {
 @Composable
 fun DetailRoutineRow(
     modifier: Modifier = Modifier,
-    id:Long,
     content:String,
     subcontent:String,
     isFinished:Boolean,
     credit:Float,
     colorIndex:Int,
     onFinishedChange:()->Unit = {},
-    swipeToDelete:() ->Unit = {},
     icon: @Composable () ->Unit = {
         Icon(
             imageVector = Icons.Filled.ChevronRight,
@@ -84,7 +81,6 @@ fun DetailRoutineRow(
                 .background(MaterialTheme.colorScheme.secondaryContainer)
                 .padding(horizontal = basePadding)
                 .height(LargeHeight),
-//                .swipeToDismiss(swipeToDelete),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val typography = MaterialTheme.typography
@@ -111,7 +107,7 @@ fun DetailRoutineRow(
                     if (content.isNotBlank())
                         Text(text = content, style = typography.bodyMedium)
                     else
-                        Text(text = "Not be EMPTY", style = typography.bodyMedium)
+                        Text(text = stringResource(R.string.routine_empty_error), style = typography.bodyMedium)
                     if (subcontent.isNotEmpty())
                         Text(text = subcontent, style = typography.bodySmall)
                     
