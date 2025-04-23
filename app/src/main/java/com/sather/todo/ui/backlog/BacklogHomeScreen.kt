@@ -4,35 +4,24 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddTask
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
-import com.sather.todo.ui.backlog.components.BacklogSwipeCard
-import com.sather.todo.ui.backlog.components.BaseScreenBody
-import com.sather.todo.ui.backlog.components.EditCardDialog
-import com.sather.todo.ui.backlog.components.SystemTimeTitle
+import com.sather.todo.ui.backlog.components.*
 import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.navigation.BaseDestination
 import kotlinx.coroutines.launch
@@ -62,10 +51,13 @@ fun BacklogHomeScreen(
     viewModel: BacklogHomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
 ) {
     val coroutineScope = rememberCoroutineScope()
-//    State
+//    数据
     val backlogHomeUiState by viewModel.backlogHomeUiState.collectAsState()
+    val backlogInvisibleUiState by viewModel.backlogInvisibleUiState.collectAsState()
     val routineHomeUiState by viewModel.routineHomeUiState.collectAsState()
 //    界面
+ 
+    
     BacklogHomeBody(
         sharedTransitionScope=sharedTransitionScope,
         animatedContentScope=animatedContentScope,
@@ -117,6 +109,7 @@ fun BacklogHomeScreen(
             }
         },
         backlogList=backlogHomeUiState.backlogList,
+        invisibleBacklogList = backlogInvisibleUiState.backlogList,
         homeRoutineList = routineHomeUiState.routineList.filter { !it.finished },
         )
 }
@@ -140,15 +133,15 @@ fun BacklogHomeBody(
     
     updateRoutine:(Routine)->Unit,
     insertRoutine:(Routine)->Unit,
-    
     backlogList: List<Backlog>,
+    invisibleBacklogList:List<Backlog> = emptyList(),
     homeRoutineList: List<Routine>,
     ){
+    var expanded by rememberSaveable { mutableStateOf(false) }
     
     var showEditDialog by remember { mutableStateOf(false) }
     var clickPart by rememberSaveable { mutableIntStateOf(-1) }
     var selectedDate by remember { mutableStateOf(LocalDate.now()) }
-    var expanded by rememberSaveable { mutableStateOf(false) }
     
     val listState = rememberLazyListState()
     
@@ -157,10 +150,13 @@ fun BacklogHomeBody(
         lazyColumnModifier = Modifier
             .semantics { contentDescription = "Backlogs Screen" },
         top = {
-            SystemTimeTitle()
+            item(key = "system_time_title"){
+                SystemTimeTitle()
+            }
         },
-        rows = {
-            itemsIndexed(items = backlogList.filter { it.isVisible },key = {_,it -> it.id}) { index,backlog ->
+        underside = {
+            itemsIndexed(items = backlogList,key = {_,it -> it.id}) { index,backlog ->
+//                未完成卡
                 val routineList =
                     homeRoutineList.filter {it.backlogId == backlog.id}
                 BacklogSwipeCard(
@@ -184,41 +180,18 @@ fun BacklogHomeBody(
                         showEditDialog = !showEditDialog
                     }
                 )
-                Spacer(Modifier.height(12.dp))
-            }
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(Modifier.width(basePadding))
-                    IconButton(
-                        modifier = Modifier.size(24.dp),
-                        onClick = {
-                        expanded = !expanded
-                    }
-                    ) {
-                        Icon(
-                            tint = MaterialTheme.colorScheme.secondary,
-                            imageVector =
-                            if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                            contentDescription = if (expanded) {
-                                stringResource(R.string.show_less)
-                            } else {
-                                stringResource(R.string.show_more)
-                            }
-                        )
-                    }
-                    Text(
-                        color = MaterialTheme.colorScheme.secondary,
-                        text = stringResource(R.string.finished_string),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
                 Spacer(Modifier.height(basePadding))
             }
-            
+            item {
+//                完成分界线
+                FinishedDivider(
+                    expanded = expanded,
+                    onClick = {expanded = !expanded}
+                )
+            }
             if(expanded)
-            itemsIndexed(items = backlogList.filter { !it.isVisible },key = {_,it -> it.id}) { index,backlog ->
+            itemsIndexed(items = invisibleBacklogList,key = {_,it -> it.id}) { index,backlog ->
+//                完成卡
                 BacklogSwipeCard(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedContentScope = animatedContentScope,

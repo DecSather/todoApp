@@ -31,4 +31,5 @@
     <string name="coming_soon">即将开发</string>
     <string name="waiting_implement">等待实现</string>
     <string name="finished_string">已完成</string>
+    <string name="diary_route">日记</string>
 </resources>

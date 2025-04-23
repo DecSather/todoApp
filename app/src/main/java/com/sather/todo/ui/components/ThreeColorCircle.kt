@@ -1,4 +1,4 @@
-package com.sather.todo.ui.backlog.components
+package com.sather.todo.ui.components
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import com.sather.todo.ui.backlog.components.RoutineColors
 
 //三色圆圈动画
 @Composable
@@ -22,12 +23,12 @@ fun ThreeColorCircle(
 ) {
     val properties =
         if(amount > 0f)credits.map { it/amount }
-        else credits
+        else listOf(1f,0f,0f,0f)
         
     val colorIndexs = listOf(0,1,2,3)
     val currentState = remember {
-        MutableTransitionState(ThreeCircleProgress.START)
-            .apply { targetState = ThreeCircleProgress.END }
+        MutableTransitionState(CircleProgress.START)
+            .apply { targetState = CircleProgress.END }
     }
     val stroke = with(LocalDensity.current) { Stroke(5.dp.toPx()) }
     val transition = rememberTransition(currentState)
@@ -38,9 +39,9 @@ fun ThreeColorCircle(
                 durationMillis = 900,
                 easing = LinearOutSlowInEasing
             )
-        }
+        }, label = "圆的转角"
     ) { progress ->
-        if (progress == ThreeCircleProgress.START) {
+        if (progress == CircleProgress.START) {
             0f
         } else {
             360f
@@ -53,9 +54,9 @@ fun ThreeColorCircle(
                 durationMillis = 900,
                 easing = CubicBezierEasing(0f, 0.75f, 0.35f, 0.85f)
             )
-        }
+        }, label = ""
     ) { progress ->
-        if (progress == ThreeCircleProgress.START) {
+        if (progress == CircleProgress.START) {
             0f
         } else {
             30f
@@ -74,9 +75,8 @@ fun ThreeColorCircle(
         )
         val size = Size(innerRadius * 2, innerRadius * 2)
         var startAngle = shift - 90f
-        var sweep:Float
-        var index=0
-        colorIndexs.map { it ->
+        var sweep: Float
+        colorIndexs.forEachIndexed { index,it ->
             sweep = properties[index] * angleOffset
             if(properties[index]>0f) {
                 drawArc(
@@ -90,10 +90,9 @@ fun ThreeColorCircle(
                 )
                 startAngle += sweep
             }
-            index++
         }
     }
 }
 
-private enum class ThreeCircleProgress { START, END }
+private enum class CircleProgress { START, END }
 private const val DividerLengthInDegrees = 1.8f

@@ -6,9 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sather.todo.data.RoutinesRepository
 import com.sather.todo.data.Routine
-import kotlinx.coroutines.flow.*
+import com.sather.todo.data.RoutinesRepository
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -47,7 +48,7 @@ class SingleRoutineViewModel(
     }
     private fun validateInput(uiState: Routine = routineUiState.routine): Boolean {
         return with(uiState) {
-            content.isNotBlank() &&rank>=0 && credit>0.0
+            content.isNotBlank() &&rank>=0
         }
     }
     

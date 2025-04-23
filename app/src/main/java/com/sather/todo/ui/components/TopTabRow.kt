@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,6 +24,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Dp
 import com.sather.todo.R
 import com.sather.todo.ui.backlog.BacklogHome
+import com.sather.todo.ui.diary.DiaryHome
 import com.sather.todo.ui.navigation.BaseDestination
 import java.util.*
 
@@ -41,15 +43,15 @@ fun TopTabRow(
         Row(
             Modifier
                 .background(color = MaterialTheme.colorScheme.secondaryContainer)
-                .selectableGroup()
+                .selectableGroup(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             allScreens.forEach { screen ->
                 ToDoAnimTab(
                     text =
                         if(screen  == BacklogHome) stringResource(R.string.backlog_route)
-                        else stringResource(R.string.come_soon_route)
-                    ,
-                    
+                        else if(screen == DiaryHome) stringResource(R.string.diary_route)
+                        else stringResource(R.string.come_soon_route),
                     icon =  screen.icon,
                     onSelected = { onTabSelected(screen) },
                     selected = currentScreen == screen
@@ -81,9 +83,8 @@ private fun ToDoAnimTab(
     )
     Row(
         modifier = Modifier
-            .padding(basePadding)
+            .padding(basePadding )
             .animateContentSize()
-            .height(TabHeight)
             .selectable(
                 selected = selected,
                 onClick = onSelected,
@@ -95,19 +96,24 @@ private fun ToDoAnimTab(
                     color = Color.Unspecified
                 )
             )
-            .clearAndSetSemantics { contentDescription = text }
+            .clearAndSetSemantics { contentDescription = text },
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        
-        Icon(imageVector = icon , contentDescription = text, tint = tabTintColor)
+        Icon(
+            imageVector = icon,
+            modifier = Modifier.size(iconMediumSize),
+            contentDescription = text,
+            tint = tabTintColor
+        )
         if (selected) {
-            Spacer(Modifier.width(basePadding))
-            Text(text.uppercase(Locale.getDefault()), color = tabTintColor)
+            Spacer(Modifier.width(startPadding))
+            Text(
+                text.uppercase(Locale.getDefault()),
+                style = MaterialTheme.typography.titleLarge,
+                color = tabTintColor
+            )
         }
     }
 }
 
-private const val InactiveTabOpacity = 0.60f
 
-private const val TabFadeInAnimationDuration = 150
-private const val TabFadeInAnimationDelay = 100
-private const val TabFadeOutAnimationDuration = 100

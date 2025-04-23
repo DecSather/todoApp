@@ -2,7 +2,6 @@ package com.sather.todo.ui.backlog
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,7 +23,6 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,8 +35,9 @@ import com.sather.todo.data.generateSimpleId
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.BaseScreenBody
 import com.sather.todo.ui.backlog.components.DeleteConfirmationDialog
-import com.sather.todo.ui.backlog.components.ThreeColorCircle
-import com.sather.todo.ui.components.DetailRoutineRow
+import com.sather.todo.ui.backlog.components.DetailRoutineRow
+import com.sather.todo.ui.components.ThreeColorCircle
+import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.routine.formatedCredit
 import kotlinx.coroutines.FlowPreview
@@ -117,9 +116,9 @@ fun SingleBacklogScreen(
 @OptIn(ExperimentalSharedTransitionApi::class, FlowPreview::class)
 @Composable
 fun  SingleBacklogBody(
-    backlog: Backlog,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
+    backlog: Backlog,
     onAddRoutine:(Routine)->Unit,
     onDelete: () -> Unit={},
     navigateBack:()->Unit,
@@ -166,25 +165,26 @@ fun  SingleBacklogBody(
         when(it.rank){
             1 -> importCredit += it.credit
             2 -> normalCredit += it.credit
-            else -> faverCredit += it.credit
+            3 -> faverCredit += it.credit
         }
     }
     val finishedAmount=importCredit + normalCredit + faverCredit
     val unfinishedAmount=unfinishedRoutineList.map { it.credit }.sum()
     var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
-    // 自动提交更新的逻辑
+    
+    // 自动提交更新的逻辑：不可变快照，防抖，放重复
     LaunchedEffect(tempUnfinishedList) {
-        snapshotFlow { tempUnfinishedList.toList() } // 转换为不可变快照
-            .debounce(1000) // 防抖：500ms无操作后提交
-            .distinctUntilChanged() // 避免重复提交
+        snapshotFlow { tempUnfinishedList.toList() }
+            .debounce(1000)
+            .distinctUntilChanged()
             .collectLatest { sortedList ->
                 onUpdateSort(sortedList)
             }
     }
     LaunchedEffect(tempfinishedList) {
-        snapshotFlow { tempfinishedList.toList() } // 转换为不可变快照
-            .debounce(1000) // 防抖：500ms无操作后提交
-            .distinctUntilChanged() // 避免重复提交
+        snapshotFlow { tempfinishedList.toList() }
+            .debounce(1000)
+            .distinctUntilChanged()
             .collectLatest { sortedList ->
                 onUpdateSort(sortedList)
             }
@@ -196,49 +196,54 @@ fun  SingleBacklogBody(
             .semantics { contentDescription = "No.${backlog.id} Screen" },
         top = {
 //                三色圈
-            ThreeColorCircle(
-                amount = finishedAmount+unfinishedAmount,
-                credits = listOf(unfinishedAmount,importCredit,normalCredit,faverCredit),
-            )
-            IconButton(onClick = {
-                    navigateBack()
-                }) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBackIosNew,
-                    contentDescription = stringResource(R.string.back_button)
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            Column(modifier = Modifier.align(Alignment.Center)) {
-                with(sharedTransitionScope){
-                    Text(
-                        text = backlog.timeTitle,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                            .wrapContentWidth()
-                            .sharedBounds(
-                                rememberSharedContentState(
-                                    key = "${backlog.id}/${backlog.timeTitle}"
-                                ),
-                                animatedVisibilityScope = animatedContentScope,
-                                enter = fadeIn(),
-                                exit = fadeOut(),
-                                resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+            item(key = "three_colors_circle"){
+                Spacer(Modifier.height(basePadding))
+                Box{
+                    ThreeColorCircle(
+                        amount = finishedAmount + unfinishedAmount,
+                        credits = listOf(unfinishedAmount, importCredit, normalCredit, faverCredit),
+                    )
+                    IconButton(onClick = navigateBack) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBackIosNew,
+                            contentDescription = stringResource(R.string.back_button)
+                        )
+                    }
+                    Column(
+//                         box中心
+                        modifier = Modifier.align(Alignment.Center),
+//                        子元素中心排列
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        with(sharedTransitionScope) {
+                            Text(
+                                text = backlog.timeTitle,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .sharedBounds(
+                                        rememberSharedContentState(
+                                            key = "${backlog.id}/${backlog.timeTitle}"
+                                        ),
+                                        animatedVisibilityScope = animatedContentScope,
+                                        enter = fadeIn(),
+                                        exit = fadeOut(),
+                                        resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                                    )
+                            
                             )
-                    
-                    )
-                    Text(
-                        text = formatedCredit( finishedAmount.toString()),
-                        style = MaterialTheme.typography.headlineLarge,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally)
-                    )
-                    
+                            Text(
+                                text = formatedCredit(finishedAmount.toString()),
+                                style = MaterialTheme.typography.headlineLarge,
+                            )
+                            
+                        }
+                    }
                 }
+                Spacer(Modifier.height(basePadding * 2))
             }
+            
         },
-        rows = {
+        underside = {
 //            未完成列
             items(
                 items = tempUnfinishedList,
@@ -252,7 +257,6 @@ fun  SingleBacklogBody(
                                 tempUnfinishedList.remove(routine)
                                 swipeToDeleteRoutine(routine.id)
                                  true
-                            
                         } else {
                             false // 未达阈值时回弹
                         }
@@ -260,9 +264,7 @@ fun  SingleBacklogBody(
                     positionalThreshold = {
                         it
                     }
-                    
                 )
-                
                 SwipeToDismissBox(
                     state = dismissState,
                     backgroundContent = {
@@ -274,9 +276,7 @@ fun  SingleBacklogBody(
                             key = routine.id
                         ) { isDragging ->
                             val elevation by animateDpAsState(if (isDragging) 4.dp else 0.dp)
-                            val zIndex by animateFloatAsState(if (isDragging) 2f else 0f)
                             Surface(
-                                Modifier.zIndex(zIndex),
                                 shadowElevation = elevation,
                             ) {
                                 DetailRoutineRow(

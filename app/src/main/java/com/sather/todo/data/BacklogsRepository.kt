@@ -25,6 +25,7 @@ class BacklogsRepository(private val backlogDao: BacklogDao) {
      
      fun getAllBacklogsStream(): Flow<List<Backlog>> = backlogDao.getAllBacklogs()
      fun getBacklogByString(timeTitle: String): Flow<List<Backlog>> = backlogDao.getBacklogByString(timeTitle)
+     fun getBacklogByVisible(isVisible: Boolean): Flow<List<Backlog>> = backlogDao.getBacklogByVisible(isVisible)
     
      fun getBacklogStream(id: Long): Flow<Backlog?> = backlogDao.getBacklog(id)
      

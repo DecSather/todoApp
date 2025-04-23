@@ -21,7 +21,7 @@ import com.sather.todo.ui.theme.ToDoTheme
 
 data object ComeSoon : BaseDestination {
     override val icon = Icons.Filled.AddHome/*EditNote */
-    override val route = "ComeSoon"
+    override val route = "com.sather.todo.ui.diary.ComeSoon"
 }
 @Composable
 fun ComeSoonScreen() {

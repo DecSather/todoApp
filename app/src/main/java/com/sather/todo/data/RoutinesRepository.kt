@@ -12,7 +12,7 @@ class RoutinesRepository(
 
      fun getRoutineStream(id: Long): Flow<Routine?> = routineDao.getRoutine(id)
 
-     suspend fun insertRoutine(routine: Routine):Long = routineDao.insert(routine)
+     suspend fun insertRoutine(routine: Routine)  = routineDao.insert(routine)
 
      suspend fun deleteRoutineById(id:Long) = routineDao.deleteRoutineById(id)
      

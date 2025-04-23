@@ -62,7 +62,6 @@ fun SingleRoutineBody(
     modifier: Modifier = Modifier
 ) {
     val routine = routineUiState.routine
-    println("rank :${routine.rank}")
     var creditText by remember { mutableStateOf(routine.credit.toString()) }
     
     val rankIndexList = listOf(1,2,3)
@@ -90,7 +89,7 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_content_req),
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyMedium
                     
                     )
                         },
@@ -103,7 +102,7 @@ fun SingleRoutineBody(
                 Text(
                     modifier = Modifier.padding(horizontal = startPadding),
                     text = stringResource(R.string.rontine_rank_req),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyMedium
                 
                 )
                 Row(
@@ -131,7 +130,7 @@ fun SingleRoutineBody(
                     newText ->
                     creditText = newText
                     if(newText.toFloatOrNull()==null) {
-                        onRoutineValueChange(routineUiState.routine.copy(credit = 0f))
+                        onRoutineValueChange(routineUiState.routine.copy(credit = 1f))
                     }
                     else{
                         onRoutineValueChange(routineUiState.routine.copy(credit = creditText.toFloat()))
@@ -141,7 +140,7 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_credit_req),
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyMedium
                     
                     )
                         },
@@ -158,7 +157,7 @@ fun SingleRoutineBody(
                 label = {
                     Text(
                         stringResource(R.string.rontine_subcontent_req),
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.bodyMedium
                     )
                         },
                 modifier = Modifier.fillMaxWidth(),

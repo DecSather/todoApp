@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.unit.dp
 import com.sather.todo.R
 import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
@@ -151,6 +150,7 @@ fun BacklogSwipeCard(
                     )
                 }
             }
+            
         }
     }
 }
@@ -207,7 +207,7 @@ fun BacklogSwipeCard(
             }
         ) {
             Card(
-                modifier = modifier.padding(horizontal = 16.dp),
+                modifier = modifier.padding(horizontal = basePadding),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
             ) {
                 Column {
@@ -284,7 +284,7 @@ fun BacklogSwipeCard(
                                     key(it.id){
                                         val routine = it.copy(sortId = sortId)
                                         sortId++
-                                        TextDisplaysRow(
+                                        RoutineDisplaysRow(
                                             modifier = Modifier.clickable { onBacklogEditClick(routine.sortId) },
                                             content = routine.content,
                                             credit = routine.credit.toString(),
@@ -302,7 +302,7 @@ fun BacklogSwipeCard(
                                     }
                                 }
                             }
-                            TextDisplaysRow(
+                            RoutineDisplaysRow(
                                 modifier = Modifier.clickable { onBacklogEditClick(-2) },
                                 content = stringResource(R.string.click_to_add)
                             )

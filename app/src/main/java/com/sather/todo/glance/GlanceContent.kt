@@ -115,7 +115,7 @@ class MyAppWidget : GlanceAppWidget() {
                         modifier = GlanceModifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text("nothing for today")
+                        Text("∠( ᐛ 」∠)")
                     }
                 }else {
                     LazyColumn(GlanceModifier.fillMaxWidth()) {

@@ -11,13 +11,15 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.sather.todo.ui.backlog.BacklogHome
 import com.sather.todo.ui.backlog.SingleBacklogDestination
-import com.sather.todo.ui.components.TopTabRow
 import com.sather.todo.ui.comesoon.ComeSoon
+import com.sather.todo.ui.components.TopTabRow
+import com.sather.todo.ui.diary.DiaryHome
 import com.sather.todo.ui.navigation.ToDoNavHost
 import com.sather.todo.ui.navigation.navigateSingleTopTo
 import com.sather.todo.ui.theme.ToDoTheme
+
 // Screens to be displayed in the top RallyTabRow
-val rallyTabRowScreens = listOf(BacklogHome, ComeSoon)
+val rallyTabRowScreens = listOf(BacklogHome,DiaryHome, ComeSoon)
 @Composable
 fun ToDoApp(navController: NavHostController = rememberNavController()) {
     ToDoNavHost(navController = navController)
@@ -28,7 +30,8 @@ fun ToDoApp(navController: NavHostController = rememberNavController()) {
         val currentDestination = currentBackStack?.destination
         val currentScreen = rallyTabRowScreens.find {
             it.route == currentDestination?.route
-                    ||it == SingleBacklogDestination
+                    ||(it == DiaryHome && currentDestination?.route?.startsWith( DiaryHome.route ) == true)
+                    ||(it == SingleBacklogDestination && currentDestination?.route?.startsWith( SingleBacklogDestination.route ) == true)
                     || (it == ComeSoon && currentDestination?.route?.startsWith( ComeSoon.route ) == true)
         } ?: BacklogHome
         Scaffold(

@@ -1,6 +1,9 @@
 package com.sather.todo.data
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,7 +22,7 @@ interface RoutineDao {
     fun getRoutine(id: Long?): Flow<Routine>
 //    suspend关键词-单独线程运行-Room 不允许在主线程上访问数据库
     @Insert
-    suspend fun insert(item: Routine):Long
+    suspend fun insert(item: Routine)
 
     //    @Update 注解与 insert() 方法类似，使用 suspend 关键字标记此函数。
     @Update

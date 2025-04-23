@@ -18,6 +18,8 @@ interface BacklogDao {
     
     @Query("SELECT * from backlogs WHERE timeTitle = :timeTitle ORDER BY id DESC")
     fun getBacklogByString(timeTitle: String?): Flow<List<Backlog>>
+    @Query("SELECT * from backlogs WHERE isVisible = :isVisible ORDER BY id DESC")
+    fun getBacklogByVisible(isVisible: Boolean?): Flow<List<Backlog>>
     
     //    OnConflictStrategy.IGNORE-在 Inventory 应用中，仅从一处（即 Add Backlog 界面）插入实体
 //    suspend关键词-单独线程运行-Room 不允许在主线程上访问数据库

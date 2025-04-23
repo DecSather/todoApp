@@ -7,6 +7,7 @@
     <string name="come_soon_route">ComeSoon</string>
     <string name="coming_soon">Coming soon</string>
     <string name="waiting_implement">waiting implement</string>
+    <string name="diary_route">Diaries</string>
 <!--     Backlog -->
     <string name="backlog_route">Backlogs</string>
     <string name="credit">Credit</string>

@@ -10,7 +10,10 @@ import com.sather.todo.data.Backlog
 import com.sather.todo.data.BacklogsRepository
 import com.sather.todo.data.Routine
 import com.sather.todo.data.RoutinesRepository
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 /**
  * BacklogHome
@@ -24,14 +27,21 @@ class BacklogHomeViewModel(
 
 //    backlog home 热观察，insert,delete
     val backlogHomeUiState:StateFlow<BacklogHomeUiState> =
-        backlogsRepository.getAllBacklogsStream().map {
+        backlogsRepository.getBacklogByVisible(true).map {
             BacklogHomeUiState(it)
         } .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed((TIMEOUT_MILLIS)),
             initialValue = BacklogHomeUiState()
         )
-    
+    val backlogInvisibleUiState:StateFlow<BacklogHomeUiState> =
+        backlogsRepository.getBacklogByVisible(false).map {
+            BacklogHomeUiState(it)
+        } .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed((TIMEOUT_MILLIS)),
+            initialValue = BacklogHomeUiState()
+        )
     suspend fun onExpandChange(id:Long,isExpand:Boolean) {
         backlogsRepository.onExpandChange(id,isExpand)
     }
@@ -83,17 +93,14 @@ class BacklogHomeViewModel(
             routinesRepository.deleteRoutineById(routine.id)
         }
     }
-    suspend fun insertRoutine(routine: Routine):Int {
+    suspend fun insertRoutine(routine: Routine)  {
         if(validateInput(routine)){
-            return routinesRepository.insertRoutine(routine).toInt()
-        }else {
-            return -1
+             routinesRepository.insertRoutine(routine)
         }
     }
-    
     private fun validateInput(uiState: Routine): Boolean {
         return with(uiState) {
-            content.isNotBlank() &&rank>=0 && credit>0.0
+            content.isNotBlank() && rank>=0
         }
     }
 }

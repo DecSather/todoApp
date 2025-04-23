@@ -17,7 +17,7 @@ import com.sather.todo.ui.components.RowIndicator
 import com.sather.todo.ui.components.basePadding
 
 @Composable
-fun TextDisplaysRow(
+fun RoutineDisplaysRow(
     modifier: Modifier = Modifier,
     content: String,
     credit: String = "",
@@ -25,6 +25,7 @@ fun TextDisplaysRow(
     finished:Boolean = false,
     onFinishedChange:(Boolean)->Unit = {}
 ) {
+    val typography = MaterialTheme.typography
     val color = RoutineColors[colorIndex]
     var finished by remember { mutableStateOf(finished) }
     val customColors = CheckboxDefaults.colors(
@@ -34,7 +35,6 @@ fun TextDisplaysRow(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val typography = MaterialTheme.typography
         RowIndicator(
             color = color,
             modifier = Modifier

@@ -1,7 +1,10 @@
 package com.sather.todo.ui.navigation
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -15,8 +18,11 @@ import com.sather.todo.ui.backlog.SingleBacklogDestination
 import com.sather.todo.ui.backlog.SingleBacklogScreen
 import com.sather.todo.ui.comesoon.ComeSoon
 import com.sather.todo.ui.comesoon.ComeSoonScreen
+import com.sather.todo.ui.diary.DiaryHome
+import com.sather.todo.ui.diary.DiaryHomeScreen
 import com.sather.todo.ui.routine.SingleRoutineDestination
 import com.sather.todo.ui.routine.SingleRoutineScreen
+
 //waiting implement:页面转化的过渡
 
 
@@ -37,6 +43,12 @@ fun ToDoNavHost(
             startDestination = BacklogHome.route,
             modifier = modifier
         ) {
+
+//            Diary Home
+            composable(route = DiaryHome.route) {
+                DiaryHomeScreen(
+                )
+            }
 //            Backlog Home
             composable(route = BacklogHome.route) {
                 BacklogHomeScreen(

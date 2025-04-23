@@ -42,16 +42,14 @@ val Typography = Typography(
     headlineMedium= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 18.sp,
-        lineHeight = 20.sp,
         fontFamily = EczarFontFamily,
         letterSpacing = 3.sp
     ),
 //    subtitle1
     titleLarge= TextStyle(
-        fontWeight = FontWeight.Light,
-        fontSize = 14.sp,
-        lineHeight = 20.sp,
-        letterSpacing = 3.sp
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
+        letterSpacing = 2.sp
     ),
 //    subtitle2
     titleMedium=TextStyle(
@@ -63,17 +61,16 @@ val Typography = Typography(
     bodyMedium= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
-//        letterSpacing = 0.1.em
     ),
 //    body2
     bodySmall= TextStyle(
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
-        lineHeight = 20.sp,
-//        letterSpacing = 0.1.em
     ),
     bodyLarge = TextStyle(
-        fontSize = 15.sp,
+        fontFamily = EczarFontFamily,
+        fontWeight = FontWeight.W500,
+        fontSize = 20.sp,
     )
 
 //    button = TextStyle(
