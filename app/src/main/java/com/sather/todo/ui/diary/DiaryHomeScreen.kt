@@ -1,8 +1,9 @@
 package com.sather.todo.ui.diary
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.sather.todo.data.Diary
 import com.sather.todo.rallyTabRowScreens
 import com.sather.todo.ui.backlog.components.BaseScreenBody
 import com.sather.todo.ui.components.RowIndicator
@@ -20,6 +22,7 @@ import com.sather.todo.ui.components.TopTabRow
 import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.components.iconMediumSize
 import com.sather.todo.ui.diary.components.DiaryDisplaysRow
+import com.sather.todo.ui.diary.components.DiaryEditRow
 import com.sather.todo.ui.diary.components.DiaryTabMode
 import com.sather.todo.ui.diary.components.TimeStringSelectionRow
 import com.sather.todo.ui.navigation.BaseDestination
@@ -31,8 +34,50 @@ data object DiaryHome : BaseDestination {
     override val route = "diaries"
 }
 @Composable
-fun DiaryHomeScreen( ) {
+fun DiaryHomeScreen(
+    onDiaryDetailClick:(Long)->Unit={},
     
+) {
+    val diaries = listOf(
+        Diary(
+            timeTitle = "2025-01-01",
+            content = "hello 世界!"
+        ),
+        Diary(
+            timeTitle = "2025-01-01",
+            content = " "
+        ),
+        Diary(
+            timeTitle = "2025-01-01",
+            content = ""
+        ),
+        Diary(
+            timeTitle = "2025-01-01",
+            content = ""
+        ),
+        Diary(
+            timeTitle = "2025-01-01",
+            content = "123"
+        ),
+        Diary(
+            timeTitle = "2025-02-01",
+            content = "hello 世界!"
+        ),
+        Diary(
+            timeTitle = "2025-03-01",
+            content = "hello 世界!"
+        ),
+        Diary(
+            timeTitle = "2025-04-01",
+            content = "hello 世界!"
+        ),
+        Diary(
+            timeTitle = "2025-05-01",
+            content = "hello 世界!"
+        ),
+    )
+    
+//    状态值
     var tabMode by remember { mutableStateOf(DiaryTabMode.DEFAULT) }
     var rememberMode by remember { mutableStateOf(tabMode) }
     var selectedYear by remember { mutableStateOf(LocalDate.now().year.toString()) }
@@ -138,20 +183,25 @@ fun DiaryHomeScreen( ) {
         underside = {
             
                 itemsIndexed(
-                    items = List(5) { index -> "$index" }+List(5){""},
-                    key = { Index,_ -> Index}
-                ) {index,it ->
+                    items = diaries,
+                    key = { _,it -> it.id}
+                ) {index,diary ->
                     if(rememberMode == DiaryTabMode.DEFAULT) {
-                        if(index  % 2 ==0) DiaryDisplaysRow("123")
-                        else DiaryDisplaysRow("")
+                        DiaryDisplaysRow(
+                            onDetailClick =  {
+                                onDiaryDetailClick(diary.id)
+                            },
+                            timeTitle = diary.timeTitle,
+                            content = diary.content,
+                            onNewClick = {}
+                            
+                        )
                     }else{
-                        BasicTextField(
-                            value = it,
-                            onValueChange = {},
-                            modifier = Modifier.padding(basePadding)
+                        DiaryEditRow(
+                            timeTitle = diary.timeTitle,
+                            content = diary.content
                         )
                     }
-                    Spacer(Modifier.height(basePadding))
                 }
         },
         floatButtonAction = {},

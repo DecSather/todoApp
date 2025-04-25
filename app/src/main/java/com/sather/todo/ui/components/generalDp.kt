@@ -2,6 +2,9 @@ package com.sather.todo.ui.components
 
 import androidx.compose.ui.unit.dp
 
+val DiaryRowHeight = 90.dp
+val LargeHeight = 68.dp
+val TabHeight = 56.dp
 
   val EditRowHeight = 42.dp
   val EditRowSpacer = 10.dp
@@ -25,6 +28,3 @@ val iconLargeSize = 42.dp
 val cardSize = 248.dp
 val spacePadding = 4.dp
 val boxActionWidth = 150.dp
-
-val LargeHeight = 68.dp
-val TabHeight = 56.dp

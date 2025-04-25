@@ -20,6 +20,8 @@ import com.sather.todo.ui.comesoon.ComeSoon
 import com.sather.todo.ui.comesoon.ComeSoonScreen
 import com.sather.todo.ui.diary.DiaryHome
 import com.sather.todo.ui.diary.DiaryHomeScreen
+import com.sather.todo.ui.diary.SingleDiaryDestination
+import com.sather.todo.ui.diary.SingleDiaryScreen
 import com.sather.todo.ui.routine.SingleRoutineDestination
 import com.sather.todo.ui.routine.SingleRoutineScreen
 
@@ -44,9 +46,28 @@ fun ToDoNavHost(
             modifier = modifier
         ) {
 
+//        Single Diary
+            composable(
+                route = SingleDiaryDestination.routeWithArgs,
+                arguments = SingleDiaryDestination.arguments,
+//                动画效果-淡入
+                enterTransition = {
+                    slideInVertically() + fadeIn(
+                        animationSpec = tween(2000),
+                    )
+                },
+            ){
+                SingleDiaryScreen(
+                
+                )
+            }
+
 //            Diary Home
             composable(route = DiaryHome.route) {
                 DiaryHomeScreen(
+                    onDiaryDetailClick = {
+                        navController.navigate("${SingleDiaryDestination.route}/${it}")
+                    }
                 )
             }
 //            Backlog Home
