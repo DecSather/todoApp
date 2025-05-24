@@ -8,11 +8,28 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.sather.todo.ToDoApplication
 import com.sather.todo.ui.backlog.BacklogHomeViewModel
 import com.sather.todo.ui.backlog.SingleBacklogViewModel
+import com.sather.todo.ui.diary.DiaryHomeViewModel
+import com.sather.todo.ui.diary.SingleDiaryViewModel
 import com.sather.todo.ui.routine.SingleRoutineViewModel
 
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
+
+//            DiaryHome
+        initializer {
+            DiaryHomeViewModel(
+                inventoryApplication().container.diariesRepository,
+            )
+        }
+
+//            SingleDiary
+        initializer {
+            SingleDiaryViewModel(
+                this.createSavedStateHandle(),
+                inventoryApplication().container.diariesRepository
+            )
+        }
 
 //            SingleRoutine
         initializer {

@@ -1,10 +1,7 @@
 package com.sather.todo.ui.navigation
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -24,6 +21,7 @@ import com.sather.todo.ui.diary.SingleDiaryDestination
 import com.sather.todo.ui.diary.SingleDiaryScreen
 import com.sather.todo.ui.routine.SingleRoutineDestination
 import com.sather.todo.ui.routine.SingleRoutineScreen
+
 
 //waiting implement:页面转化的过渡
 
@@ -52,14 +50,19 @@ fun ToDoNavHost(
                 arguments = SingleDiaryDestination.arguments,
 //                动画效果-淡入
                 enterTransition = {
-                    slideInVertically() + fadeIn(
-                        animationSpec = tween(2000),
+                    slideIntoContainer(
+                        towards =  AnimatedContentTransitionScope.SlideDirection.Down ,
+                        animationSpec = tween(durationMillis = 300)
                     )
                 },
+                exitTransition = {
+                    slideOutOfContainer(
+                        towards =  AnimatedContentTransitionScope.SlideDirection.Up ,
+                         animationSpec = tween(durationMillis = 300)
+                    )
+                }
             ){
-                SingleDiaryScreen(
-                
-                )
+                SingleDiaryScreen()
             }
 
 //            Diary Home

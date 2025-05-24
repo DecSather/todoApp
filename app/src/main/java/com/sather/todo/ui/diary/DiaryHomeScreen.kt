@@ -14,20 +14,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sather.todo.data.Diary
 import com.sather.todo.rallyTabRowScreens
+import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.BaseScreenBody
+import com.sather.todo.ui.backlog.formatter
 import com.sather.todo.ui.components.RowIndicator
 import com.sather.todo.ui.components.TopTabRow
 import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.components.iconMediumSize
 import com.sather.todo.ui.diary.components.DiaryDisplaysRow
-import com.sather.todo.ui.diary.components.DiaryEditRow
 import com.sather.todo.ui.diary.components.DiaryTabMode
 import com.sather.todo.ui.diary.components.TimeStringSelectionRow
 import com.sather.todo.ui.navigation.BaseDestination
 import com.sather.todo.ui.theme.ToDoTheme
+import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.YearMonth
+import java.util.*
 
 data object DiaryHome : BaseDestination {
     override val icon = Icons.Filled.EditCalendar
@@ -36,52 +41,25 @@ data object DiaryHome : BaseDestination {
 @Composable
 fun DiaryHomeScreen(
     onDiaryDetailClick:(Long)->Unit={},
+    viewModel:DiaryHomeViewModel = viewModel(factory = AppViewModelProvider.Factory)
     
 ) {
-    val diaries = listOf(
-        Diary(
-            timeTitle = "2025-01-01",
-            content = "hello 世界!"
-        ),
-        Diary(
-            timeTitle = "2025-01-01",
-            content = " "
-        ),
-        Diary(
-            timeTitle = "2025-01-01",
-            content = ""
-        ),
-        Diary(
-            timeTitle = "2025-01-01",
-            content = ""
-        ),
-        Diary(
-            timeTitle = "2025-01-01",
-            content = "123"
-        ),
-        Diary(
-            timeTitle = "2025-02-01",
-            content = "hello 世界!"
-        ),
-        Diary(
-            timeTitle = "2025-03-01",
-            content = "hello 世界!"
-        ),
-        Diary(
-            timeTitle = "2025-04-01",
-            content = "hello 世界!"
-        ),
-        Diary(
-            timeTitle = "2025-05-01",
-            content = "hello 世界!"
-        ),
-    )
+    val coroutineScope = rememberCoroutineScope()
+    var selectedYear by remember { mutableStateOf(LocalDate.now().year.toString()) }
+    var selectedMouth by remember { mutableStateOf(String.format("%02d",LocalDate.now().monthValue)) }
     
+    var selectedMouthNum by remember(selectedYear,selectedMouth) { mutableIntStateOf(getDaysInMonth(selectedYear,selectedMouth)) }
+    LaunchedEffect(selectedYear,selectedMouth) {
+        viewModel.loadMonthDiaries("$selectedYear-$selectedMouth")
+    }
+    val dateStrings = remember(selectedYear,selectedMouth) { generateMonthDateStrings(selectedYear.toInt(),selectedMouth.toInt()) }
+    val diaries by viewModel.currentMonthDiaries.collectAsState()
 //    状态值
     var tabMode by remember { mutableStateOf(DiaryTabMode.DEFAULT) }
     var rememberMode by remember { mutableStateOf(tabMode) }
-    var selectedYear by remember { mutableStateOf(LocalDate.now().year.toString()) }
-    var selectedMouth by remember { mutableStateOf(String.format("%02d",LocalDate.now().monthValue)) }
+    
+    
+    
     BaseScreenBody(
         top = {
             item {
@@ -181,30 +159,69 @@ fun DiaryHomeScreen(
             }
               },
         underside = {
-            
-                itemsIndexed(
-                    items = diaries,
-                    key = { _,it -> it.id}
-                ) {index,diary ->
-                    if(rememberMode == DiaryTabMode.DEFAULT) {
+            itemsIndexed(
+                items = dateStrings.subList(0,selectedMouthNum),
+                key = { index,_ -> index}
+            ) { index,date ->
+                val hasDiary = diaries.containsKey(date)
+                
+                if(rememberMode == DiaryTabMode.DEFAULT) {
+                    if (hasDiary) {
+                    // 存在日记的渲染
                         DiaryDisplaysRow(
+                            existed = hasDiary,
                             onDetailClick =  {
-                                onDiaryDetailClick(diary.id)
+                                onDiaryDetailClick(diaries[date]!!.id)
                             },
-                            timeTitle = diary.timeTitle,
-                            content = diary.content,
-                            onNewClick = {}
-                            
+                            timeTitle = diaries[date]!!.timeTitle,
+                            content = diaries[date]!!.content,
                         )
                     }else{
-                        DiaryEditRow(
-                            timeTitle = diary.timeTitle,
-                            content = diary.content
+                        DiaryDisplaysRow(
+                            existed = hasDiary,
+                            
+                            onNewClick = {
+                                 val newDiary = Diary(
+                                     timeTitle = date
+                                 )
+                                 coroutineScope.launch {
+                                     viewModel.insertDiary(newDiary)
+                                     viewModel.loadMonthDiaries("${selectedYear}-${selectedMouth}")
+                                 }
+                                 onDiaryDetailClick(newDiary.id)
+                            }
                         )
                     }
-                }
+                }/*else{
+                    DiaryEditRow(
+                        timeTitle = diaries[date]!!.timeTitle,
+                        content = diaries[date]!!.content
+                    )
+                }*/
+            }
         },
-        floatButtonAction = {},
+        floatButtonAction = {
+            if(rememberMode == DiaryTabMode.DEFAULT) {
+                val currentTime = LocalDate.now().format(formatter)
+                if(diaries.containsKey(currentTime)) {
+                    
+                    onDiaryDetailClick(diaries[currentTime]!!.id)
+                }else{
+                    val newDiary = Diary(
+                        timeTitle = currentTime
+                    )
+                    coroutineScope.launch {
+                        viewModel.insertDiary(newDiary)
+                    }
+                    onDiaryDetailClick(newDiary.id)
+                }
+            }/*else{
+                Icon(
+                    imageVector = Icons.Default.Save,
+                    contentDescription = "Save Edited diary"
+                )
+            }*/
+        },
         floatButtoncontent = {
             if(rememberMode == DiaryTabMode.DEFAULT) {
                 Icon(
@@ -219,6 +236,35 @@ fun DiaryHomeScreen(
             }
         }
     )
+}
+fun getDaysInMonth(year: String, month: String): Int {
+    val yearInt = year.toInt()
+    val monthInt = month.toInt()
+    if(yearInt == LocalDate.now().year && monthInt == LocalDate.now().monthValue)
+        return LocalDate.now().dayOfMonth
+    return YearMonth.of(yearInt, monthInt).lengthOfMonth()
+}
+
+// 生成当月所有日期字符串的列表
+fun generateMonthDateStrings(year: Int,month:Int): List<String> {
+    val calendar = Calendar.getInstance().apply {
+        set(Calendar.YEAR, year)
+        set(Calendar.MONTH, month - 1)
+        set(Calendar.DAY_OF_MONTH, 1)
+    }
+    
+    return buildList {
+        while (calendar.get(Calendar.MONTH) == month - 1) {
+            add(
+                "%04d-%02d-%02d".format(
+                    calendar.get(Calendar.YEAR),
+                    calendar.get(Calendar.MONTH) + 1,
+                    calendar.get(Calendar.DAY_OF_MONTH)
+                )
+            )
+            calendar.add(Calendar.DAY_OF_MONTH, 1)
+        }
+    }
 }
 
 @Preview

@@ -20,16 +20,17 @@ import com.sather.todo.ui.components.borderWidth
 @Composable
 fun DiaryDisplaysRow(
     modifier: Modifier = Modifier,
+    existed:Boolean,
     timeTitle:String = "",
     content:String = "",
-    onDetailClick:()->Unit,
-    onNewClick:()->Unit,
+    onDetailClick:()->Unit = {},
+    onNewClick:()->Unit = {},
 ){
     
     val typography = MaterialTheme.typography
     val colorScheme  = MaterialTheme.colorScheme
     
-    if(content.isNotBlank()) {
+    if(existed) {
         Row (
             modifier = modifier
                 .clickable { onDetailClick() }
