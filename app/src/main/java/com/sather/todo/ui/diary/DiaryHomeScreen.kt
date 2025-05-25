@@ -8,27 +8,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sather.todo.data.Diary
-import com.sather.todo.rallyTabRowScreens
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.BaseScreenBody
 import com.sather.todo.ui.backlog.formatter
 import com.sather.todo.ui.components.RowIndicator
-import com.sather.todo.ui.components.TopTabRow
 import com.sather.todo.ui.components.basePadding
 import com.sather.todo.ui.components.iconMediumSize
-import com.sather.todo.ui.diary.components.DiaryDisplaysRow
-import com.sather.todo.ui.diary.components.DiaryTabMode
-import com.sather.todo.ui.diary.components.TimeStringSelectionRow
+import com.sather.todo.ui.diary.components.*
 import com.sather.todo.ui.navigation.BaseDestination
-import com.sather.todo.ui.theme.ToDoTheme
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.YearMonth
@@ -166,38 +159,37 @@ fun DiaryHomeScreen(
                 val hasDiary = diaries.containsKey(date)
                 
                 if(rememberMode == DiaryTabMode.DEFAULT) {
-                    if (hasDiary) {
-                    // 存在日记的渲染
+                    if(hasDiary){
                         DiaryDisplaysRow(
-                            existed = hasDiary,
-                            onDetailClick =  {
-                                onDiaryDetailClick(diaries[date]!!.id)
-                            },
                             timeTitle = diaries[date]!!.timeTitle,
                             content = diaries[date]!!.content,
+                            modifier = Modifier.clickable {
+                                onDiaryDetailClick(diaries[date]!!.id)
+                            }
                         )
                     }else{
-                        DiaryDisplaysRow(
-                            existed = hasDiary,
-                            
-                            onNewClick = {
-                                 val newDiary = Diary(
-                                     timeTitle = date
-                                 )
-                                 coroutineScope.launch {
-                                     viewModel.insertDiary(newDiary)
-                                     viewModel.loadMonthDiaries("${selectedYear}-${selectedMouth}")
-                                 }
-                                 onDiaryDetailClick(newDiary.id)
+                        BlueDotPlaceholder(
+                            modifier = Modifier.clickable {
+                                val newDiary = Diary(
+                                    timeTitle = date
+                                )
+                                coroutineScope.launch {
+                                    viewModel.insertDiary(newDiary)
+                                    viewModel.loadMonthDiaries("${selectedYear}-${selectedMouth}")
+                                }
+                                onDiaryDetailClick(newDiary.id)
                             }
                         )
                     }
-                }/*else{
-                    DiaryEditRow(
-                        timeTitle = diaries[date]!!.timeTitle,
-                        content = diaries[date]!!.content
-                    )
-                }*/
+                    
+                }else{
+                    if(hasDiary) {
+                        DiaryEditRow(
+                            timeTitle = diaries[date]!!.timeTitle,
+                            content = diaries[date]!!.content
+                        )
+                    }
+                }
             }
         },
         floatButtonAction = {
@@ -265,27 +257,4 @@ fun generateMonthDateStrings(year: Int,month:Int): List<String> {
             calendar.add(Calendar.DAY_OF_MONTH, 1)
         }
     }
-}
-
-@Preview
-@Composable
-fun diaryScreenPreview(){
-    ToDoTheme {
-        Scaffold(
-            containerColor = MaterialTheme.colorScheme.background,
-//            导航栏样式
-            topBar = {
-                TopTabRow(
-                    allScreens = rallyTabRowScreens,
-                    onTabSelected = { newScreen ->
-                    },
-                    currentScreen= DiaryHome
-                )
-            }
-        ) { innerPadding ->
-            val i = innerPadding
-            DiaryHomeScreen( )
-        }
-    }
-
 }

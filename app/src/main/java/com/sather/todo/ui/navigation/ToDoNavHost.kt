@@ -62,7 +62,10 @@ fun ToDoNavHost(
                     )
                 }
             ){
-                SingleDiaryScreen()
+                SingleDiaryScreen(
+                    navigateBack= { navController.popBackStack() },
+                    
+                )
             }
 
 //            Diary Home

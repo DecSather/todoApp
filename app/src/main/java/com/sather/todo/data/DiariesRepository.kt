@@ -10,4 +10,6 @@ class DiariesRepository(
     fun getDiariesByMonth(yearMonth: String): Flow<List<Diary>> = diaryDao.getDiariesByMonth(yearMonth)
     
     suspend fun insertDiary(diary: Diary) = diaryDao.insert(diary)
+    
+    
 }

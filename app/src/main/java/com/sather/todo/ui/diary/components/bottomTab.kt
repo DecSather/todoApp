@@ -1,5 +1,6 @@
 package com.sather.todo.ui.diary.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -9,14 +10,13 @@ import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.sather.todo.ui.components.LargeHeight
 import com.sather.todo.ui.components.basePadding
-import com.sather.todo.ui.theme.ToDoTheme
 
 @Composable
 fun KeyboardAwareBottomBarWithTimeInsertion(
-    onClick:() ->Unit,
+    onTimeClick:() ->Unit,
+    onSaveClick:() ->Unit,
 ) {
         // 底部功能栏
     BottomAppBar(
@@ -30,7 +30,7 @@ fun KeyboardAwareBottomBarWithTimeInsertion(
         Spacer(modifier = Modifier.width(basePadding))
         
         IconButton(
-            onClick = onClick
+            onClick = onTimeClick
         ) {
             Icon(
                 imageVector = Icons.Default.Schedule,
@@ -44,19 +44,9 @@ fun KeyboardAwareBottomBarWithTimeInsertion(
         Text(
             text = "保存",
             style = MaterialTheme.typography.headlineMedium,
-//                color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.clickable { onSaveClick() }
         )
         Spacer(modifier = Modifier.width(basePadding))
         
-    }
-}
-
-@Preview
-@Composable
-fun bottomTabPreview(){
-    ToDoTheme {
-        KeyboardAwareBottomBarWithTimeInsertion(
-            {}
-        )
     }
 }

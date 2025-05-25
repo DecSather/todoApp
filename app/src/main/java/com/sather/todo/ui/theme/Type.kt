@@ -68,7 +68,7 @@ val Typography = Typography(
         fontSize = 14.sp,
     ),
     bodyLarge = TextStyle(
-        fontFamily = EczarFontFamily,
+//        fontFamily = EczarFontFamily,
         fontWeight = FontWeight.W500,
         fontSize = 20.sp,
     )

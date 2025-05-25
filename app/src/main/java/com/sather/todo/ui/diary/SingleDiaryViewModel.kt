@@ -28,6 +28,11 @@ class SingleDiaryViewModel(
                 initialValue = DiaryUiState()
             )
     
+    suspend fun triggerSave(newContent:String) {
+        println("single diary update:$newContent")
+        diariesRepository.insertDiary(diaryUiState.value.diary.copy(content = newContent))
+    }
+    
     companion object {
         private const val TIMEOUT_MILLIS = 5_000L
     }

@@ -91,7 +91,7 @@ private fun ToDoAnimTab(
                 role = Role.Tab,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = ripple(
-                    bounded = false,
+//                    bounded = false,
                     radius = Dp.Unspecified,
                     color = Color.Unspecified
                 )
