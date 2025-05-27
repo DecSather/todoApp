@@ -1,6 +1,5 @@
 package com.sather.todo.ui.backlog.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -20,7 +19,6 @@ import com.sather.todo.ui.components.basePadding
 fun RoutineDisplaysRow(
     modifier: Modifier = Modifier,
     content: String,
-    credit: String = "",
     colorIndex: Int = 0,
     finished:Boolean = false,
     onFinishedChange:(Boolean)->Unit = {}
@@ -53,22 +51,6 @@ fun RoutineDisplaysRow(
             style = typography.bodyMedium
         )
         Spacer(Modifier.weight(1f))
-        if(credit.isNotEmpty()) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.dollarSign),
-                    style = typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-                Text(
-                    text = credit,
-                    style = typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-        }
         Spacer(Modifier.width(basePadding))
     }
 }

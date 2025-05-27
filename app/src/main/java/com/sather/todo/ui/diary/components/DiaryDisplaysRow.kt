@@ -35,7 +35,7 @@ fun DiaryDisplaysRow(
             ) {
                 Text(
                     text = timeTitle,
-                    style = typography.headlineMedium
+                    style = typography.headlineMedium,
                 )
                 Text(
                     text = content,

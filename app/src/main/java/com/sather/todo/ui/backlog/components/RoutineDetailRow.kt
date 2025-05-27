@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sather.todo.R
 import com.sather.todo.ui.components.BaseDivider
@@ -26,7 +27,6 @@ fun DetailRoutineRow(
     content:String,
     subcontent:String,
     isFinished:Boolean,
-    credit:Float,
     colorIndex:Int,
     onFinishedChange:()->Unit = {},
     icon: @Composable () ->Unit = {
@@ -65,16 +65,23 @@ fun DetailRoutineRow(
                     onFinishedChange()
                 }
             )
-            Column(Modifier) {
+            Column(Modifier.weight(1f)) {
                 if (finished) {
                     Text(
                         text = content,
                         style = typography.bodyMedium,
                         textDecoration = TextDecoration.LineThrough,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 } else {
                     if (content.isNotBlank())
-                        Text(text = content, style = typography.bodyMedium)
+                        Text(
+                            text = content,
+                            style = typography.bodyMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     else
                         Text(text = stringResource(R.string.routine_empty_error), style = typography.bodyMedium)
                     if (subcontent.isNotEmpty())
@@ -82,22 +89,6 @@ fun DetailRoutineRow(
                     
                 }
             }
-            Spacer(Modifier.weight(1f))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.dollarSign),
-                    style = typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-                Text(
-                    text = credit.toString(),
-                    style = typography.headlineMedium,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
-            }
-            Spacer(Modifier.width(16.dp))
             icon()
         }
         BaseDivider()

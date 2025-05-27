@@ -28,7 +28,7 @@ import java.time.YearMonth
 import java.util.*
 
 data object DiaryHome : BaseDestination {
-    override val icon = Icons.Filled.EditCalendar
+    override val icon = Icons.Filled.EditNote
     override val route = "diaries"
 }
 @Composable
@@ -185,6 +185,9 @@ fun DiaryHomeScreen(
                 }else{
                     if(hasDiary) {
                         DiaryEditRow(
+                            modifier = Modifier.clickable {
+                                onDiaryDetailClick(diaries[date]!!.id)
+                            },
                             timeTitle = diaries[date]!!.timeTitle,
                             content = diaries[date]!!.content
                         )

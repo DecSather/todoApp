@@ -287,7 +287,6 @@ fun BacklogSwipeCard(
                                         RoutineDisplaysRow(
                                             modifier = Modifier.clickable { onBacklogEditClick(routine.sortId) },
                                             content = routine.content,
-                                            credit = routine.credit.toString(),
                                             colorIndex = routine.rank,
                                             finished = routine.finished,
                                             onFinishedChange = { it ->

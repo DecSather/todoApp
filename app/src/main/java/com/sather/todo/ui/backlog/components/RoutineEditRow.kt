@@ -4,13 +4,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,13 +16,9 @@ import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
-import com.sather.todo.R
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.components.EditRowSpacer
 
@@ -58,17 +52,10 @@ fun RoutineEditRow(
             )
         )
     }
-    var creditFieldValueState by remember {
-        mutableStateOf(
-            TextFieldValue(
-                text = routine.credit.toString(),
-                selection = TextRange(routine.credit.toString().length),
-            )
-        )
-    }
+    
     var contentwasFocused by remember { mutableStateOf(false) }
     var contentwasEmpty by remember { mutableStateOf(false) }
-    var creditwasFocused by remember { mutableStateOf(false) }
+    
 //        文本输入框
     AnimatedVisibility(
         visibleState = animVisibleState,
@@ -147,42 +134,7 @@ fun RoutineEditRow(
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium,
             )
-//        分数输入框
-            Text(
-                text = stringResource(R.string.dollarSign),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            BasicTextField(
-                modifier = Modifier.width(68.dp)
-                    .padding(start = EditRowSpacer)
-                    .onFocusEvent { focusState ->
-                        if (focusState.isFocused) {
-                            creditwasFocused = true
-                        } else if (creditwasFocused) {
-                            val credit = creditFieldValueState.text.toFloatOrNull()
-                            if (credit != null) updateRoutine(routine.copy(credit = credit))
-                            else updateRoutine(routine.copy(credit = 1f))
-                            creditwasFocused = false
-                        }
-                    },
-                singleLine = true,
-                value = creditFieldValueState,
-                onValueChange = { creditFieldValue ->
-                    creditFieldValueState = creditFieldValue
-                },
-                
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Number
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        addRoutine(1, "",true)
-                    }
-                ),
-                textStyle = MaterialTheme.typography.bodyMedium,
-            )
+            
         }
     }
 }

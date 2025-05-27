@@ -1,6 +1,7 @@
 package com.sather.todo.ui.diary.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,16 +17,17 @@ fun DiaryEditRow(
     content:String,
 ){
     Column(
-        Modifier.padding(basePadding)
+        modifier.fillMaxWidth().padding(basePadding)
     ) {
         Text(
             text = timeTitle,
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineLarge
         )
         Text(
             text = content,
             style = MaterialTheme.typography.bodyMedium,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(start = basePadding)
         )
         
     }

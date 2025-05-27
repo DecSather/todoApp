@@ -289,7 +289,6 @@ fun  SingleBacklogBody(
                                     content = routine.content,
                                     subcontent = routine.subcontent,
                                     isFinished = routine.finished,
-                                    credit = routine.credit,
                                     colorIndex = routine.rank,
                                     onFinishedChange = {
                                         tempUnfinishedList.remove(routine)
@@ -331,7 +330,6 @@ fun  SingleBacklogBody(
                     content = stringResource(R.string.todo_list),
                     subcontent = stringResource(R.string.click_to_add),
                     isFinished = false,
-                    credit = 0f,
                     colorIndex = 0,
                 )
             }
@@ -349,8 +347,7 @@ fun  SingleBacklogBody(
                         },
                     content = routine.content,
                     subcontent = routine.subcontent,
-                    isFinished = routine.finished,
-                    credit = routine.credit,
+                    isFinished = routine.finished, 
                     colorIndex = routine.rank,
                     onFinishedChange={
                         tempfinishedList.remove(routine)

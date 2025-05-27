@@ -1,16 +1,15 @@
 package com.sather.todo.ui.routine
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
@@ -62,7 +61,6 @@ fun SingleRoutineBody(
     modifier: Modifier = Modifier
 ) {
     val routine = routineUiState.routine
-    var creditText by remember { mutableStateOf(routine.credit.toString()) }
     
     val rankIndexList = listOf(1,2,3)
     Column(
@@ -123,31 +121,7 @@ fun SingleRoutineBody(
                 }
                 
             }
-//        credit
-            OutlinedTextField(
-                value = creditText,
-                onValueChange = {
-                    newText ->
-                    creditText = newText
-                    if(newText.toFloatOrNull()==null) {
-                        onRoutineValueChange(routineUiState.routine.copy(credit = 1f))
-                    }
-                    else{
-                        onRoutineValueChange(routineUiState.routine.copy(credit = creditText.toFloat()))
-                    }
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                label = {
-                    Text(
-                        stringResource(R.string.rontine_credit_req),
-                        style = MaterialTheme.typography.bodyMedium
-                    
-                    )
-                        },
-                leadingIcon = { Text(stringResource(R.string.dollarSign)) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
+            
 //        subcontent
             OutlinedTextField(
                 value = routineUiState.routine.subcontent,
