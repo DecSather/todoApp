@@ -13,10 +13,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sather.todo.R
-import com.sather.todo.ui.components.BaseDivider
-import com.sather.todo.ui.components.LargeHeight
-import com.sather.todo.ui.components.RowIndicator
-import com.sather.todo.ui.components.basePadding
+import com.sather.todo.ui.components.*
+
 /*
 * 全信息展示的Routine
 *   Single Backlog用
@@ -27,16 +25,23 @@ fun DetailRoutineRow(
     content:String,
     subcontent:String,
     isFinished:Boolean,
+    credit:Float,
     colorIndex:Int,
     onFinishedChange:()->Unit = {},
     icon: @Composable () ->Unit = {
-        Icon(
-            imageVector = Icons.Filled.ChevronRight,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 12.dp)
-                .size(24.dp)
+        Spacer(Modifier.width(IconWrapSpacer)
+            .fillMaxHeight()
         )
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxHeight()
+                )
+        Spacer(Modifier.width(IconWrapSpacer)
+            .fillMaxHeight()
+        )
+        
     },
 ) {
     val color= RoutineColors[colorIndex]
@@ -76,18 +81,33 @@ fun DetailRoutineRow(
                     )
                 } else {
                     if (content.isNotBlank())
-                        Text(
-                            text = content,
-                            style = typography.bodyMedium,
+                        Text(text = content, style = typography.bodyMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     else
                         Text(text = stringResource(R.string.routine_empty_error), style = typography.bodyMedium)
                     if (subcontent.isNotEmpty())
-                        Text(text = subcontent, style = typography.bodySmall)
+                        Text(text = subcontent, style = typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     
                 }
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.dollarSign),
+                    style = typography.headlineMedium,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                Text(
+                    text = credit.toString(),
+                    style = typography.headlineMedium,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
             }
             icon()
         }

@@ -129,7 +129,7 @@ fun  SingleBacklogBody(
     unfinishedRoutineList:List<Routine>,
 ) {
     val view = LocalView.current
-    
+
 //    临时数据
     val tempfinishedList = remember {mutableStateListOf<Routine>()}
     var tempUnfinishedList = remember { mutableStateListOf<Routine>()}
@@ -254,9 +254,9 @@ fun  SingleBacklogBody(
                 val dismissState = rememberSwipeToDismissBoxState(
                     confirmValueChange = {
                         if (it == SwipeToDismissBoxValue.StartToEnd) { // 仅在完全滑动时触发
-                                tempUnfinishedList.remove(routine)
-                                swipeToDeleteRoutine(routine.id)
-                                 true
+                            tempUnfinishedList.remove(routine)
+                            swipeToDeleteRoutine(routine.id)
+                            true
                         } else {
                             false // 未达阈值时回弹
                         }
@@ -289,6 +289,7 @@ fun  SingleBacklogBody(
                                     content = routine.content,
                                     subcontent = routine.subcontent,
                                     isFinished = routine.finished,
+                                    credit = routine.credit,
                                     colorIndex = routine.rank,
                                     onFinishedChange = {
                                         tempUnfinishedList.remove(routine)
@@ -300,6 +301,7 @@ fun  SingleBacklogBody(
                                         onClick = {},
                                         modifier = Modifier.fillMaxHeight()
                                             .draggableHandle()
+                                        
                                     ) {
                                         Icon(Icons.Rounded.Menu, "Drag Handle")
                                     }
@@ -330,6 +332,7 @@ fun  SingleBacklogBody(
                     content = stringResource(R.string.todo_list),
                     subcontent = stringResource(R.string.click_to_add),
                     isFinished = false,
+                    credit = 0f,
                     colorIndex = 0,
                 )
             }
@@ -347,7 +350,8 @@ fun  SingleBacklogBody(
                         },
                     content = routine.content,
                     subcontent = routine.subcontent,
-                    isFinished = routine.finished, 
+                    isFinished = routine.finished,
+                    credit = routine.credit,
                     colorIndex = routine.rank,
                     onFinishedChange={
                         tempfinishedList.remove(routine)

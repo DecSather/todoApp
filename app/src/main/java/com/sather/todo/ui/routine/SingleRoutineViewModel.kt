@@ -66,7 +66,7 @@ data class RoutineUiState(
 
 fun Routine.toRoutineUiState(): RoutineUiState = RoutineUiState(
     routine = this,
-    isEntryValid = this.content.isNotBlank() &&this.rank>=0
+    isEntryValid = this.content.isNotBlank() &&this.rank>=0 && this.credit >= 0f
 )
 
 fun formatedCredit(creditText:String):String{

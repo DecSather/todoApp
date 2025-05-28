@@ -10,6 +10,7 @@ val TabHeight = 56.dp
   val EditRowSpacer = 10.dp
   val CheckBoxSize = 16.dp
   val roundCornerShape = 2.dp
+val IconWrapSpacer = 11.dp
 
 
   const val InactiveTabOpacity = 0.60f

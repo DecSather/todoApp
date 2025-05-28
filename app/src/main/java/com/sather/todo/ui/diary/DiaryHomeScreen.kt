@@ -5,7 +5,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.HorizontalSplit
+import androidx.compose.material.icons.filled.ModeEdit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -196,39 +199,25 @@ fun DiaryHomeScreen(
             }
         },
         floatButtonAction = {
-            if(rememberMode == DiaryTabMode.DEFAULT) {
-                val currentTime = LocalDate.now().format(formatter)
-                if(diaries.containsKey(currentTime)) {
-                    
-                    onDiaryDetailClick(diaries[currentTime]!!.id)
-                }else{
-                    val newDiary = Diary(
-                        timeTitle = currentTime
-                    )
-                    coroutineScope.launch {
-                        viewModel.insertDiary(newDiary)
-                    }
-                    onDiaryDetailClick(newDiary.id)
-                }
-            }/*else{
-                Icon(
-                    imageVector = Icons.Default.Save,
-                    contentDescription = "Save Edited diary"
+            val currentTime = LocalDate.now().format(formatter)
+            if(diaries.containsKey(currentTime)) {
+                
+                onDiaryDetailClick(diaries[currentTime]!!.id)
+            }else{
+                val newDiary = Diary(
+                    timeTitle = currentTime
                 )
-            }*/
+                coroutineScope.launch {
+                    viewModel.insertDiary(newDiary)
+                }
+                onDiaryDetailClick(newDiary.id)
+            }
         },
         floatButtoncontent = {
-            if(rememberMode == DiaryTabMode.DEFAULT) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add toady's diary"
-                )
-            }else{
-                Icon(
-                    imageVector = Icons.Default.Save,
-                    contentDescription = "Save Edited diary"
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add toady's diary"
+            )
         }
     )
 }
