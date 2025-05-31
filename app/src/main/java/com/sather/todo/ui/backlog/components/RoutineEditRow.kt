@@ -29,21 +29,14 @@ fun RoutineEditRow(
     locationInEnd:Boolean,
     updateRoutine: (Routine) -> Unit ={ },
     addRoutine: (Int,String,Boolean) -> Unit,
-    deleteRoutine:() -> Unit,
+    deleteRoutine:(String) -> Unit,
     focusClick:(Int) -> Unit,
 ) {
     
     var animFlag by remember { mutableStateOf(false) }
     
     val animVisibleState = remember {  MutableTransitionState(true).apply {  targetState = true  }  }
-    LaunchedEffect(animVisibleState.currentState) {
-        
-        if (!animVisibleState.targetState &&
-            !animVisibleState.currentState
-        ) {
-            deleteRoutine()
-        }
-    }
+    
     var contentFieldValueState by remember {
         mutableStateOf(
             TextFieldValue(
@@ -52,9 +45,16 @@ fun RoutineEditRow(
             )
         )
     }
-    
+    LaunchedEffect(animVisibleState.currentState) {
+        
+        if (!animVisibleState.targetState &&
+            !animVisibleState.currentState
+        ) {
+            deleteRoutine(contentFieldValueState.text)
+        }
+    }
     var contentwasFocused by remember { mutableStateOf(false) }
-    var contentwasEmpty by remember { mutableStateOf(false) }
+    var selectionwasStarted by remember { mutableStateOf(false) }
     
 //        文本输入框
     AnimatedVisibility(
@@ -80,16 +80,19 @@ fun RoutineEditRow(
                     .padding(start = EditRowSpacer)
                     .onKeyEvent { keyEvent ->
                         if (keyEvent.key == Key.Delete || keyEvent.key == Key.Backspace) {
-                            if (contentFieldValueState.text.isEmpty() && !contentwasEmpty) {
-                                contentwasEmpty = true
+                            if (contentFieldValueState.selection.start == 0 && !selectionwasStarted) {
+                                selectionwasStarted = true
                                 false
-                            } else if (contentFieldValueState.text.isEmpty() && contentwasEmpty) {
+                            } else if (contentFieldValueState.selection.start == 0 && selectionwasStarted) {
                                 focusClick(routine.sortId - 1)
                                 animVisibleState.targetState = false
                                 true
                             }
                         }
+//                        不阻止其他键位的默认返回
                         false
+                        
+                        
                     }
                     .onFocusEvent { focusState ->
                         if (focusState.isFocused) {

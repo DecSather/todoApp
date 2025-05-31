@@ -75,7 +75,7 @@ fun EditCardDialog(
     val tempRoutineList = remember {
         mutableStateListOf<Routine>().apply {
             addAll(routineList)
-            if(clickPart <= 0) {
+            if(clickPart == -2) {
                 add(
                     Routine(
                         backlogId = backlog.id,
@@ -168,7 +168,7 @@ fun EditCardDialog(
                             RoutineEditRow(
                                 modifier = if (index == focusIndex) Modifier.focusRequester(focusRequester) else Modifier,
                                 routine = item.copy(sortId = index),
-                                locationInEnd = locationInEnd,
+                                locationInEnd = if (index == focusIndex)locationInEnd else true,
                                 updateRoutine = { routine ->
                                     tempRoutineList[index] = routine
                                 },
@@ -186,21 +186,16 @@ fun EditCardDialog(
                                     focusIndex = index + sortIndex
                                     locationInEnd = location
                                 },
-                                deleteRoutine = {
-                                    val deleteRoutine = tempRoutineList[index]
-                                    updateRoutine(deleteRoutine)
-                                    tempRoutineList.removeAt(index)
-                                    if (tempRoutineList.size == 0) tempRoutineList.add(
-                                        0,
-                                        Routine(
-                                            backlogId = backlog.id,
-                                            sortId = index + 1,
-                                            finished = true,
-                                            rank = 0,
-                                            content = "",
-                                        )
-                                    )
-                                    
+                                deleteRoutine = {legacyTexts ->
+                                    val deleteRoutine = tempRoutineList[index].copy(content = "")
+                                    if(index != 0) {
+                                        val newContent = tempRoutineList[index - 1].content+legacyTexts
+                                        tempRoutineList[index-1] = tempRoutineList[index - 1].copy(content = newContent)
+                                        println("temp routine:${tempRoutineList[index-1]}")
+                                        tempRoutineList.removeAt(index)
+                                        updateRoutine(tempRoutineList[index-1])
+                                        updateRoutine(deleteRoutine)
+                                    }
                                 },
                                 focusClick = { newFocusIndex ->
                                     if (focusIndex != newFocusIndex) {

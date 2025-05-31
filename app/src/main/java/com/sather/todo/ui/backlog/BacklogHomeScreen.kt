@@ -241,7 +241,10 @@ fun BacklogHomeBody(
             },
             updateBacklogUiState = updateBacklogUiState,
             onUpdateBacklog=susUpdateBacklog,
-            updateRoutine= updateRoutine,
+            updateRoutine= {
+                println("viewmodel update:$it")
+                           updateRoutine(it)
+            },
             onDismiss = {
                 showEditDialog = !showEditDialog
                         },
