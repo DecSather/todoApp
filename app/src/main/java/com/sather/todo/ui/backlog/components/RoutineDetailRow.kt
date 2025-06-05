@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.sather.todo.R
 import com.sather.todo.ui.components.*
+import com.sather.todo.ui.theme.RoutineColors
 
 /*
 * 全信息展示的Routine

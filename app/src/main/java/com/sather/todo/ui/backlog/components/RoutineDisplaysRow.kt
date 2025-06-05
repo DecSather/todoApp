@@ -14,6 +14,7 @@ import androidx.compose.ui.res.stringResource
 import com.sather.todo.R
 import com.sather.todo.ui.components.RowIndicator
 import com.sather.todo.ui.components.basePadding
+import com.sather.todo.ui.theme.RoutineColors
 
 @Composable
 fun RoutineDisplaysRow(

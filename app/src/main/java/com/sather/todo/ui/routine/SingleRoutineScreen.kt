@@ -17,10 +17,10 @@ import androidx.navigation.navArgument
 import com.sather.todo.R
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
-import com.sather.todo.ui.backlog.components.RoutineColors
 import com.sather.todo.ui.components.cardSize
 import com.sather.todo.ui.components.startPadding
 import com.sather.todo.ui.navigation.BaseDestination
+import com.sather.todo.ui.theme.RoutineColors
 import kotlinx.coroutines.launch
 
 //new Routine Entry-预添加类设计，非数据

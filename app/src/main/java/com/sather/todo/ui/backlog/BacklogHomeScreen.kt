@@ -241,14 +241,14 @@ fun BacklogHomeBody(
             },
             updateBacklogUiState = updateBacklogUiState,
             onUpdateBacklog=susUpdateBacklog,
-            updateRoutine= {
+            onUpdateRoutine= {
                 println("viewmodel update:$it")
                            updateRoutine(it)
             },
-            onDismiss = {
+            dismissDialog = {
                 showEditDialog = !showEditDialog
                         },
-            SortAndSave = { tempRoutineList ->
+            onSortAndSave = { tempRoutineList ->
                 var index = 0
                 var sortId = 0
                 while (index < tempRoutineList.size) {

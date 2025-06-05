@@ -16,6 +16,7 @@ import com.sather.todo.ui.components.CheckBoxSize
 import com.sather.todo.ui.components.EditRowHeight
 import com.sather.todo.ui.components.EditRowSpacer
 import com.sather.todo.ui.components.roundCornerShape
+import com.sather.todo.ui.theme.RoutineColors
 
 @Composable
 fun RankAnimRow(

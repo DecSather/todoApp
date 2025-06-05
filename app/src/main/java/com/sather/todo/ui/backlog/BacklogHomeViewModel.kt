@@ -100,7 +100,7 @@ class BacklogHomeViewModel(
     }
     private fun validateInput(uiState: Routine): Boolean {
         return with(uiState) {
-            content.isNotBlank() && rank>=0
+            content.isNotBlank() && rank > 0
         }
     }
 }

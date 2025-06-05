@@ -13,7 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import com.sather.todo.ui.backlog.components.RoutineColors
+import com.sather.todo.ui.theme.RoutineColors
 
 //三色圆圈动画
 @Composable

@@ -26,10 +26,11 @@ import com.sather.todo.ui.components.EditRowSpacer
 fun RoutineEditRow(
     modifier: Modifier,
     routine: Routine,
-    locationInEnd:Boolean,
+    locationInEnd:Int,
     updateRoutine: (Routine) -> Unit ={ },
-    addRoutine: (Int,String,Boolean) -> Unit,
-    deleteRoutine:(String) -> Unit,
+    addRoutine: (Int,String,Int) -> Unit,
+    deleteRoutine:(String)->Unit,
+    onDeleteRoutine:() -> Unit,
     focusClick:(Int) -> Unit,
 ) {
     
@@ -37,11 +38,11 @@ fun RoutineEditRow(
     
     val animVisibleState = remember {  MutableTransitionState(true).apply {  targetState = true  }  }
     
-    var contentFieldValueState by remember {
+    var contentFieldValueState by remember(routine.content) {
         mutableStateOf(
             TextFieldValue(
                 text = routine.content,
-                selection = TextRange(if(locationInEnd)routine.content.length else 0),
+                selection = TextRange(locationInEnd),
             )
         )
     }
@@ -50,7 +51,7 @@ fun RoutineEditRow(
         if (!animVisibleState.targetState &&
             !animVisibleState.currentState
         ) {
-            deleteRoutine(contentFieldValueState.text)
+            onDeleteRoutine()
         }
     }
     var contentwasFocused by remember { mutableStateOf(false) }
@@ -85,6 +86,7 @@ fun RoutineEditRow(
                                 false
                             } else if (contentFieldValueState.selection.start == 0 && selectionwasStarted) {
                                 focusClick(routine.sortId - 1)
+                                deleteRoutine(contentFieldValueState.text)
                                 animVisibleState.targetState = false
                                 true
                             }
@@ -119,7 +121,7 @@ fun RoutineEditRow(
                             else addRoutine(
                                 index,
                                 lineText,
-                                true
+                                lineText.length
                             )
                         }
                     }
@@ -132,7 +134,7 @@ fun RoutineEditRow(
                         val oldText = contentFieldValueState.text.subSequence(0,contentFieldValueState.selection.end)
                         val newText = contentFieldValueState.text.substring(contentFieldValueState.selection.end)
                         contentFieldValueState = TextFieldValue(text = oldText.toString())
-                        addRoutine(1, newText,false)
+                        addRoutine(1, newText,0)
                     }
                 ),
                 textStyle = MaterialTheme.typography.bodyMedium,

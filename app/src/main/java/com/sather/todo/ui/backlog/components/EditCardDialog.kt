@@ -39,8 +39,8 @@ import java.time.format.DateTimeFormatter
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun EditCardDialog(
-    SortAndSave: (List<Routine>) -> Unit,
-    onDismiss:()->Unit,
+    onSortAndSave: (List<Routine>) -> Unit,
+    dismissDialog:()->Unit,
 //    需要判断点击部位
 //      -2- empty routine
 //      -1- backlog
@@ -52,7 +52,7 @@ fun EditCardDialog(
     updateBacklogUiState: (Backlog) -> Unit,
     onUpdateBacklog:()->Unit,
     
-    updateRoutine:(Routine)->Unit,
+    onUpdateRoutine:(Routine)->Unit,
     ) {
     
     val clipboardManager = LocalClipboardManager.current
@@ -67,7 +67,7 @@ fun EditCardDialog(
     *   初始化焦点-sortId或末尾-
     *   回收利用来保存数据组
     */
-    var saveFoucsIndex by remember { mutableIntStateOf(if(clickPart < 0)routineList.size else clickPart) }
+    var saveFoucsIndex by remember { mutableIntStateOf(if(clickPart < 0 )routineList.size else clickPart) }
     
     val focusRequester = remember { FocusRequester()}
     var focusIndex by remember { mutableIntStateOf(saveFoucsIndex) }
@@ -75,7 +75,7 @@ fun EditCardDialog(
     val tempRoutineList = remember {
         mutableStateListOf<Routine>().apply {
             addAll(routineList)
-            if(clickPart == -2) {
+            if(clickPart < 0) {
                 add(
                     Routine(
                         backlogId = backlog.id,
@@ -89,7 +89,7 @@ fun EditCardDialog(
         }
     }
     
-    var locationInEnd by remember { mutableStateOf(true) }
+    var locationInEnd by remember { mutableStateOf(tempRoutineList[focusIndex].content.length) }
     LaunchedEffect(focusIndex) {
         when(isItemVisible(focusIndex, listState)) {
             -1 -> listState.animateScrollToItem(maxOf(0, focusIndex))
@@ -145,8 +145,8 @@ fun EditCardDialog(
                             titleFocusRequester.requestFocus()
                             delay(1)
                             if (saveFoucsIndex == -3) {
-                                SortAndSave(tempRoutineList)
-                                onDismiss()
+                                onSortAndSave(tempRoutineList)
+                                dismissDialog()
                             }
                         }
                     }
@@ -168,7 +168,7 @@ fun EditCardDialog(
                             RoutineEditRow(
                                 modifier = if (index == focusIndex) Modifier.focusRequester(focusRequester) else Modifier,
                                 routine = item.copy(sortId = index),
-                                locationInEnd = if (index == focusIndex)locationInEnd else true,
+                                locationInEnd = if (index == focusIndex)locationInEnd else item.content.length,
                                 updateRoutine = { routine ->
                                     tempRoutineList[index] = routine
                                 },
@@ -186,21 +186,34 @@ fun EditCardDialog(
                                     focusIndex = index + sortIndex
                                     locationInEnd = location
                                 },
-                                deleteRoutine = {legacyTexts ->
-                                    val deleteRoutine = tempRoutineList[index].copy(content = "")
+                                deleteRoutine = { legacyTexts ->
                                     if(index != 0) {
-                                        val newContent = tempRoutineList[index - 1].content+legacyTexts
-                                        tempRoutineList[index-1] = tempRoutineList[index - 1].copy(content = newContent)
-                                        println("temp routine:${tempRoutineList[index-1]}")
-                                        tempRoutineList.removeAt(index)
-                                        updateRoutine(tempRoutineList[index-1])
-                                        updateRoutine(deleteRoutine)
+                                        locationInEnd = tempRoutineList[index - 1].content.length
+                                        tempRoutineList[index-1] = tempRoutineList[index - 1].copy(content = tempRoutineList[index - 1].content+legacyTexts)
+                                        println("temp routine:${tempRoutineList[index-1]}\t$locationInEnd")
+                                        focusIndex = index - 1
+                                    }
+                                },
+                                onDeleteRoutine = {
+                                    val deleteRoutine = tempRoutineList[index].copy(content = "")
+                                    tempRoutineList.removeAt(index)
+                                    onUpdateRoutine(deleteRoutine)
+                                    if(index == 0) {
+                                        tempRoutineList.add(
+                                            0,
+                                            Routine(
+                                                backlogId = backlog.id,
+                                                sortId = 0,
+                                                finished = true,
+                                                rank =0 ,
+                                                content = "",
+                                            )
+                                        )
                                     }
                                 },
                                 focusClick = { newFocusIndex ->
                                     if (focusIndex != newFocusIndex) {
                                         focusIndex = newFocusIndex
-                                        if(!locationInEnd)locationInEnd = true
                                     }
                                 },
                             )
@@ -215,7 +228,7 @@ fun EditCardDialog(
                 }
             },
             onDismissRequest = {
-                onDismiss()
+                dismissDialog()
             },
             confirmButton = {
                 TextButton(

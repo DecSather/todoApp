@@ -8,10 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.sather.todo.R
-import com.sather.todo.ui.theme.faverColor
-import com.sather.todo.ui.theme.importColor
-import com.sather.todo.ui.theme.normalColor
-import com.sather.todo.ui.theme.unfinishedColor
 
 //警示对话框-删除
 @Composable
@@ -39,6 +35,3 @@ fun DeleteConfirmationDialog(
             }
         })
 }
-
-val RoutineColors= listOf(unfinishedColor, importColor, normalColor, faverColor)
-
