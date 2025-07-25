@@ -22,10 +22,8 @@ import com.sather.todo.ui.theme.ToDoTheme
 val rallyTabRowScreens = listOf(BacklogHome,DiaryHome, ComeSoon)
 @Composable
 fun ToDoApp(navController: NavHostController = rememberNavController()) {
-    ToDoNavHost(navController = navController)
     ToDoTheme {
 //        判断当前页面展开标题
-        val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
         val currentScreen = rallyTabRowScreens.find {
