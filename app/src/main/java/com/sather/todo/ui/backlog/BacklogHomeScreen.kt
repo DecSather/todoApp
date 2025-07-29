@@ -1,16 +1,13 @@
 package com.sather.todo.ui.backlog
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddTask
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -23,28 +20,16 @@ import com.sather.todo.data.Routine
 import com.sather.todo.ui.AppViewModelProvider
 import com.sather.todo.ui.backlog.components.*
 import com.sather.todo.ui.components.basePadding
-import com.sather.todo.ui.navigation.BaseDestination
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
 //日程-home页
-data object BacklogHome : BaseDestination {
-    override val icon =Icons.Filled.AddTask
-    override val route ="backlogs"
-}
 //    三次接入-标题展开，进入页面，数据渲染
-@OptIn(ExperimentalSharedTransitionApi::class)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun BacklogHomeScreen(
-    /*
-    * 参数上仅考虑顶级页面间的交互
-    */
-//    元素共享-动画效果
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
 //    导航
     onBacklogDetailClick:(Long)->Unit={},
 //    数据管理
@@ -59,8 +44,6 @@ fun BacklogHomeScreen(
  
     
     BacklogHomeBody(
-        sharedTransitionScope=sharedTransitionScope,
-        animatedContentScope=animatedContentScope,
         susDeleteBacklogById ={
             coroutineScope.launch {
                 viewModel.deleteBacklogById(it)
@@ -116,9 +99,6 @@ fun BacklogHomeScreen(
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BacklogHomeBody(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    
     backlogUiState: BacklogUiState,
     onBacklogDetailClick:(Long)->Unit={},
     onExpandChange:(Long,Boolean)->Unit,
@@ -160,8 +140,6 @@ fun BacklogHomeBody(
                 val routineList =
                     homeRoutineList.filter {it.backlogId == backlog.id}
                 BacklogSwipeCard(
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope,
                     
                     backlog = backlog,
                     routineList = routineList,
@@ -193,9 +171,6 @@ fun BacklogHomeBody(
             itemsIndexed(items = invisibleBacklogList,key = {_,it -> it.id}) { index,backlog ->
 //                完成卡
                 BacklogSwipeCard(
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope,
-                    
                     backlog = backlog,
                     
                     onExpandClick = onExpandChange,

@@ -30,10 +30,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.util.*
 
-data object DiaryHome : BaseDestination {
-    override val icon = Icons.Filled.EditNote
-    override val route = "diaries"
-}
 @Composable
 fun DiaryHomeScreen(
     onDiaryDetailClick:(Long)->Unit={},

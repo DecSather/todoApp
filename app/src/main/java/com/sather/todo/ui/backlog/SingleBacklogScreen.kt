@@ -1,6 +1,5 @@
 package com.sather.todo.ui.backlog
 
-import androidx.compose.animation.*
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,11 +57,8 @@ object SingleBacklogDestination : BaseDestination {
     })
 }
 //记得添加删除键
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SingleBacklogScreen(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     navigateBack: () -> Unit,
     navigateToSingleRoutine: (Long) -> Unit={},
     viewModel: SingleBacklogViewModel = viewModel(factory = AppViewModelProvider.Factory),
@@ -74,12 +70,8 @@ fun SingleBacklogScreen(
     val unfinishedRoutines = routineUiState.routineList.filter { it -> !it.finished }
     
     val coroutineScope = rememberCoroutineScope()
-//    if(routineUiState.routineList.isNotEmpty())
-//        VerticalReorderList(routineUiState.routineList)
     SingleBacklogBody(
         backlog =backlog,
-        sharedTransitionScope=sharedTransitionScope,
-        animatedContentScope=animatedContentScope,
         navigateBack={
             coroutineScope.launch {
                 navigateBack()
@@ -113,11 +105,9 @@ fun SingleBacklogScreen(
         unfinishedRoutineList=unfinishedRoutines,
     )
 }
-@OptIn(ExperimentalSharedTransitionApi::class, FlowPreview::class)
+@OptIn(FlowPreview::class)
 @Composable
 fun  SingleBacklogBody(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     backlog: Backlog,
     onAddRoutine:(Routine)->Unit,
     onDelete: () -> Unit={},
@@ -215,28 +205,14 @@ fun  SingleBacklogBody(
 //                        子元素中心排列
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        with(sharedTransitionScope) {
                             Text(
                                 text = backlog.timeTitle,
                                 style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier
-                                    .sharedBounds(
-                                        rememberSharedContentState(
-                                            key = "${backlog.id}/${backlog.timeTitle}"
-                                        ),
-                                        animatedVisibilityScope = animatedContentScope,
-                                        enter = fadeIn(),
-                                        exit = fadeOut(),
-                                        resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
-                                    )
-                            
                             )
                             Text(
                                 text = formatedCredit(finishedAmount.toString()),
                                 style = MaterialTheme.typography.headlineLarge,
                             )
-                            
-                        }
                     }
                 }
                 Spacer(Modifier.height(basePadding * 2))

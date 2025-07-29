@@ -25,14 +25,11 @@ import com.sather.todo.data.Backlog
 import com.sather.todo.data.Routine
 import com.sather.todo.ui.components.BaseDivider
 import com.sather.todo.ui.components.basePadding
-
+//删除卡1
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BacklogSwipeCard(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    
     modifier: Modifier = Modifier,
     backlog: Backlog,
     
@@ -97,15 +94,13 @@ fun BacklogSwipeCard(
                                 onVisibleClick(backlog.id,isVisble)
                             }
                         )
-//                            时间标题
-                        with(sharedTransitionScope) {
                             Text(
                                 text = backlog.timeTitle,
                                 style = MaterialTheme.typography.headlineLarge,
                                 color = MaterialTheme.colorScheme.secondary,
                                 modifier = Modifier
                                     .weight(1f)
-                                    .sharedBounds(
+                                    /*.sharedBounds(
                                         rememberSharedContentState(
                                             key = "${backlog.id}/${backlog.timeTitle}"
                                         ),
@@ -113,12 +108,11 @@ fun BacklogSwipeCard(
                                         enter = fadeIn(),
                                         exit = fadeOut(),
                                         resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
-                                    )
+                                    )*/
                                     .clickable {
                                         onTitleEditClick(-1)
                                     }
                             )
-                        }
 //                            展开按钮
                         IconButton(onClick = {
                             expanded = !expanded
@@ -154,12 +148,10 @@ fun BacklogSwipeCard(
         }
     }
 }
+//删除卡2
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun BacklogSwipeCard(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
-    
     modifier: Modifier = Modifier,
     backlog: Backlog,
     routineList:List<Routine>,
@@ -236,13 +228,12 @@ fun BacklogSwipeCard(
                                 }
                             )
 //                            时间标题
-                            with(sharedTransitionScope) {
                                 Text(
                                     text = backlog.timeTitle,
                                     style = MaterialTheme.typography.headlineLarge,
                                     modifier = Modifier
                                         .weight(1f)
-                                        .sharedBounds(
+                                        /*.sharedBounds(
                                             rememberSharedContentState(
                                                 key = "${backlog.id}/${backlog.timeTitle}"
                                             ),
@@ -250,12 +241,11 @@ fun BacklogSwipeCard(
                                             enter = fadeIn(),
                                             exit = fadeOut(),
                                             resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
-                                        )
+                                        )*/
                                         .clickable {
                                             onBacklogEditClick(-1)
                                         }
                                 )
-                            }
 //                            展开按钮
                             IconButton(onClick = {
                                 expanded = !expanded

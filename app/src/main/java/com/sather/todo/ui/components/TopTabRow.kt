@@ -23,17 +23,14 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.Dp
 import com.sather.todo.R
-import com.sather.todo.ui.backlog.BacklogHome
-import com.sather.todo.ui.diary.DiaryHome
-import com.sather.todo.ui.navigation.BaseDestination
+import com.sather.todo.ui.navigation.MainScreen
 import java.util.*
 
 //            导航栏样式
 @Composable
 fun TopTabRow(
-    allScreens: List<BaseDestination>,
-    onTabSelected: (BaseDestination) -> Unit,
-    currentScreen: BaseDestination
+    onTabSelected: (MainScreen) -> Unit,
+    currentScreen: MainScreen
 ) {
     Surface(
         Modifier
@@ -46,12 +43,12 @@ fun TopTabRow(
                 .selectableGroup(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            allScreens.forEach { screen ->
+            MainScreen.allScreens.forEach { screen ->
                 ToDoAnimTab(
                     text =
-                        if(screen  == BacklogHome) stringResource(R.string.backlog_route)
-                        else if(screen == DiaryHome) stringResource(R.string.diary_route)
-                        else stringResource(R.string.come_soon_route),
+                    if(screen  == MainScreen.BacklogHome) stringResource(R.string.backlog_route)
+                    else if(screen == MainScreen.DiaryHome) stringResource(R.string.diary_route)
+                    else stringResource(R.string.come_soon_route),
                     icon =  screen.icon,
                     onSelected = { onTabSelected(screen) },
                     selected = currentScreen == screen
@@ -80,7 +77,7 @@ private fun ToDoAnimTab(
     val tabTintColor by animateColorAsState(
         targetValue = if (selected) color else color.copy(alpha = InactiveTabOpacity),
         animationSpec = animSpec
-    )
+    ) 
     Row(
         modifier = Modifier
             .padding(basePadding )
